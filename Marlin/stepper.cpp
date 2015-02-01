@@ -61,7 +61,8 @@ volatile static unsigned long step_events_completed; // The number of step event
 #endif
 static long acceleration_time, deceleration_time;
 //static unsigned long accelerate_until, decelerate_after, acceleration_rate, initial_rate, final_rate, nominal_rate;
-static unsigned short acc_step_rate; // needed for deccelaration start point
+static unsigned long acc_step_rate; // needed for deceleration start point
+
 static char step_loops;
 static unsigned long OCR1A_nominal;
 static unsigned short step_loops_nominal;
@@ -251,31 +252,26 @@ void st_wake_up() {
   ENABLE_STEPPER_DRIVER_INTERRUPT();
 }
 
-void step_wait(){
-    for(int8_t i=0; i < 6; i++){
-    }
-}
 
-
-FORCE_INLINE unsigned long calc_timer(unsigned short step_rate) {
+FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   unsigned long timer;
   if(step_rate > MAX_STEP_FREQUENCY) step_rate = MAX_STEP_FREQUENCY;
 
-  if(step_rate > 20000) { // If steprate > 20kHz >> step 4 times
-    step_rate = (step_rate >> 2);
-    step_loops = 4;
-  }
-  else if(step_rate > 10000) { // If steprate > 10kHz >> step 2 times
-    step_rate = (step_rate >> 1);
-    step_loops = 2;
-  }
-  else {
+  // if(step_rate > (2 * DOUBLE_FREQUENCY)) { // If steprate > 20kHz >> step 4 times
+    // step_rate = (step_rate >> 2);
+    // step_loops = 4;
+  // }
+  // else if(step_rate > DOUBLE_FREQUENCY) { // If steprate > 10kHz >> step 2 times
+    // step_rate = (step_rate >> 1);
+    // step_loops = 2;
+  // }
+  // else {
     step_loops = 1;
-  }
+  // }
 
-  if(step_rate < (F_CPU/500000)) step_rate = (F_CPU/500000);
-
+  
 #if defined(ARDUINO_ARCH_AVR)
+  if(step_rate < (F_CPU/500000)) step_rate = (F_CPU/500000);
   step_rate -= (F_CPU/500000); // Correct for minimal speed
   if(step_rate >= (8*256)){ // higher step rate
     unsigned short table_address = (unsigned short)&speed_lookuptable_fast[(unsigned char)(step_rate>>8)][0];
@@ -290,11 +286,14 @@ FORCE_INLINE unsigned long calc_timer(unsigned short step_rate) {
     timer = (unsigned short)pgm_read_word_near(table_address);
     timer -= (((unsigned short)pgm_read_word_near(table_address+2) * (unsigned char)(step_rate & 0x0007))>>3);
   }
-#elif defined(ARDUINO_ARCH_SAM)
+  if(timer < 100) { timer = 100; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(20kHz this should never happen)
+#endif
+#if defined(ARDUINO_ARCH_SAM)
+  if(step_rate < 210) step_rate = 210;
   timer = HAL_TIMER_RATE / step_rate;
+  if(timer < 100) { timer = 100; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(420kHz this should never happen)
 #endif
 
-  if(timer < 100) { timer = 100; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(20kHz this should never happen)
   return timer;
 }
 
@@ -871,42 +870,48 @@ void st_init()
   #if defined(X_MIN_PIN) && X_MIN_PIN > -1
     SET_INPUT(X_MIN_PIN);
     #ifdef ENDSTOPPULLUP_XMIN
-      WRITE(X_MIN_PIN,HIGH);
+		PULLUP(X_MIN_PIN,HIGH);
+      // WRITE(X_MIN_PIN,HIGH);
     #endif
   #endif
 
   #if defined(Y_MIN_PIN) && Y_MIN_PIN > -1
     SET_INPUT(Y_MIN_PIN);
     #ifdef ENDSTOPPULLUP_YMIN
-      WRITE(Y_MIN_PIN,HIGH);
+		PULLUP(Y_MIN_PIN,HIGH);
+      // WRITE(Y_MIN_PIN,HIGH);
     #endif
   #endif
 
   #if defined(Z_MIN_PIN) && Z_MIN_PIN > -1
     SET_INPUT(Z_MIN_PIN);
     #ifdef ENDSTOPPULLUP_ZMIN
-      WRITE(Z_MIN_PIN,HIGH);
+		PULLUP(Z_MIN_PIN,HIGH);
+      // WRITE(Z_MIN_PIN,HIGH);
     #endif
   #endif
 
   #if defined(X_MAX_PIN) && X_MAX_PIN > -1
     SET_INPUT(X_MAX_PIN);
     #ifdef ENDSTOPPULLUP_XMAX
-      WRITE(X_MAX_PIN,HIGH);
+		PULLUP(X_MAX_PIN,HIGH);
+      // WRITE(X_MAX_PIN,HIGH);
     #endif
   #endif
 
   #if defined(Y_MAX_PIN) && Y_MAX_PIN > -1
     SET_INPUT(Y_MAX_PIN);
     #ifdef ENDSTOPPULLUP_YMAX
-      WRITE(Y_MAX_PIN,HIGH);
+		PULLUP(Y_MAX_PIN,HIGH);
+      // WRITE(Y_MAX_PIN,HIGH);
     #endif
   #endif
 
   #if defined(Z_MAX_PIN) && Z_MAX_PIN > -1
     SET_INPUT(Z_MAX_PIN);
     #ifdef ENDSTOPPULLUP_ZMAX
-      WRITE(Z_MAX_PIN,HIGH);
+		PULLUP(Z_MAX_PIN,HIGH);
+      // WRITE(Z_MAX_PIN,HIGH);
     #endif
   #endif
 
@@ -978,7 +983,7 @@ void st_init()
 #elif defined (ARDUINO_ARCH_SAM)
   //todo: Due
 
-  HAL_timer_start (STEP_TIMER_NUM, 1000);
+  HAL_step_timer_start (STEP_TIMER_NUM, 244); // Neu 28.01.2015 Nico
 
 #endif
 
@@ -1090,7 +1095,7 @@ void babystep(const uint8_t axis,const bool direction)
       WRITE(X2_STEP_PIN, !INVERT_X_STEP_PIN);
     #endif
     {
-    float x=1./float(axis+1)/float(axis+2); //wait a tiny bit
+    delayMicroseconds(1); //wait a tiny bit
     }
     WRITE(X_STEP_PIN, INVERT_X_STEP_PIN);
     #ifdef DUAL_X_CARRIAGE
@@ -1122,7 +1127,7 @@ void babystep(const uint8_t axis,const bool direction)
       WRITE(Y2_STEP_PIN, !INVERT_Y_STEP_PIN);
     #endif
     {
-    float x=1./float(axis+1)/float(axis+2); //wait a tiny bit
+    delayMicroseconds(1); //wait a tiny bit
     }
     WRITE(Y_STEP_PIN, INVERT_Y_STEP_PIN);
     #ifdef DUAL_Y_CARRIAGE
@@ -1155,7 +1160,7 @@ void babystep(const uint8_t axis,const bool direction)
     #endif
     //wait a tiny bit
     {
-    float x=1./float(axis+1); //absolutely useless
+    delayMicroseconds(1); //absolutely useless
     }
     WRITE(Z_STEP_PIN, INVERT_Z_STEP_PIN);
     #ifdef Z_DUAL_STEPPER_DRIVERS
@@ -1191,7 +1196,7 @@ void babystep(const uint8_t axis,const bool direction)
     
     //wait a tiny bit
     {
-    float x=1./float(axis+1); //absolutely useless
+    delayMicroseconds(1); //absolutely useless
     }
     WRITE(X_STEP_PIN, INVERT_X_STEP_PIN); 
     WRITE(Y_STEP_PIN, INVERT_Y_STEP_PIN); 

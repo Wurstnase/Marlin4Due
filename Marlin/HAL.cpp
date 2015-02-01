@@ -29,6 +29,7 @@
 // --------------------------------------------------------------------------
 
 #include "HAL.h"
+// #include "DueTimer.h"
 
 #include <Wire.h>
 
@@ -184,25 +185,60 @@ static const tTimerConfig TimerConfig [NUM_HARDWARE_TIMERS] =
     { TC2, 2, TC8_IRQn},
   };
 
-
-void HAL_timer_start (uint8_t timer_num, uint32_t frequency)
+  
+/*
+	Timer_clock1: Prescaler 2 -> 42MHz
+	Timer_clock2: Prescaler 8 -> 10.5MHz
+	Timer_clock3: Prescaler 32 -> 2.625MHz
+	Timer_clock4: Prescaler 128 -> 656.25kHz
+*/
+	
+void HAL_step_timer_start (uint8_t timer_num, uint32_t frequency)
 {
+		
 	Tc *tc = TimerConfig [timer_num].pTimerRegs;
 	IRQn_Type irq = TimerConfig [timer_num].IRQ_Id;
 	uint32_t channel = TimerConfig [timer_num].channel;
 
 	pmc_set_writeprotect(false);
 	pmc_enable_periph_clk((uint32_t)irq);
-	TC_Configure (tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK3);
+		
+	TC_Configure (tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK1);
 
-	uint32_t rc = VARIANT_MCK/32/frequency;
+	uint32_t rc = VARIANT_MCK/2/frequency;
 
 	TC_SetRC(tc, channel, rc);
 
 	TC_Start(tc, channel);
 
-	// enable interrupt on RC compare
+	//enable interrupt on RC compare
+	tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS;
+	tc->TC_CHANNEL[channel].TC_IDR = ~TC_IER_CPCS;
+
+	NVIC_EnableIRQ(irq);
+}
+
+void HAL_temp_timer_start (uint8_t timer_num, uint32_t frequency)
+{
+		
+	Tc *tc = TimerConfig [timer_num].pTimerRegs;
+	IRQn_Type irq = TimerConfig [timer_num].IRQ_Id;
+	uint32_t channel = TimerConfig [timer_num].channel;
+
+	pmc_set_writeprotect(false);
+	pmc_enable_periph_clk((uint32_t)irq);
+		
+	TC_Configure (tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK4);
+
+	uint32_t rc = VARIANT_MCK/128/frequency;
+
+	TC_SetRC(tc, channel, rc);
+
+	TC_Start(tc, channel);
+
+	//enable interrupt on RC compare
 	tc->TC_CHANNEL[channel].TC_IER=TC_IER_CPCS;
+	tc->TC_CHANNEL[channel].TC_IDR = ~TC_IER_CPCS;
 
 	NVIC_EnableIRQ(irq);
 }
@@ -212,20 +248,24 @@ void HAL_timer_enable_interrupt (uint8_t timer_num)
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
 
 	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IER = TC_IER_CPCS;
+	
 }
 
 void HAL_timer_disable_interrupt (uint8_t timer_num)
 {
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
 
-	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IDR = TC_IER_CPCS;
+	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IDR = ~TC_IER_CPCS;
 }
 
 void HAL_timer_set_count (uint8_t timer_num, uint32_t count)
 {
+	//if(count < 210) count = 210;
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
-
 	TC_SetRC (pConfig->pTimerRegs, pConfig->channel, count);
+	
+	if(TC_ReadCV(pConfig->pTimerRegs, pConfig->channel)>count)
+		TC_Start(pConfig->pTimerRegs, pConfig->channel);
 }
 
 void HAL_timer_isr_prologue (uint8_t timer_num)

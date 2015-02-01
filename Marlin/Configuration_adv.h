@@ -1,4 +1,4 @@
-#ifndef CONFIGURATION_ADV_H
+#ifndef CONFIGURATION_ADV_H //
 #define CONFIGURATION_ADV_H
 
 //===========================================================================
@@ -61,7 +61,7 @@
 //This is for controlling a fan to cool down the stepper drivers
 //it will turn on when any driver is enabled
 //and turn off after the set amount of seconds from last driver being disabled again
-#define CONTROLLERFAN_PIN -1 //Pin used for the fan to cool controller (-1 to disable)
+#define CONTROLLERFAN_PIN 11 //Pin used for the fan to cool controller (-1 to disable)
 #define CONTROLLERFAN_SECS 60 //How many seconds, after all motors were disabled, the fan should run
 #define CONTROLLERFAN_SPEED 255  // == full speed
 
@@ -75,7 +75,7 @@
 // extruder temperature is above/below EXTRUDER_AUTO_FAN_TEMPERATURE.
 // Multiple extruders can be assigned to the same pin in which case
 // the fan will turn on when any selected extruder is above the threshold.
-#define EXTRUDER_0_AUTO_FAN_PIN   -1
+#define EXTRUDER_0_AUTO_FAN_PIN   8
 #define EXTRUDER_1_AUTO_FAN_PIN   -1
 #define EXTRUDER_2_AUTO_FAN_PIN   -1
 #define EXTRUDER_AUTO_FAN_TEMPERATURE 50
@@ -220,7 +220,8 @@
 
 #define AXIS_RELATIVE_MODES {false, false, false, false}
 
-#define MAX_STEP_FREQUENCY 40000 // Max step frequency for Ultimaker (5000 pps / half step)
+#define MAX_STEP_FREQUENCY 320000 // Max step frequency for Ultimaker (5000 pps / half step)
+#define DOUBLE_FREQUENCY 80000 // Normally forth of max_step_frequency
 
 //By default pololu step drivers require an active high signal. However, some high power drivers require an active low signal as step.
 #define INVERT_X_STEP_PIN false
@@ -229,7 +230,7 @@
 #define INVERT_E_STEP_PIN false
 
 //default stepper release if idle
-#define DEFAULT_STEPPER_DEACTIVE_TIME 60
+#define DEFAULT_STEPPER_DEACTIVE_TIME 900
 
 #define DEFAULT_MINIMUMFEEDRATE       0.0     // minimum feedrate
 #define DEFAULT_MINTRAVELFEEDRATE     0.0

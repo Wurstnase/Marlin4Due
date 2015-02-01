@@ -811,7 +811,7 @@ void tp_init()
   TIMSK0 |= (1<<OCIE0B);  
 #elif defined(ARDUINO_ARCH_SAM)
 
-  HAL_timer_start (TEMP_TIMER_NUM, 1000);
+  HAL_temp_timer_start (TEMP_TIMER_NUM, 1000);
   HAL_timer_enable_interrupt (TEMP_TIMER_NUM);
 #endif
   
@@ -1120,12 +1120,15 @@ HAL_TEMP_TIMER_ISR
   //these variables are only accesible from the ISR, but static, so they don't lose their value
   static unsigned char temp_count = 0;
   static unsigned long raw_temp_0_value = 0;
+  static unsigned long last_temp_0_value = 0;
   static unsigned long raw_temp_1_value = 0;
   static unsigned long raw_temp_2_value = 0;
   static unsigned long raw_temp_bed_value = 0;
+  static unsigned long last_temp_bed_value = 0;
   static unsigned char temp_state = 8;
   static unsigned char pwm_count = (1 << SOFT_PWM_SCALE);
   static unsigned char soft_pwm_0;
+
   #if (EXTRUDERS > 1) || defined(HEATERS_PARALLEL)
   static unsigned char soft_pwm_1;
   #endif
@@ -1280,30 +1283,43 @@ HAL_TEMP_TIMER_ISR
   switch(temp_state) {
     case 0: // Prepare TEMP_0
       #if defined(TEMP_0_PIN) && (TEMP_0_PIN > -1)
-    	// Start conversion
+	    // raw_temp_0_value += analogRead (TEMP_0_PIN);
+		// A low-pass filter
+        raw_temp_0_value += (analogRead (TEMP_0_PIN) << 4) - last_temp_0_value;
+		last_temp_0_value = raw_temp_0_value >> 4;
+      #endif
+      #ifdef HEATER_0_USES_MAX6675 // TODO remove the blocking
+        raw_temp_0_value = read_max6675();
       #endif
       lcd_buttons_update();
       temp_state = 1;
       break;
     case 1: // Measure TEMP_0
-      #if defined(TEMP_0_PIN) && (TEMP_0_PIN > -1)
-        raw_temp_0_value += analogRead (TEMP_0_PIN);
-      #endif
-      #ifdef HEATER_0_USES_MAX6675 // TODO remove the blocking
-        raw_temp_0_value = read_max6675();
+      #if defined(TEMP_BED_PIN) && (TEMP_BED_PIN > -1)
+        raw_temp_bed_value += analogRead (TEMP_BED_PIN);
+		// raw_temp_bed_value += (analogRead (TEMP_BED_PIN) << 4) - last_temp_bed_value;
+		// last_temp_bed_value = raw_temp_bed_value >> 3;
       #endif
       temp_state = 2;
       break;
     case 2: // Prepare TEMP_BED
-      #if defined(TEMP_BED_PIN) && (TEMP_BED_PIN > -1)
-    	// Start conversion
+      #if defined(TEMP_0_PIN) && (TEMP_0_PIN > -1)
+        // raw_temp_0_value += analogRead (TEMP_0_PIN);
+		// A low-pass filter
+		raw_temp_0_value += (analogRead (TEMP_0_PIN) << 4) - last_temp_0_value;
+		last_temp_0_value = raw_temp_0_value >> 4;
+      #endif
+      #ifdef HEATER_0_USES_MAX6675 // TODO remove the blocking
+        raw_temp_0_value = read_max6675();
       #endif
       lcd_buttons_update();
       temp_state = 3;
       break;
     case 3: // Measure TEMP_BED
       #if defined(TEMP_BED_PIN) && (TEMP_BED_PIN > -1)
-        raw_temp_bed_value += analogRead (TEMP_BED_PIN);
+	    raw_temp_bed_value += analogRead (TEMP_BED_PIN);
+        // raw_temp_bed_value += (analogRead (TEMP_BED_PIN) << 4) - last_temp_bed_value;
+		// last_temp_bed_value = raw_temp_bed_value >> 3;
       #endif
       temp_state = 4;
       break;
@@ -1336,6 +1352,11 @@ HAL_TEMP_TIMER_ISR
       break;
     case 8: //Startup, delay initial temp reading a tiny bit so the hardware can settle.
       temp_state = 0;
+	  delayMicroseconds(5);
+	  current_temperature_raw[0] = (OVERSAMPLENR * 977 ) << 4; //first temperature 25 deg
+	  current_temperature_bed_raw = OVERSAMPLENR * 977 ;
+	  REG_ADC_MR = (REG_ADC_MR & 0xFFF0FFFF) | 0x00040000; //64Clocks
+	  
       break;
 //    default:
 //      SERIAL_ERROR_START;
@@ -1345,11 +1366,16 @@ HAL_TEMP_TIMER_ISR
 
 #endif
 
-  if(temp_count >= OVERSAMPLENR) // 8 * 16 * 1/(16000000/64/256)  = 131ms.
+  if(temp_count >= OVERSAMPLENR ) // 8 * 16 * 1/(16000000/64/256)  = 131ms.
   {
     if (!temp_meas_ready) //Only update the raw values if they have been read. Else we could be updating them during reading.
     {
-      current_temperature_raw[0] = raw_temp_0_value;
+      //current_temperature_raw[0] = raw_temp_0_value;
+	  //current_temperature_raw[0] = raw_temp_0_value >> 1;
+	  // current_temperature_raw[0] = (((raw_temp_0_value * 4 ) ) + (( current_temperature_raw[0] * 12 ) << 1 ) + 16 ) >> 5; //moving average
+	  current_temperature_raw[0] = last_temp_0_value;
+	  // current_temperature_raw[0] = (((last_temp_0_value * 4 ) ) + (( current_temperature_raw[0] * 12 ) << 1 ) + 16 ) >> 5; //moving average
+	  
 #if EXTRUDERS > 1
       current_temperature_raw[1] = raw_temp_1_value;
 #endif
@@ -1359,12 +1385,16 @@ HAL_TEMP_TIMER_ISR
 #if EXTRUDERS > 2
       current_temperature_raw[2] = raw_temp_2_value;
 #endif
-      current_temperature_bed_raw = raw_temp_bed_value;
+      //current_temperature_bed_raw = raw_temp_bed_value;
+	  current_temperature_bed_raw = (((raw_temp_bed_value * 4) ) + (( current_temperature_bed_raw * 12) << 1 ) + 16 ) >> 5; //moving average
+	  //(current_temperature_bed_raw = raw_temp_bed_value >> 1;
+	  //current_temperature_bed_raw = last_temp_bed_value;
+	  
     }
     
     temp_meas_ready = true;
     temp_count = 0;
-    raw_temp_0_value = 0;
+    //raw_temp_0_value = 0; // We don't need to reset with the low-pass-filter running!
     raw_temp_1_value = 0;
     raw_temp_2_value = 0;
     raw_temp_bed_value = 0;
