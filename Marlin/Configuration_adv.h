@@ -1,4 +1,4 @@
-#ifndef CONFIGURATION_ADV_H
+#ifndef CONFIGURATION_ADV_H //
 #define CONFIGURATION_ADV_H
 
 //===========================================================================
@@ -220,7 +220,8 @@
 
 #define AXIS_RELATIVE_MODES {false, false, false, false}
 
-#define MAX_STEP_FREQUENCY 40000 // Max step frequency for Ultimaker (5000 pps / half step)
+#define MAX_STEP_FREQUENCY 320000 // Max step frequency for Ultimaker (5000 pps / half step)
+#define DOUBLE_FREQUENCY 80000 // Normally forth of max_step_frequency
 
 //By default pololu step drivers require an active high signal. However, some high power drivers require an active low signal as step.
 #define INVERT_X_STEP_PIN false
@@ -229,7 +230,7 @@
 #define INVERT_E_STEP_PIN false
 
 //default stepper release if idle
-#define DEFAULT_STEPPER_DEACTIVE_TIME 60
+#define DEFAULT_STEPPER_DEACTIVE_TIME 900
 
 #define DEFAULT_MINIMUMFEEDRATE       0.0     // minimum feedrate
 #define DEFAULT_MINTRAVELFEEDRATE     0.0
