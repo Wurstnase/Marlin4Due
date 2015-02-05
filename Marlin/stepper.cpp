@@ -252,24 +252,22 @@ void st_wake_up() {
   ENABLE_STEPPER_DRIVER_INTERRUPT();
 }
 
-
 FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   unsigned long timer;
   if(step_rate > MAX_STEP_FREQUENCY) step_rate = MAX_STEP_FREQUENCY;
 
-  // if(step_rate > (2 * DOUBLE_FREQUENCY)) { // If steprate > 20kHz >> step 4 times
-    // step_rate = (step_rate >> 2);
-    // step_loops = 4;
-  // }
-  // else if(step_rate > DOUBLE_FREQUENCY) { // If steprate > 10kHz >> step 2 times
-    // step_rate = (step_rate >> 1);
-    // step_loops = 2;
-  // }
-  // else {
+  if(step_rate > (2 * DOUBLE_FREQUENCY)) { // If steprate > 20kHz >> step 4 times
+    step_rate = (step_rate >> 2);
+    step_loops = 4;
+  }
+  else if(step_rate > DOUBLE_FREQUENCY) { // If steprate > 10kHz >> step 2 times
+    step_rate = (step_rate >> 1);
+    step_loops = 2;
+  }
+  else {
     step_loops = 1;
-  // }
+  }
 
-  
 #if defined(ARDUINO_ARCH_AVR)
   if(step_rate < (F_CPU/500000)) step_rate = (F_CPU/500000);
   step_rate -= (F_CPU/500000); // Correct for minimal speed
@@ -293,8 +291,7 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   timer = HAL_TIMER_RATE / step_rate;
   if(timer < 100) { timer = 100; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(420kHz this should never happen)
 #endif
-
-  return timer;
+  return (timer);
 }
 
 // Initializes the trapezoid generator from the current block. Called whenever a new
@@ -325,6 +322,9 @@ FORCE_INLINE void trapezoid_generator_reset() {
 //  SERIAL_ECHO(current_block->initial_advance/256.0);
 //    SERIAL_ECHOPGM("final advance :");
 //    SERIAL_ECHOLN(current_block->final_advance/256.0);
+	// SERIAL_ECHO_START;
+	// SERIAL_ECHOPGM("OCR1A: ");
+	// SERIAL_ECHOLN(OCR1A_nominal);
 
 }
 
@@ -367,9 +367,9 @@ HAL_STEP_TIMER_ISR
   }
 
   if (current_block != NULL) {
-    // Set directions TO DO This should be done once during init of trapezoid. Endstops -> interrupt
+	
+	// Set directions TO DO This should be done once during init of trapezoid. Endstops -> interrupt
     out_bits = current_block->direction_bits;
-
 
     // Set the direction bits (X_AXIS=A_AXIS and Y_AXIS=B_AXIS for COREXY)
     if((out_bits & (1<<X_AXIS))!=0){
@@ -662,7 +662,7 @@ HAL_STEP_TIMER_ISR
       step_events_completed += 1;
       if(step_events_completed >= current_block->step_event_count) break;
     }
-    // Calculare new timer value
+    // Calculate new timer value
     unsigned long timer;
     unsigned long step_rate;
     if (step_events_completed <= (unsigned long int)current_block->accelerate_until) {
@@ -677,6 +677,7 @@ HAL_STEP_TIMER_ISR
       // step_rate to timer interval
       timer = calc_timer(acc_step_rate);
       HAL_timer_set_count (STEP_TIMER_NUM, timer);
+	  
       acceleration_time += timer;
       #ifdef ADVANCE
         for(int8_t i=0; i < step_loops; i++) {
@@ -983,7 +984,8 @@ void st_init()
 #elif defined (ARDUINO_ARCH_SAM)
   //todo: Due
 
-  HAL_step_timer_start (STEP_TIMER_NUM, 244); // Neu 28.01.2015 Nico
+  //HAL_step_timer_start (STEP_TIMER_NUM, 244); // Neu 28.01.2015 Nico
+  HAL_step_timer_start();
 
 #endif
 

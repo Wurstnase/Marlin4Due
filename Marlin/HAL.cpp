@@ -54,6 +54,7 @@
 // --------------------------------------------------------------------------
 
 uint8_t MCUSR;
+uint8_t HAL_step_timer_RC;
 
 // --------------------------------------------------------------------------
 // Private Variables
@@ -193,19 +194,31 @@ static const tTimerConfig TimerConfig [NUM_HARDWARE_TIMERS] =
 	Timer_clock4: Prescaler 128 -> 656.25kHz
 */
 	
-void HAL_step_timer_start (uint8_t timer_num, uint32_t frequency)
+	
+	
+void HAL_step_timer_start (/*uint8_t timer_num, uint32_t frequency*/)
 {
-		
+	uint32_t     tc_count, tc_clock;
+	uint8_t timer_num;
+
+	pmc_set_writeprotect(false);
+	
+	NVIC_SetPriorityGrouping(4);
+	
+	// Timer for stepper
+	// Timer 3 HAL.h -> STEP_TIMER_NUM
+	timer_num = STEP_TIMER_NUM;
+
 	Tc *tc = TimerConfig [timer_num].pTimerRegs;
 	IRQn_Type irq = TimerConfig [timer_num].IRQ_Id;
 	uint32_t channel = TimerConfig [timer_num].channel;
-
-	pmc_set_writeprotect(false);
+	
 	pmc_enable_periph_clk((uint32_t)irq);
-		
+	NVIC_SetPriority(irq, NVIC_EncodePriority(4, 1, 0));
+	
 	TC_Configure (tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK1);
 
-	uint32_t rc = VARIANT_MCK/2/frequency;
+	uint32_t rc = VARIANT_MCK/2/244 /*frequency*/;
 
 	TC_SetRC(tc, channel, rc);
 
@@ -218,7 +231,8 @@ void HAL_step_timer_start (uint8_t timer_num, uint32_t frequency)
 	NVIC_EnableIRQ(irq);
 }
 
-void HAL_temp_timer_start (uint8_t timer_num, uint32_t frequency)
+
+void HAL_temp_timer_start (uint8_t timer_num)
 {
 		
 	Tc *tc = TimerConfig [timer_num].pTimerRegs;
@@ -227,13 +241,31 @@ void HAL_temp_timer_start (uint8_t timer_num, uint32_t frequency)
 
 	pmc_set_writeprotect(false);
 	pmc_enable_periph_clk((uint32_t)irq);
-		
-	TC_Configure (tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK4);
+// void HAL_temp_timer_start()
+// {
+	uint32_t     tc_count, tc_clock;
+	// uint8_t timer_num;
 
-	uint32_t rc = VARIANT_MCK/128/frequency;
+	// Timer for Temperature
+	// Timer 4 HAL.h -> TEMP_TIMER_NUM
+	// timer_num = TEMP_TIMER_NUM;
+	
+	// TC *tc = TimerConfig [timer_num].pTimerRegs;
+	// IRQn_Type irq = TimerConfig [timer_num].IRQ_Id;
+	// uint32_t channel = TimerConfig [timer_num].channel;
 
+	// pmc_set_writeprotect(false);
+	
+	NVIC_SetPriorityGrouping(4);
+	
+	// pmc_enable_periph_clk((uint32_t)irq);
+	NVIC_SetPriority(irq, NVIC_EncodePriority(4, 3, 0));
+	
+	TC_FindMckDivisor(3906, VARIANT_MCK, &tc_count, &tc_clock, VARIANT_MCK);
+	TC_Configure (tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | tc_clock);
+
+	uint32_t rc = VARIANT_MCK / tc_count / 3906;
 	TC_SetRC(tc, channel, rc);
-
 	TC_Start(tc, channel);
 
 	//enable interrupt on RC compare
@@ -273,6 +305,13 @@ void HAL_timer_isr_prologue (uint8_t timer_num)
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
 
 	TC_GetStatus (pConfig->pTimerRegs, pConfig->channel);
+}
+
+int HAL_timer_get_count (uint8_t timer_num)
+{
+	Tc *tc = TimerConfig [timer_num].pTimerRegs;
+	uint32_t channel = TimerConfig [timer_num].channel;
+	return tc->TC_CHANNEL[channel].TC_RC;
 }
 
 // --------------------------------------------------------------------------

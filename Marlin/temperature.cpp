@@ -811,7 +811,8 @@ void tp_init()
   TIMSK0 |= (1<<OCIE0B);  
 #elif defined(ARDUINO_ARCH_SAM)
 
-  HAL_temp_timer_start (TEMP_TIMER_NUM, 1000);
+  //HAL_temp_timer_start (TEMP_TIMER_NUM, 1000);
+  HAL_temp_timer_start(TEMP_TIMER_NUM);
   HAL_timer_enable_interrupt (TEMP_TIMER_NUM);
 #endif
   

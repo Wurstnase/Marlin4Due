@@ -94,14 +94,18 @@ unsigned char eeprom_read_byte(unsigned char *pos);
 #define HAL_STEP_TIMER_ISR 	void TC3_Handler()
 #define HAL_TEMP_TIMER_ISR 	void TC4_Handler()
 
-void HAL_step_timer_start (uint8_t timer_num, uint32_t frequency);
-void HAL_temp_timer_start (uint8_t timer_num, uint32_t frequency);
+// void HAL_timer_start (void);
+void HAL_step_timer_start(void);
+//void HAL_temp_timer_start (uint8_t timer_num, uint32_t frequency);
+void HAL_temp_timer_start (uint8_t timer_num);
+void HAL_temp_timer_start(void);
 void HAL_timer_set_count (uint8_t timer_num, uint32_t count);
 
 void HAL_timer_enable_interrupt (uint8_t timer_num);
 void HAL_timer_disable_interrupt (uint8_t timer_num);
 
 void HAL_timer_isr_prologue (uint8_t timer_num);
+int HAL_timer_get_count (uint8_t timer_num);
 //
 
 

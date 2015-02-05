@@ -177,11 +177,12 @@ void calculate_trapezoid_for_block(block_t *block, float entry_factor, float exi
   unsigned long final_rate = ceil(block->nominal_rate*exit_factor); // (step/min)
 
   // Limit minimal step rate (Otherwise the timer will overflow.)
-  if(initial_rate <120) {
-    initial_rate=120; 
+  #define INITIAL_RATE_LIMIT 10
+  if(initial_rate < INITIAL_RATE_LIMIT) {
+    initial_rate = INITIAL_RATE_LIMIT; 
   }
-  if(final_rate < 120) {
-    final_rate=120;  
+  if(final_rate < INITIAL_RATE_LIMIT) {
+    final_rate = INITIAL_RATE_LIMIT;  
   }
 
   long acceleration = block->acceleration_st;
