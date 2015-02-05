@@ -256,6 +256,7 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   unsigned long timer;
   if(step_rate > MAX_STEP_FREQUENCY) step_rate = MAX_STEP_FREQUENCY;
 
+<<<<<<< HEAD
   if(step_rate > (2 * DOUBLE_FREQUENCY)) { // If steprate > 20kHz >> step 4 times
     step_rate = (step_rate >> 2);
     step_loops = 4;
@@ -267,6 +268,19 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   else {
     step_loops = 1;
   }
+=======
+   if(step_rate > (2 * DOUBLE_FREQUENCY)) { // If steprate > 20kHz >> step 4 times
+     step_rate = (step_rate >> 2);
+     step_loops = 4;
+   }
+   else if(step_rate > DOUBLE_FREQUENCY) { // If steprate > 10kHz >> step 2 times
+     step_rate = (step_rate >> 1);
+     step_loops = 2;
+   }
+   else {
+    step_loops = 1;
+   }
+>>>>>>> af5d50b947c01a7f66ad70818eed7c16d5c4cab2
 
 #if defined(ARDUINO_ARCH_AVR)
   if(step_rate < (F_CPU/500000)) step_rate = (F_CPU/500000);
