@@ -1,6 +1,6 @@
 from sam3x_helper import uint32_t, uint64_t
 import plannercpp
-from config import HAL_TIMER_RATE, MAX_STEP_FREQUENCY
+from config import HAL_TIMER_RATE, MAX_STEP_FREQUENCY, DOUBLE_FREQUENCY
 import matplotlib.pyplot as plt
 
 
@@ -24,18 +24,33 @@ def MultiU24X24toH16(longIn1, longIn2):
     return (uint64_t(longIn1) * uint32_t(longIn2)) >> 24
 
 # This is a simulation, so I don't need quadstepping for now
+first_in_quad = True
+first_in_double = True
 
 
 def calc_timer(step_rate):
     global step_loops
+    global first_in_quad, first_in_double
 
     step_rate = step_rate if step_rate < MAX_STEP_FREQUENCY else MAX_STEP_FREQUENCY
-    step_loops = 1
+    step_rate = uint32_t(step_rate)
 
-    step_rate = uint32_t(step_rate) if step_rate > 210 else 210
-    timer = HAL_TIMER_RATE / step_rate
-    timer = uint32_t(timer)
-    return timer
+    if step_rate > (2 * DOUBLE_FREQUENCY):
+        if first_in_quad:
+            print("quadstepping at {} steps".format(step_rate))
+            first_in_quad = False
+            first_in_double = True
+        step_rate >>= 2
+        step_loops = 4
+    elif step_rate > DOUBLE_FREQUENCY:
+        if first_in_double:
+            print("doublestepping at {} steps".format(step_rate))
+            first_in_quad = True
+            first_in_double = False
+        step_rate >>= 1
+        step_loops = 2
+    else:
+        step_loops = 1
 
 
 def trapezoid_generator_reset():
@@ -152,7 +167,7 @@ def run_it(steps):
 
 
 def show_plot():
-    plt.plot(list_of_timer_complete, list_of_acc_step_rate, 'k', label='HAL_timer')
+    plt.step(list_of_timer_complete, list_of_acc_step_rate, 'k', label='HAL_timer')
     plt.ylim(0, curblock_nominal_rate*1.05)
 
     plt.show()
