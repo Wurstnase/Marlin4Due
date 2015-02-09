@@ -135,6 +135,8 @@ list_of_timer_complete = []
 
 
 def run_it(steps):
+    list_of_acc_step_rate.clear()
+    list_of_timer_complete.clear()
     global step_events_completed
     global list_of_acc_step_rate
     global list_of_timer_complete
