@@ -711,7 +711,7 @@ HAL_STEP_TIMER_ISR
         step_rate = current_block->final_rate;
       }
       else {
-        step_rate = acc_step_rate - step_rate; // Decelerate from aceleration end point.
+        step_rate = acc_step_rate - step_rate; // Decelerate from acceleration end point.
       }
 
       // lower limit
