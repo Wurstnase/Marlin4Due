@@ -51,6 +51,11 @@ def calc_timer(step_rate):
         step_loops = 2
     else:
         step_loops = 1
+        
+    step_rate = uint32_t(step_rate) if step_rate > 210 else 210
+    timer = HAL_TIMER_RATE / step_rate
+    timer = uint32_t(timer)
+    return timer
 
 
 def trapezoid_generator_reset():
