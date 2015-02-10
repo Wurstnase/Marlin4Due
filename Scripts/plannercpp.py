@@ -14,12 +14,7 @@ current_block.acceleration_st = config.ACCELERATION * config.STEPS_PER_MM
 current_block.millimeters = config.TRAVEL_IN_MM  # mm to travel
 current_block.step_event_count = current_block.millimeters * config.STEPS_PER_MM
 
-current_block.accelerate_until = 10000
-
-# current_block.acceleration_until = 0
 current_block.acceleration_rate = current_block.acceleration_st * (2**24) / config.HAL_TIMER_RATE
-# current_block.deceleration_after = 0
-# current_block.final_rate = 0
 
 
 def estimate_acceleration_distance(initial_rate, target_rate, acceleration):
