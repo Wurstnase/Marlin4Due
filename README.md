@@ -3,7 +3,6 @@ At the moment the status is pre-alpha.
 
 Todo:
 - at higher frequency the trapezoid should not work as expected. The acc/decc works, also the linear motion. The problem could be the small time when reaching the expected speed.
-- slower READ for temperature, to be more stable
 - implementation in the actual original Marlin
   - This needs alot of rework (HAL)
 
