@@ -194,41 +194,39 @@ static const tTimerConfig TimerConfig [NUM_HARDWARE_TIMERS] =
 	Timer_clock4: Prescaler 128 -> 656.25kHz
 */
 	
-	
-	
-void HAL_step_timer_start (/*uint8_t timer_num, uint32_t frequency*/)
+// new timer by Ps991
+// thanks for that work
+// http://forum.arduino.cc/index.php?topic=297397.0
+
+void HAL_step_timer_start()
 {
-	uint32_t     tc_count, tc_clock;
-	uint8_t timer_num;
+  uint32_t tc_count, tc_clock;
+  uint8_t timer_num;
+  
+  pmc_set_writeprotect(false); //remove write protection on registers
+  NVIC_SetPriorityGrouping(4);
+  
+  // Timer for stepper
+  // Timer 3 HAL.h STEP_TIMER_NUM
+  timer_num = STEP_TIMER_NUM;
+  
+  // Get the ISR from table
+  Tc *tc = TimerConfig [timer_num].pTimerRegs;
+  IRQn_Type irq = TimerConfig [timer_num].IRQ_Id;
+  uint32_t channel = TimerConfig [timer_num].channel;
+  
+  pmc_enable_periph_clk((uint32_t)irq); //we need a clock?
+  NVIC_SetPriority(irq, NVIC_EncodePriority(4, 1, 0));
+  
+  TC_Configure(tc, channel, TC_CMR_TCCLKS_TIMER_CLOCK1 | TC_CMR_CPCTRG); //set clock rate (CLOCK1 is MCK/2) and reset counter register C on match
+  tc->TC_CHANNEL[channel].TC_IER |= TC_IER_CPCS; //enable interrupt on timer match with register C
 
-	pmc_set_writeprotect(false);
-	
-	NVIC_SetPriorityGrouping(4);
-	
-	// Timer for stepper
-	// Timer 3 HAL.h -> STEP_TIMER_NUM
-	timer_num = STEP_TIMER_NUM;
-
-	Tc *tc = TimerConfig [timer_num].pTimerRegs;
-	IRQn_Type irq = TimerConfig [timer_num].IRQ_Id;
-	uint32_t channel = TimerConfig [timer_num].channel;
-	
-	pmc_enable_periph_clk((uint32_t)irq);
-	NVIC_SetPriority(irq, NVIC_EncodePriority(4, 1, 0));
-	
-	TC_Configure (tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK1);
-
-	uint32_t rc = VARIANT_MCK/2/244 /*frequency*/;
-
-	TC_SetRC(tc, channel, rc);
-
-	TC_Start(tc, channel);
-
-	//enable interrupt on RC compare
-	tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS;
-	tc->TC_CHANNEL[channel].TC_IDR = ~TC_IER_CPCS;
-
-	NVIC_EnableIRQ(irq);
+  tc->TC_CHANNEL[channel].TC_RC   = (VARIANT_MCK >> 1) / 1000; // start with 1kHz as frequency; //interrupt occurs every x interations of the timer counter
+  TC_Start(tc, channel); //start timer counter
+  NVIC_EnableIRQ(irq); //enable Nested Vector Interrupt Controller
+  
+  tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS;
+  tc->TC_CHANNEL[channel].TC_IDR =~ TC_IER_CPCS;
 }
 
 
@@ -243,7 +241,7 @@ void HAL_temp_timer_start (uint8_t timer_num)
 	pmc_enable_periph_clk((uint32_t)irq);
 // void HAL_temp_timer_start()
 // {
-	uint32_t     tc_count, tc_clock;
+	// uint32_t     tc_count, tc_clock;
 	// uint8_t timer_num;
 
 	// Timer for Temperature
@@ -261,15 +259,15 @@ void HAL_temp_timer_start (uint8_t timer_num)
 	// pmc_enable_periph_clk((uint32_t)irq);
 	NVIC_SetPriority(irq, NVIC_EncodePriority(4, 3, 0));
 	
-	TC_FindMckDivisor(3906, VARIANT_MCK, &tc_count, &tc_clock, VARIANT_MCK);
-	TC_Configure (tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | tc_clock);
+	// TC_FindMckDivisor(20000, VARIANT_MCK, &tc_count, &tc_clock, VARIANT_MCK);
+	TC_Configure (tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK4);
 
-	uint32_t rc = VARIANT_MCK / tc_count / 3906;
+	uint32_t rc = VARIANT_MCK / 128 / 1250;
 	TC_SetRC(tc, channel, rc);
 	TC_Start(tc, channel);
 
 	//enable interrupt on RC compare
-	tc->TC_CHANNEL[channel].TC_IER=TC_IER_CPCS;
+	tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS;
 	tc->TC_CHANNEL[channel].TC_IDR = ~TC_IER_CPCS;
 
 	NVIC_EnableIRQ(irq);
@@ -292,9 +290,11 @@ void HAL_timer_disable_interrupt (uint8_t timer_num)
 
 void HAL_timer_set_count (uint8_t timer_num, uint32_t count)
 {
-	//if(count < 210) count = 210;
+	if(count < 210) count = 210;
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
-	TC_SetRC (pConfig->pTimerRegs, pConfig->channel, count);
+	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_RC = count;
+	
+	//TC_SetRC (pConfig->pTimerRegs, pConfig->channel, count);
 	
 	if(TC_ReadCV(pConfig->pTimerRegs, pConfig->channel)>count)
 		TC_Start(pConfig->pTimerRegs, pConfig->channel);
@@ -303,8 +303,9 @@ void HAL_timer_set_count (uint8_t timer_num, uint32_t count)
 void HAL_timer_isr_prologue (uint8_t timer_num)
 {
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
-
-	TC_GetStatus (pConfig->pTimerRegs, pConfig->channel);
+	
+	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_SR;
+	// TC_GetStatus (pConfig->pTimerRegs, pConfig->channel);
 }
 
 int HAL_timer_get_count (uint8_t timer_num)

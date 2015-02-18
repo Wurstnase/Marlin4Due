@@ -221,6 +221,10 @@ void calculate_trapezoid_for_block(block_t *block, float entry_factor, float exi
     block->initial_advance = initial_advance;
     block->final_advance = final_advance;
 #endif //ADVANCE
+  // SERIAL_ECHOLNPGM(" --- planner.cpp --- ");
+  // SERIAL_ECHOPGM("accelerate_until/steps: "); SERIAL_ECHOLN(accelerate_steps); 
+  // SERIAL_ECHOPGM("decelerate_after: "); SERIAL_ECHOLN(block->decelerate_after);
+  // SERIAL_ECHOLNPGM(" -------------------");
   }
   CRITICAL_SECTION_END;
   /* Debug  
@@ -558,8 +562,9 @@ void plan_buffer_line(const float &x, const float &y, const float &z, const floa
   long target[4];
   target[X_AXIS] = lround(x*axis_steps_per_unit[X_AXIS]);
   target[Y_AXIS] = lround(y*axis_steps_per_unit[Y_AXIS]);
-  target[Z_AXIS] = lround(z*axis_steps_per_unit[Z_AXIS]);     
+  target[Z_AXIS] = lround(z*axis_steps_per_unit[Z_AXIS]);
   target[E_AXIS] = lround(e*axis_steps_per_unit[E_AXIS]);
+  
 
   #ifdef PREVENT_DANGEROUS_EXTRUDE
   if(target[E_AXIS]!=position[E_AXIS])
@@ -589,10 +594,13 @@ void plan_buffer_line(const float &x, const float &y, const float &z, const floa
   block->busy = false;
 
   // Number of steps for each axis
+static long head_x, head_y, head_event_count_st; 
+head_x = labs(target[X_AXIS]-position[X_AXIS]);
+head_y = labs(target[Y_AXIS]-position[Y_AXIS]);
 #ifndef COREXY
 // default non-h-bot planning
-block->steps_x = labs(target[X_AXIS]-position[X_AXIS]);
-block->steps_y = labs(target[Y_AXIS]-position[Y_AXIS]);
+block->steps_x = head_x;
+block->steps_y = head_y;
 #else
 // corexy planning
 // these equations follow the form of the dA and dB equations on http://www.corexy.com/theory.html
@@ -630,13 +638,21 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
     block->direction_bits |= (1<<Y_AXIS); 
   }
 #else
+  if (target[X_AXIS] < position[X_AXIS])
+  {
+    block->direction_bits |= (1<<X_HEAD); //AlexBorro: Save the real Extruder (head) direction in X Axis
+  }
+  if (target[Y_AXIS] < position[Y_AXIS])
+  {
+    block->direction_bits |= (1<<Y_HEAD); //AlexBorro: Save the real Extruder (head) direction in Y Axis
+  }
   if ((target[X_AXIS]-position[X_AXIS]) + (target[Y_AXIS]-position[Y_AXIS]) < 0)
   {
-    block->direction_bits |= (1<<X_AXIS); 
+    block->direction_bits |= (1<<X_AXIS); //AlexBorro: Motor A direction (Incorrectly implemented as X_AXIS)
   }
   if ((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-position[Y_AXIS]) < 0)
   {
-    block->direction_bits |= (1<<Y_AXIS); 
+    block->direction_bits |= (1<<Y_AXIS); //AlexBorro: Motor B direction (Incorrectly implemented as Y_AXIS)
   }
 #endif
   if (target[Z_AXIS] < position[Z_AXIS])
@@ -696,9 +712,11 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
 
   
   #ifndef COREXY
-    float delta_mm[4];
+    float delta_mm[6];
     delta_mm[X_AXIS] = (target[X_AXIS]-position[X_AXIS])/axis_steps_per_unit[X_AXIS];
     delta_mm[Y_AXIS] = (target[Y_AXIS]-position[Y_AXIS])/axis_steps_per_unit[Y_AXIS];
+	delta_mm[X_HEAD] = delta_mm[X_AXIS];
+	delta_mm[Y_HEAD] = delta_mm[Y_AXIS];
   #else
 	float delta_mm[6];
     delta_mm[X_HEAD] = (target[X_AXIS]-position[X_AXIS])/axis_steps_per_unit[X_AXIS];
@@ -714,11 +732,7 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
   } 
   else
   {
-    #ifndef COREXY
-      block->millimeters = sqrt(square(delta_mm[X_AXIS]) + square(delta_mm[Y_AXIS]) + square(delta_mm[Z_AXIS]));
-	#else
 	  block->millimeters = sqrt(square(delta_mm[X_HEAD]) + square(delta_mm[Y_HEAD]) + square(delta_mm[Z_AXIS]));
-    #endif
   }
   float inverse_millimeters = 1.0/block->millimeters;  // Inverse millimeters to remove multiple divides 
 
@@ -752,16 +766,18 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
 
   block->nominal_speed = block->millimeters * inverse_second; // (mm/sec) Always > 0
   block->nominal_rate = ceil(block->step_event_count * inverse_second); // (step/sec) Always > 0
-
+  
   // Calculate and limit speed in mm/sec for each axis
   float current_speed[4];
   float speed_factor = 1.0; //factor <=1 do decrease speed
   for(int i=0; i < 4; i++)
   {
-    current_speed[i] = delta_mm[i] * inverse_second;
-    if(fabs(current_speed[i]) > max_feedrate[i])
+	// const int head = (i < 2) ? 4 : 0;
+    current_speed[i] = delta_mm[i/*+head*/] * inverse_second;
+	if(fabs(current_speed[i]) > max_feedrate[i])
       speed_factor = min(speed_factor, max_feedrate[i] / fabs(current_speed[i]));
   }
+  
 
   // Max segement time in us.
 #ifdef XY_FREQUENCY_LIMIT
@@ -830,10 +846,10 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
   }
   block->acceleration = block->acceleration_st / steps_per_mm;
   block->acceleration_rate = (uint32_t)((float)block->acceleration_st * 16777216.0 / HAL_TIMER_RATE);
-  SERIAL_ECHO("acceleration_rate");
-  SERIAL_ECHOLN(block->acceleration_rate);
-  SERIAL_ECHO("acceleration");
-  SERIAL_ECHOLN(block->acceleration);
+  // SERIAL_ECHO("acceleration_rate: ");
+  // SERIAL_ECHOLN(block->acceleration_rate);
+  // SERIAL_ECHO("acceleration: ");
+  // SERIAL_ECHOLN(block->acceleration);
 
 #if 0  // Use old jerk for now
   // Compute path unit vector
@@ -909,7 +925,7 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
 
   // Initialize planner efficiency flags
   // Set flag if block will always reach maximum junction speed regardless of entry/exit speeds.
-  // If a block can de/ac-celerate from nominal speed to zero within the length of the block, then
+  // If a block can de/accelerate from nominal speed to zero within the length of the block, then
   // the current block and next block junction speeds are guaranteed to always be at their maximum
   // junction speeds in deceleration and acceleration, respectively. This is due to how the current
   // block nominal speed limits both the current and next maximum junction speeds. Hence, in both

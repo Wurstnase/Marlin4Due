@@ -168,6 +168,78 @@ unsigned long watchmillis[EXTRUDERS] = ARRAY_BY_EXTRUDERS(0,0,0);
 //=============================   functions      ============================
 //===========================================================================
 
+#if (defined(EXTRUDER_0_AUTO_FAN_PIN) && EXTRUDER_0_AUTO_FAN_PIN > -1) || \
+    (defined(EXTRUDER_1_AUTO_FAN_PIN) && EXTRUDER_1_AUTO_FAN_PIN > -1) || \
+    (defined(EXTRUDER_2_AUTO_FAN_PIN) && EXTRUDER_2_AUTO_FAN_PIN > -1)
+
+  #if defined(FAN_PIN) && FAN_PIN > -1
+    #if EXTRUDER_0_AUTO_FAN_PIN == FAN_PIN 
+       #error "You cannot set EXTRUDER_0_AUTO_FAN_PIN equal to FAN_PIN"
+    #endif
+    #if EXTRUDER_1_AUTO_FAN_PIN == FAN_PIN 
+       #error "You cannot set EXTRUDER_1_AUTO_FAN_PIN equal to FAN_PIN"
+    #endif
+    #if EXTRUDER_2_AUTO_FAN_PIN == FAN_PIN 
+       #error "You cannot set EXTRUDER_2_AUTO_FAN_PIN equal to FAN_PIN"
+    #endif
+  #endif 
+
+void setExtruderAutoFanState(int pin, bool state)
+{
+  unsigned char newFanSpeed = (state != 0) ? EXTRUDER_AUTO_FAN_SPEED : 0;
+  // this idiom allows both digital and PWM fan outputs (see M42 handling).
+  pinMode(pin, OUTPUT);
+  digitalWrite(pin, newFanSpeed);
+  analogWrite(pin, newFanSpeed);
+}
+
+void checkExtruderAutoFans()
+{
+  uint8_t fanState = 0;
+
+  // which fan pins need to be turned on?      
+  #if defined(EXTRUDER_0_AUTO_FAN_PIN) && EXTRUDER_0_AUTO_FAN_PIN > -1
+    if (current_temperature[0] > EXTRUDER_AUTO_FAN_TEMPERATURE) 
+      fanState |= 1;
+  #endif
+  #if defined(EXTRUDER_1_AUTO_FAN_PIN) && EXTRUDER_1_AUTO_FAN_PIN > -1
+    if (current_temperature[1] > EXTRUDER_AUTO_FAN_TEMPERATURE) 
+    {
+      if (EXTRUDER_1_AUTO_FAN_PIN == EXTRUDER_0_AUTO_FAN_PIN) 
+        fanState |= 1;
+      else
+        fanState |= 2;
+    }
+  #endif
+  #if defined(EXTRUDER_2_AUTO_FAN_PIN) && EXTRUDER_2_AUTO_FAN_PIN > -1
+    if (current_temperature[2] > EXTRUDER_AUTO_FAN_TEMPERATURE) 
+    {
+      if (EXTRUDER_2_AUTO_FAN_PIN == EXTRUDER_0_AUTO_FAN_PIN) 
+        fanState |= 1;
+      else if (EXTRUDER_2_AUTO_FAN_PIN == EXTRUDER_1_AUTO_FAN_PIN) 
+        fanState |= 2;
+      else
+        fanState |= 4;
+    }
+  #endif
+  
+  // update extruder auto fan states
+  #if defined(EXTRUDER_0_AUTO_FAN_PIN) && EXTRUDER_0_AUTO_FAN_PIN > -1
+    setExtruderAutoFanState(EXTRUDER_0_AUTO_FAN_PIN, (fanState & 1) != 0);
+  #endif 
+  #if defined(EXTRUDER_1_AUTO_FAN_PIN) && EXTRUDER_1_AUTO_FAN_PIN > -1
+    if (EXTRUDER_1_AUTO_FAN_PIN != EXTRUDER_0_AUTO_FAN_PIN) 
+      setExtruderAutoFanState(EXTRUDER_1_AUTO_FAN_PIN, (fanState & 2) != 0);
+  #endif 
+  #if defined(EXTRUDER_2_AUTO_FAN_PIN) && EXTRUDER_2_AUTO_FAN_PIN > -1
+    if (EXTRUDER_2_AUTO_FAN_PIN != EXTRUDER_0_AUTO_FAN_PIN 
+        && EXTRUDER_2_AUTO_FAN_PIN != EXTRUDER_1_AUTO_FAN_PIN)
+      setExtruderAutoFanState(EXTRUDER_2_AUTO_FAN_PIN, (fanState & 4) != 0);
+  #endif 
+}
+
+#endif // any extruder auto fan pins set
+
 void PID_autotune(float temp, int extruder, int ncycles)
 {
   float input = 0.0;
@@ -185,6 +257,12 @@ void PID_autotune(float temp, int extruder, int ncycles)
   float Kp, Ki, Kd;
   float max = 0, min = 10000;
 
+  #if (defined(EXTRUDER_0_AUTO_FAN_PIN) && EXTRUDER_0_AUTO_FAN_PIN > -1) || \
+      (defined(EXTRUDER_1_AUTO_FAN_PIN) && EXTRUDER_1_AUTO_FAN_PIN > -1) || \
+      (defined(EXTRUDER_2_AUTO_FAN_PIN) && EXTRUDER_2_AUTO_FAN_PIN > -1)
+    unsigned long extruder_autofan_last_check = millis();
+  #endif
+  
   if ((extruder >= EXTRUDERS)
   #if (TEMP_BED_PIN <= -1)
        ||(extruder < 0)
@@ -202,9 +280,9 @@ void PID_autotune(float temp, int extruder, int ncycles)
   {
      soft_pwm_bed = (MAX_BED_POWER)/2;
      bias = d = (MAX_BED_POWER)/2;
-   }
-   else
-   {
+  }
+  else
+  {
      soft_pwm[extruder] = (PID_MAX)/2;
      bias = d = (PID_MAX)/2;
   }
@@ -221,6 +299,18 @@ void PID_autotune(float temp, int extruder, int ncycles)
 
       max=max(max,input);
       min=min(min,input);
+	  
+      #if (defined(EXTRUDER_0_AUTO_FAN_PIN) && EXTRUDER_0_AUTO_FAN_PIN > -1) || \
+          (defined(EXTRUDER_1_AUTO_FAN_PIN) && EXTRUDER_1_AUTO_FAN_PIN > -1) || \
+          (defined(EXTRUDER_2_AUTO_FAN_PIN) && EXTRUDER_2_AUTO_FAN_PIN > -1)
+      if(millis() - extruder_autofan_last_check > 2500)  // only need to check fan state very infrequently
+      {
+        checkExtruderAutoFans();
+        extruder_autofan_last_check = millis();
+      }  
+      #endif 
+
+	  
       if(heating == true && input > temp) {
         if(millis() - t2 > 5000) { 
           heating=false;
@@ -337,78 +427,6 @@ int getHeaterPower(int heater) {
   return soft_pwm[heater];
 }
 
-#if (defined(EXTRUDER_0_AUTO_FAN_PIN) && EXTRUDER_0_AUTO_FAN_PIN > -1) || \
-    (defined(EXTRUDER_1_AUTO_FAN_PIN) && EXTRUDER_1_AUTO_FAN_PIN > -1) || \
-    (defined(EXTRUDER_2_AUTO_FAN_PIN) && EXTRUDER_2_AUTO_FAN_PIN > -1)
-
-  #if defined(FAN_PIN) && FAN_PIN > -1
-    #if EXTRUDER_0_AUTO_FAN_PIN == FAN_PIN 
-       #error "You cannot set EXTRUDER_0_AUTO_FAN_PIN equal to FAN_PIN"
-    #endif
-    #if EXTRUDER_1_AUTO_FAN_PIN == FAN_PIN 
-       #error "You cannot set EXTRUDER_1_AUTO_FAN_PIN equal to FAN_PIN"
-    #endif
-    #if EXTRUDER_2_AUTO_FAN_PIN == FAN_PIN 
-       #error "You cannot set EXTRUDER_2_AUTO_FAN_PIN equal to FAN_PIN"
-    #endif
-  #endif 
-
-void setExtruderAutoFanState(int pin, bool state)
-{
-  unsigned char newFanSpeed = (state != 0) ? EXTRUDER_AUTO_FAN_SPEED : 0;
-  // this idiom allows both digital and PWM fan outputs (see M42 handling).
-  pinMode(pin, OUTPUT);
-  digitalWrite(pin, newFanSpeed);
-  analogWrite(pin, newFanSpeed);
-}
-
-void checkExtruderAutoFans()
-{
-  uint8_t fanState = 0;
-
-  // which fan pins need to be turned on?      
-  #if defined(EXTRUDER_0_AUTO_FAN_PIN) && EXTRUDER_0_AUTO_FAN_PIN > -1
-    if (current_temperature[0] > EXTRUDER_AUTO_FAN_TEMPERATURE) 
-      fanState |= 1;
-  #endif
-  #if defined(EXTRUDER_1_AUTO_FAN_PIN) && EXTRUDER_1_AUTO_FAN_PIN > -1
-    if (current_temperature[1] > EXTRUDER_AUTO_FAN_TEMPERATURE) 
-    {
-      if (EXTRUDER_1_AUTO_FAN_PIN == EXTRUDER_0_AUTO_FAN_PIN) 
-        fanState |= 1;
-      else
-        fanState |= 2;
-    }
-  #endif
-  #if defined(EXTRUDER_2_AUTO_FAN_PIN) && EXTRUDER_2_AUTO_FAN_PIN > -1
-    if (current_temperature[2] > EXTRUDER_AUTO_FAN_TEMPERATURE) 
-    {
-      if (EXTRUDER_2_AUTO_FAN_PIN == EXTRUDER_0_AUTO_FAN_PIN) 
-        fanState |= 1;
-      else if (EXTRUDER_2_AUTO_FAN_PIN == EXTRUDER_1_AUTO_FAN_PIN) 
-        fanState |= 2;
-      else
-        fanState |= 4;
-    }
-  #endif
-  
-  // update extruder auto fan states
-  #if defined(EXTRUDER_0_AUTO_FAN_PIN) && EXTRUDER_0_AUTO_FAN_PIN > -1
-    setExtruderAutoFanState(EXTRUDER_0_AUTO_FAN_PIN, (fanState & 1) != 0);
-  #endif 
-  #if defined(EXTRUDER_1_AUTO_FAN_PIN) && EXTRUDER_1_AUTO_FAN_PIN > -1
-    if (EXTRUDER_1_AUTO_FAN_PIN != EXTRUDER_0_AUTO_FAN_PIN) 
-      setExtruderAutoFanState(EXTRUDER_1_AUTO_FAN_PIN, (fanState & 2) != 0);
-  #endif 
-  #if defined(EXTRUDER_2_AUTO_FAN_PIN) && EXTRUDER_2_AUTO_FAN_PIN > -1
-    if (EXTRUDER_2_AUTO_FAN_PIN != EXTRUDER_0_AUTO_FAN_PIN 
-        && EXTRUDER_2_AUTO_FAN_PIN != EXTRUDER_1_AUTO_FAN_PIN)
-      setExtruderAutoFanState(EXTRUDER_2_AUTO_FAN_PIN, (fanState & 4) != 0);
-  #endif 
-}
-
-#endif // any extruder auto fan pins set
-
 void manage_heater()
 {
   float pid_input;
@@ -475,7 +493,8 @@ void manage_heater()
     #endif //PID_DEBUG
   #else /* PID off */
     pid_output = 0;
-    if(current_temperature[e] < target_temperature[e]) {
+    if(current_temperature[e] < target_temperature[e]) 
+	{
       pid_output = PID_MAX;
     }
   #endif
@@ -485,7 +504,8 @@ void manage_heater()
     {
       soft_pwm[e] = (int)pid_output >> 1;
     }
-    else {
+    else 
+	{
       soft_pwm[e] = 0;
     }
 
@@ -504,9 +524,11 @@ void manage_heater()
     }
     #endif
     #ifdef TEMP_SENSOR_1_AS_REDUNDANT
-      if(fabs(current_temperature[0] - redundant_temperature) > MAX_REDUNDANT_TEMP_SENSOR_DIFF) {
+      if(fabs(current_temperature[0] - redundant_temperature) > MAX_REDUNDANT_TEMP_SENSOR_DIFF) 
+	  {
         disable_heater();
-        if(IsStopped() == false) {
+        if(IsStopped() == false) 
+		{
           SERIAL_ERROR_START;
           SERIAL_ERRORLNPGM("Extruder switched off. Temperature difference between temp sensors is too high !");
           LCD_ALERTMESSAGEPGM("Err: REDUNDANT TEMP ERROR");
@@ -1113,7 +1135,6 @@ int read_max6675()
 }
 #endif
 
-
 // Timer 0 is shared with millies
 //ISR(TIMER0_COMPB_vect)
 HAL_TEMP_TIMER_ISR
@@ -1121,14 +1142,24 @@ HAL_TEMP_TIMER_ISR
   //these variables are only accesible from the ISR, but static, so they don't lose their value
   static unsigned char temp_count = 0;
   static unsigned long raw_temp_0_value = 0;
-  static unsigned long last_temp_0_value = 0;
+  //static unsigned long last_temp_0_value = 0;
   static unsigned long raw_temp_1_value = 0;
   static unsigned long raw_temp_2_value = 0;
   static unsigned long raw_temp_bed_value = 0;
-  static unsigned long last_temp_bed_value = 0;
+  //static unsigned long last_temp_bed_value = 0;
   static unsigned char temp_state = 8;
   static unsigned char pwm_count = (1 << SOFT_PWM_SCALE);
   static unsigned char soft_pwm_0;
+  static unsigned long max_temp[2];
+  static unsigned long min_temp[2];
+  static unsigned long temp_read;
+  
+  for(int i = 0; i < 2; i++) 
+  {
+	max_temp[i] = 0;
+	min_temp[i] = 10000;
+  }
+	  
 
   #if (EXTRUDERS > 1) || defined(HEATERS_PARALLEL)
   static unsigned char soft_pwm_1;
@@ -1284,10 +1315,16 @@ HAL_TEMP_TIMER_ISR
   switch(temp_state) {
     case 0: // Prepare TEMP_0
       #if defined(TEMP_0_PIN) && (TEMP_0_PIN > -1)
-	    // raw_temp_0_value += analogRead (TEMP_0_PIN);
+	    temp_read = analogRead (TEMP_0_PIN);
+		max_temp[0] = max( temp_read, max_temp[0]);
+		min_temp[0] = min( temp_read, min_temp[0]);
+		
+		raw_temp_0_value += temp_read;
 		// A low-pass filter
-        raw_temp_0_value += (analogRead (TEMP_0_PIN) << 4) - last_temp_0_value;
-		last_temp_0_value = raw_temp_0_value >> 4;
+        // raw_temp_0_value += (analogRead (TEMP_0_PIN) << 4) - last_temp_0_value;
+		// last_temp_0_value = raw_temp_0_value >> 3;
+		
+		
       #endif
       #ifdef HEATER_0_USES_MAX6675 // TODO remove the blocking
         raw_temp_0_value = read_max6675();
@@ -1297,7 +1334,11 @@ HAL_TEMP_TIMER_ISR
       break;
     case 1: // Measure TEMP_0
       #if defined(TEMP_BED_PIN) && (TEMP_BED_PIN > -1)
-        raw_temp_bed_value += analogRead (TEMP_BED_PIN);
+		temp_read =  analogRead (TEMP_BED_PIN);
+		max_temp[1] = max( temp_read, max_temp[1]);
+		min_temp[1] = min( temp_read, min_temp[1]);
+		
+		raw_temp_bed_value += temp_read;
 		// raw_temp_bed_value += (analogRead (TEMP_BED_PIN) << 4) - last_temp_bed_value;
 		// last_temp_bed_value = raw_temp_bed_value >> 3;
       #endif
@@ -1305,10 +1346,14 @@ HAL_TEMP_TIMER_ISR
       break;
     case 2: // Prepare TEMP_BED
       #if defined(TEMP_0_PIN) && (TEMP_0_PIN > -1)
-        // raw_temp_0_value += analogRead (TEMP_0_PIN);
+        temp_read = analogRead (TEMP_0_PIN);
+		max_temp[0] = max( temp_read, max_temp[0]);
+		min_temp[0] = min( temp_read, min_temp[0]);
+		
+		raw_temp_0_value += temp_read;
 		// A low-pass filter
-		raw_temp_0_value += (analogRead (TEMP_0_PIN) << 4) - last_temp_0_value;
-		last_temp_0_value = raw_temp_0_value >> 4;
+		// raw_temp_0_value += (analogRead (TEMP_0_PIN) << 4) - last_temp_0_value;
+		// last_temp_0_value = raw_temp_0_value >> 3;
       #endif
       #ifdef HEATER_0_USES_MAX6675 // TODO remove the blocking
         raw_temp_0_value = read_max6675();
@@ -1318,7 +1363,11 @@ HAL_TEMP_TIMER_ISR
       break;
     case 3: // Measure TEMP_BED
       #if defined(TEMP_BED_PIN) && (TEMP_BED_PIN > -1)
-	    raw_temp_bed_value += analogRead (TEMP_BED_PIN);
+	    temp_read =  analogRead (TEMP_BED_PIN);
+		max_temp[1] = max( temp_read, max_temp[1]);
+		min_temp[1] = min( temp_read, min_temp[1]);
+		
+		raw_temp_bed_value += temp_read;
         // raw_temp_bed_value += (analogRead (TEMP_BED_PIN) << 4) - last_temp_bed_value;
 		// last_temp_bed_value = raw_temp_bed_value >> 3;
       #endif
@@ -1357,7 +1406,8 @@ HAL_TEMP_TIMER_ISR
 	  current_temperature_raw[0] = (OVERSAMPLENR * 977 ) << 4; //first temperature 25 deg
 	  current_temperature_bed_raw = OVERSAMPLENR * 977 ;
 	  REG_ADC_MR = (REG_ADC_MR & 0xFFF0FFFF) | 0x00040000; //64Clocks
-	  
+	  analogReadResolution(12);
+	   
       break;
 //    default:
 //      SERIAL_ERROR_START;
@@ -1367,14 +1417,14 @@ HAL_TEMP_TIMER_ISR
 
 #endif
 
-  if(temp_count >= OVERSAMPLENR ) // 8 * 16 * 1/(16000000/64/256)  = 131ms.
+  if(temp_count >= OVERSAMPLENR + 1) // 8 * 16 * 1/(16000000/64/256)  = 131ms.
   {
     if (!temp_meas_ready) //Only update the raw values if they have been read. Else we could be updating them during reading.
     {
       //current_temperature_raw[0] = raw_temp_0_value;
-	  //current_temperature_raw[0] = raw_temp_0_value >> 1;
+		current_temperature_raw[0] = (raw_temp_0_value >> 3) - ((max_temp[0] + min_temp[0]) >> 3);
 	  // current_temperature_raw[0] = (((raw_temp_0_value * 4 ) ) + (( current_temperature_raw[0] * 12 ) << 1 ) + 16 ) >> 5; //moving average
-	  current_temperature_raw[0] = last_temp_0_value;
+	  //current_temperature_raw[0] = last_temp_0_value;
 	  // current_temperature_raw[0] = (((last_temp_0_value * 4 ) ) + (( current_temperature_raw[0] * 12 ) << 1 ) + 16 ) >> 5; //moving average
 	  
 #if EXTRUDERS > 1
@@ -1387,18 +1437,23 @@ HAL_TEMP_TIMER_ISR
       current_temperature_raw[2] = raw_temp_2_value;
 #endif
       //current_temperature_bed_raw = raw_temp_bed_value;
-	  current_temperature_bed_raw = (((raw_temp_bed_value * 4) ) + (( current_temperature_bed_raw * 12) << 1 ) + 16 ) >> 5; //moving average
-	  //(current_temperature_bed_raw = raw_temp_bed_value >> 1;
+	  // current_temperature_bed_raw = (((raw_temp_bed_value * 4) ) + (( current_temperature_bed_raw * 12) << 1 ) + 16 ) >> 5; //moving average
+	  current_temperature_bed_raw = (raw_temp_bed_value >> 3) - ((max_temp[1] + min_temp[1]) >> 3);
 	  //current_temperature_bed_raw = last_temp_bed_value;
 	  
     }
     
     temp_meas_ready = true;
     temp_count = 0;
-    //raw_temp_0_value = 0; // We don't need to reset with the low-pass-filter running!
+    raw_temp_0_value = 0; // We don't need to reset with the low-pass-filter running!
     raw_temp_1_value = 0;
     raw_temp_2_value = 0;
     raw_temp_bed_value = 0;
+	for(int i = 0; i < 2; i++) 
+	  {
+		max_temp[i] = 0;
+		min_temp[i] = 10000;
+	  }
 
 #if HEATER_0_RAW_LO_TEMP > HEATER_0_RAW_HI_TEMP
     if(current_temperature_raw[0] <= maxttemp_raw[0]) {

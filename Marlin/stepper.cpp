@@ -294,6 +294,13 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   return (timer);
 }
 
+#ifdef DEBUG_STEPPER
+  static long dec_steps, acc_steps, nom_steps, dec_rate, acc_rate, nom_rate, dec_timer, acc_timer, nom_timer;
+  static bool last_acc = true;
+  static bool first_dec = true;
+  static bool first_nom = true;
+#endif
+
 // Initializes the trapezoid generator from the current block. Called whenever a new
 // block begins.
 FORCE_INLINE void trapezoid_generator_reset() {
@@ -427,10 +434,11 @@ HAL_STEP_TIMER_ISR
 
     // Set direction en check limit switches
     #ifndef COREXY
-    if ((out_bits & (1<<X_AXIS)) != 0) {   // stepping along -X axis
+    if ((out_bits & (1<<X_AXIS)) != 0)   // stepping along -X axis
     #else
-    if ((((out_bits & (1<<X_AXIS)) != 0)&&(out_bits & (1<<Y_AXIS)) != 0)) {   //-X occurs for -A and -B
+    if ((out_bits & (1<<X_HEAD)) != 0)   //AlexBorro: Head direction in -X axis for CoreXY bots.
     #endif
+	{
       CHECK_ENDSTOPS
       {
         #ifdef DUAL_X_CARRIAGE
@@ -451,7 +459,8 @@ HAL_STEP_TIMER_ISR
         }
       }
     }
-    else { // +direction
+    else 
+	{ // +direction
       CHECK_ENDSTOPS
       {
         #ifdef DUAL_X_CARRIAGE
@@ -462,7 +471,8 @@ HAL_STEP_TIMER_ISR
         {
           #if defined(X_MAX_PIN) && X_MAX_PIN > -1
             bool x_max_endstop=(READ(X_MAX_PIN) != X_MAX_ENDSTOP_INVERTING);
-            if(x_max_endstop && old_x_max_endstop && (current_block->steps_x > 0)){
+            if(x_max_endstop && old_x_max_endstop && (current_block->steps_x > 0))
+			{
               endstops_trigsteps[X_AXIS] = count_position[X_AXIS];
               endstop_x_hit=true;
               step_events_completed = current_block->step_event_count;
@@ -474,15 +484,17 @@ HAL_STEP_TIMER_ISR
     }
 
     #ifndef COREXY
-    if ((out_bits & (1<<Y_AXIS)) != 0) {   // -direction
+    if ((out_bits & (1<<Y_AXIS)) != 0)   // -direction
     #else
-    if ((((out_bits & (1<<X_AXIS)) != 0)&&(out_bits & (1<<Y_AXIS)) == 0)) {   // -Y occurs for -A and +B
+    if ((out_bits & (1<<Y_HEAD)) != 0)  //AlexBorro: Head direction in -Y axis for CoreXY bots.
     #endif
+	{
       CHECK_ENDSTOPS
       {
         #if defined(Y_MIN_PIN) && Y_MIN_PIN > -1
           bool y_min_endstop=(READ(Y_MIN_PIN) != Y_MIN_ENDSTOP_INVERTING);
-          if(y_min_endstop && old_y_min_endstop && (current_block->steps_y > 0)) {
+          if(y_min_endstop && old_y_min_endstop && (current_block->steps_y > 0)) 
+		  {
             endstops_trigsteps[Y_AXIS] = count_position[Y_AXIS];
             endstop_y_hit=true;
             step_events_completed = current_block->step_event_count;
@@ -491,12 +503,14 @@ HAL_STEP_TIMER_ISR
         #endif
       }
     }
-    else { // +direction
+    else 
+	{ // +direction
       CHECK_ENDSTOPS
       {
         #if defined(Y_MAX_PIN) && Y_MAX_PIN > -1
           bool y_max_endstop=(READ(Y_MAX_PIN) != Y_MAX_ENDSTOP_INVERTING);
-          if(y_max_endstop && old_y_max_endstop && (current_block->steps_y > 0)){
+          if(y_max_endstop && old_y_max_endstop && (current_block->steps_y > 0))
+		  {
             endstops_trigsteps[Y_AXIS] = count_position[Y_AXIS];
             endstop_y_hit=true;
             step_events_completed = current_block->step_event_count;
@@ -518,7 +532,8 @@ HAL_STEP_TIMER_ISR
       {
         #if defined(Z_MIN_PIN) && Z_MIN_PIN > -1
           bool z_min_endstop=(READ(Z_MIN_PIN) != Z_MIN_ENDSTOP_INVERTING);
-          if(z_min_endstop && old_z_min_endstop && (current_block->steps_z > 0)) {
+          if(z_min_endstop && old_z_min_endstop && (current_block->steps_z > 0))
+		  {
             endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
             endstop_z_hit=true;
             step_events_completed = current_block->step_event_count;
@@ -539,7 +554,8 @@ HAL_STEP_TIMER_ISR
       {
         #if defined(Z_MAX_PIN) && Z_MAX_PIN > -1
           bool z_max_endstop=(READ(Z_MAX_PIN) != Z_MAX_ENDSTOP_INVERTING);
-          if(z_max_endstop && old_z_max_endstop && (current_block->steps_z > 0)) {
+          if(z_max_endstop && old_z_max_endstop && (current_block->steps_z > 0))
+		  {
             endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
             endstop_z_hit=true;
             step_events_completed = current_block->step_event_count;
@@ -550,11 +566,13 @@ HAL_STEP_TIMER_ISR
     }
 
     #ifndef ADVANCE
-      if ((out_bits & (1<<E_AXIS)) != 0) {  // -direction
+      if ((out_bits & (1<<E_AXIS)) != 0)
+	  {  // -direction
         REV_E_DIR();
         count_direction[E_AXIS]=-1;
       }
-      else { // +direction
+      else
+	  { // +direction
         NORM_E_DIR();
         count_direction[E_AXIS]=1;
       }
@@ -665,13 +683,14 @@ HAL_STEP_TIMER_ISR
     // Calculate new timer value
     unsigned long timer;
     unsigned long step_rate;
-    if (step_events_completed <= (unsigned long int)current_block->accelerate_until) {
+    if (step_events_completed <= (unsigned long int)current_block->accelerate_until)
+	{
 
       MultiU24X24toH16(acc_step_rate, acceleration_time, current_block->acceleration_rate);
       acc_step_rate += current_block->initial_rate;
 
       // upper limit
-      if(acc_step_rate > current_block->nominal_rate)
+      if(acc_step_rate > current_block->nominal_rate) 
         acc_step_rate = current_block->nominal_rate;
 
       // step_rate to timer interval
@@ -679,6 +698,18 @@ HAL_STEP_TIMER_ISR
       HAL_timer_set_count (STEP_TIMER_NUM, timer);
 	  
       acceleration_time += timer;
+	  #ifdef DEBUG_STEPPER
+	  if (step_events_completed == ((unsigned long int)current_block->accelerate_until - 160))
+	  {
+		acc_rate = acc_step_rate;
+		acc_steps = step_events_completed;
+		acc_timer = timer;
+		// SERIAL_ECHO("st_ev_com/cur_blo->acc_unt: "); SERIAL_ECHO(step_events_completed); 
+		// SERIAL_ECHO(":"); SERIAL_ECHOLN(current_block->accelerate_until);
+		last_acc = false;
+		first_nom = true;
+	  }
+	  #endif
       #ifdef ADVANCE
         for(int8_t i=0; i < step_loops; i++) {
           advance += advance_rate;
@@ -701,7 +732,7 @@ HAL_STEP_TIMER_ISR
       }
 
       // lower limit
-      if(step_rate < current_block->final_rate)
+      if(step_rate < current_block->final_rate) 
         step_rate = current_block->final_rate;
 
       // step_rate to timer interval
@@ -717,15 +748,49 @@ HAL_STEP_TIMER_ISR
         e_steps[current_block->active_extruder] += ((advance >>8) - old_advance);
         old_advance = advance >>8;
       #endif //ADVANCE
+	  // if (step_events_completed == ((unsigned long int)current_block->decelerate_after + 1)) {
+		  // SERIAL_ECHO("st_ev_com/cur_blo->dec_aft: "); SERIAL_ECHO(step_events_completed); 
+		  // SERIAL_ECHO(":"); SERIAL_ECHOLN(current_block->decelerate_after);
+		  // first_dec = true;
+	  // }
+	  #ifdef DEBUG_STEPPER
+	  if (step_events_completed == ((unsigned long int)current_block->decelerate_after + 160)) {
+		// first_dec = false;
+		dec_rate = step_rate;
+		dec_steps = deceleration_time;
+		dec_timer = timer;
+		first_nom = true;
+	  }
+	  #endif
     }
     else {
     	HAL_timer_set_count (STEP_TIMER_NUM, OCR1A_nominal);
       // ensure we're running at the correct step rate, even if we just came off an acceleration
       step_loops = step_loops_nominal;
+	  #ifdef DEBUG_STEPPER
+	  if (first_nom)
+	  {
+		first_nom = false;
+		nom_rate = current_block->nominal_rate;
+		nom_steps = step_events_completed;
+		nom_timer = OCR1A_nominal;
+	  }
+	  #endif
     }
 
     // If current block is finished, reset pointer
-    if (step_events_completed >= current_block->step_event_count) {
+    if (step_events_completed >= current_block->step_event_count)
+	{
+	  #ifdef DEBUG_STEPPER
+	    SERIAL_ECHOLN("---------- timer end -----------");
+	    SERIAL_ECHOPGM("acc_rate/acc_steps/acc_timer: "); SERIAL_ECHO(acc_rate); SERIAL_ECHO(" / "); SERIAL_ECHOLN(acc_steps); SERIAL_ECHO(" / "); SERIAL_ECHOLN(acc_timer);
+	    SERIAL_ECHOPGM("dec_rate/dec_steps/dec_timer: "); SERIAL_ECHO(dec_rate); SERIAL_ECHO(" / "); SERIAL_ECHOLN(dec_steps); SERIAL_ECHO(" / "); SERIAL_ECHOLN(dec_timer);
+	    SERIAL_ECHOPGM("nom_rate/nom_steps/nom_timer: "); SERIAL_ECHO(nom_rate); SERIAL_ECHO(" / "); SERIAL_ECHOLN(nom_steps); SERIAL_ECHO(" / "); SERIAL_ECHOLN(nom_timer);
+	    SERIAL_ECHOPGM("current_block->accelerate_until: "); SERIAL_ECHOLN(current_block->accelerate_until);
+	    SERIAL_ECHOPGM("current_block->decelerate_after: "); SERIAL_ECHOLN(current_block->decelerate_after);
+	    SERIAL_ECHOLN("---------------------------------");
+	    last_acc = false;
+	  #endif
       current_block = NULL;
       plan_discard_current_block();
     }
