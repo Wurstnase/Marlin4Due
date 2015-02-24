@@ -28,9 +28,7 @@
 #include "ultralcd.h"
 #include "language.h"
 #include "cardreader.h"
-#if defined(ARDUINO_ARCH_AVR)
 #include "speed_lookuptable.h"
-#endif
 #if defined(DIGIPOTSS_PIN) && DIGIPOTSS_PIN > -1
 #include <SPI.h>
 #endif
@@ -268,29 +266,31 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
     step_loops = 1;
   }
 
-#if defined(ARDUINO_ARCH_AVR)
-  if(step_rate < (F_CPU/500000)) step_rate = (F_CPU/500000);
-  step_rate -= (F_CPU/500000); // Correct for minimal speed
+// #if defined(ARDUINO_ARCH_AVR)
+  if(step_rate < (32)) step_rate = (32);
+  // step_rate -= (1); // Correct for minimal speed
   if(step_rate >= (8*256)){ // higher step rate
-    unsigned short table_address = (unsigned short)&speed_lookuptable_fast[(unsigned char)(step_rate>>8)][0];
-    unsigned char tmp_step_rate = (step_rate & 0x00ff);
-    unsigned short gain = (unsigned short)pgm_read_word_near(table_address+2);
+    step_rate -= (32); // Correct for minimal speed
+    unsigned long table_address = (unsigned long)&speed_lookuptable_fast[(unsigned int)(step_rate>>8)][0];
+    unsigned long tmp_step_rate = (step_rate & 0x00ff);
+    unsigned long gain = (unsigned long)pgm_read_word_near(table_address+2);
     MultiU16X8toH16(timer, tmp_step_rate, gain);
-    timer = (unsigned short)pgm_read_word_near(table_address) - timer;
+    timer = (unsigned long)pgm_read_word_near(table_address) - timer;
   }
   else { // lower step rates
-    unsigned short table_address = (unsigned short)&speed_lookuptable_slow[0][0];
-    table_address += ((step_rate)>>1) & 0xfffc;
-    timer = (unsigned short)pgm_read_word_near(table_address);
-    timer -= (((unsigned short)pgm_read_word_near(table_address+2) * (unsigned char)(step_rate & 0x0007))>>3);
+    // unsigned long table_address = (unsigned long)&speed_lookuptable_slow[0][0];
+    // table_address += ((step_rate)>>1) & 0xfffc;
+    // timer = (unsigned long)pgm_read_word_near(table_address);
+    // timer -= (((unsigned long)pgm_read_word_near(table_address+2) * (unsigned char)(step_rate & 0x0007))>>3);
+	timer = HAL_TIMER_RATE / step_rate;
   }
   if(timer < 100) { timer = 100; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(20kHz this should never happen)
-#endif
-#if defined(ARDUINO_ARCH_SAM)
-  if(step_rate < 210) step_rate = 210;
-  timer = HAL_TIMER_RATE / step_rate;
-  if(timer < 100) { timer = 100; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(420kHz this should never happen)
-#endif
+// #endif
+// #if defined(ARDUINO_ARCH_SAM)
+  // if(step_rate < 210) step_rate = 210;
+  // timer = HAL_TIMER_RATE / step_rate;
+  // if(timer < 100) { timer = 100; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(420kHz this should never happen)
+// #endif
   return (timer);
 }
 
