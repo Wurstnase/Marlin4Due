@@ -2,11 +2,12 @@
 At the moment the status is pre-alpha.
 
 Todo:
-- at higher frequency the trapezoid should not work as expected. The acc/decc works, also the linear motion. The problem could be the small time when reaching the expected speed.
-- implementation in the actual original Marlin
-  - This needs alot of rework (HAL)
+- Implementation of more heater (Only Heatbed and Heater0 are supported at the moment)
+- Add new features from Marlin8bit
+- Clean code from AVR-part
 
 This Version has some additional Functions.
+- Max. speed is 320.000 steps/s (you can test more in adv_config)
 - Faster READ/WRITE
 - A low-pass filter for Temp_0
 - A moving average for Temp_bed
