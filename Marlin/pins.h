@@ -47,25 +47,45 @@
 //
 #define RADDS
 
-#define X_STEP_PIN         24
-#define X_DIR_PIN          23
-#define X_ENABLE_PIN       26
+#define X_STEP_PIN_ORIGIN         24
+#define X_DIR_PIN_ORIGIN          23
+#define X_ENABLE_PIN_ORIGIN       26
 
+#define Y_STEP_PIN_ORIGIN         17
+#define Y_DIR_PIN_ORIGIN          16
+#define Y_ENABLE_PIN_ORIGIN       22
 
-#define Y_STEP_PIN         17
-#define Y_DIR_PIN          16
-#define Y_ENABLE_PIN       22
+#define DIR_STD_XY
+
+#ifdef DIR_STD_XY
+	#define X_STEP_PIN 				X_STEP_PIN_ORIGIN
+	#define X_DIR_PIN				X_DIR_PIN_ORIGIN
+	#define X_ENABLE_PIN			X_ENABLE_PIN_ORIGIN
+	
+	#define Y_STEP_PIN				Y_STEP_PIN_ORIGIN
+	#define Y_DIR_PIN				Y_DIR_PIN_ORIGIN
+	#define Y_ENABLE_PIN			Y_ENABLE_PIN_ORIGIN
+#endif
+#ifdef DIR_STD_YX
+	#define X_STEP_PIN 				Y_STEP_PIN_ORIGIN
+	#define X_DIR_PIN				Y_DIR_PIN_ORIGIN
+	#define X_ENABLE_PIN			Y_ENABLE_PIN_ORIGIN
+	
+	#define Y_STEP_PIN				X_STEP_PIN_ORIGIN
+	#define Y_DIR_PIN				X_DIR_PIN_ORIGIN
+	#define Y_ENABLE_PIN			X_ENABLE_PIN_ORIGIN
+#endif
 
 #define Z_STEP_PIN         2
 #define Z_DIR_PIN          3
 #define Z_ENABLE_PIN       15
 
 #define X_MIN_PIN          28
-#define X_MAX_PIN          -1  // 34   //Max endstops default to disabled "-1", set to commented value to enable.
+#define X_MAX_PIN          34  // 34   //Max endstops default to disabled "-1", set to commented value to enable.
 #define Y_MIN_PIN          30
-#define Y_MAX_PIN          -1  // 36
+#define Y_MAX_PIN          36  // 36
 #define Z_MIN_PIN          32
-#define Z_MAX_PIN          -1  // 38
+#define Z_MAX_PIN          38  // 38
 
 #define E0_STEP_PIN        61
 #define E0_DIR_PIN         60
@@ -85,9 +105,9 @@
 
 #define BEEPER             41
 
-#define FAN_PIN            9
+#define FAN_PIN            -1
 
-#define CONTROLLERFAN_PIN  8 //Pin used for the fan to cool controller
+#define CONTROLLERFAN_PIN  -1 //Pin used for the fan to cool controller
 
 #define PS_ON_PIN          40
 

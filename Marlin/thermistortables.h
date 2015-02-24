@@ -3,7 +3,7 @@
 
 #include "Marlin.h"
 
-#define OVERSAMPLENR 16
+#define OVERSAMPLENR 8
 
 #if (THERMISTORHEATER_0 == 1) || (THERMISTORHEATER_1 == 1)  || (THERMISTORHEATER_2 == 1) || (THERMISTORBED == 1) //100k bed thermistor
 

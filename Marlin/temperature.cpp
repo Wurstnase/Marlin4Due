@@ -34,6 +34,11 @@
 #include "temperature.h"
 #include "watchdog.h"
 
+#define MIN(a, b) ((a < b) ? a : b)
+#define MAX(a, b) ((a > b) ? a : b)
+
+#define MEDIAN_COUNT 10
+
 //===========================================================================
 //=============================public variables============================
 //===========================================================================
@@ -1150,14 +1155,27 @@ HAL_TEMP_TIMER_ISR
   static unsigned char temp_state = 8;
   static unsigned char pwm_count = (1 << SOFT_PWM_SCALE);
   static unsigned char soft_pwm_0;
-  static unsigned long max_temp[2];
-  static unsigned long min_temp[2];
-  static unsigned long temp_read;
+  static int max_temp[2];
+  static int min_temp[2];
+  static int temp_read = 0;
+  static unsigned char median_counter = 0;
+  static unsigned long raw_median_temp[2][MEDIAN_COUNT];
+  static bool first_start = true;
   
-  for(int i = 0; i < 2; i++) 
+  // Initialize some variables only at start!
+  if (first_start)
   {
-	max_temp[i] = 0;
-	min_temp[i] = 10000;
+	  for (char i = 0; i < 2; i++)
+	  {
+		  for (int j = 0; j < MEDIAN_COUNT; j++)
+		  {
+			  raw_median_temp[i][j] = 900 * OVERSAMPLENR;
+		  }
+		  max_temp[i] = 0;
+		  min_temp[i] = 123000;
+	  }
+	  first_start = false;
+	  SERIAL_ECHOLN("First start for temperature finished.");
   }
 	  
 
@@ -1221,105 +1239,16 @@ HAL_TEMP_TIMER_ISR
   pwm_count += (1 << SOFT_PWM_SCALE);
   pwm_count &= 0x7f;
   
-#if defined(ARDUINO_ARCH_AVR)
   switch(temp_state) {
     case 0: // Prepare TEMP_0
       #if defined(TEMP_0_PIN) && (TEMP_0_PIN > -1)
-        #if TEMP_0_PIN > 7
-          ADCSRB = 1<<MUX5;
-        #else
-          ADCSRB = 0;
-        #endif
-        ADMUX = ((1 << REFS0) | (TEMP_0_PIN & 0x07));
-        ADCSRA |= 1<<ADSC; // Start conversion
-      #endif
-      lcd_buttons_update();
-      temp_state = 1;
-      break;
-    case 1: // Measure TEMP_0
-      #if defined(TEMP_0_PIN) && (TEMP_0_PIN > -1)
-        raw_temp_0_value += ADC;
-      #endif
-      #ifdef HEATER_0_USES_MAX6675 // TODO remove the blocking
-        raw_temp_0_value = read_max6675();
-      #endif
-      temp_state = 2;
-      break;
-    case 2: // Prepare TEMP_BED
-      #if defined(TEMP_BED_PIN) && (TEMP_BED_PIN > -1)
-        #if TEMP_BED_PIN > 7
-          ADCSRB = 1<<MUX5;
-        #else
-          ADCSRB = 0;
-        #endif
-        ADMUX = ((1 << REFS0) | (TEMP_BED_PIN & 0x07));
-        ADCSRA |= 1<<ADSC; // Start conversion
-      #endif
-      lcd_buttons_update();
-      temp_state = 3;
-      break;
-    case 3: // Measure TEMP_BED
-      #if defined(TEMP_BED_PIN) && (TEMP_BED_PIN > -1)
-        raw_temp_bed_value += ADC;
-      #endif
-      temp_state = 4;
-      break;
-    case 4: // Prepare TEMP_1
-      #if defined(TEMP_1_PIN) && (TEMP_1_PIN > -1)
-        #if TEMP_1_PIN > 7
-          ADCSRB = 1<<MUX5;
-        #else
-          ADCSRB = 0;
-        #endif
-        ADMUX = ((1 << REFS0) | (TEMP_1_PIN & 0x07));
-        ADCSRA |= 1<<ADSC; // Start conversion
-      #endif
-      lcd_buttons_update();
-      temp_state = 5;
-      break;
-    case 5: // Measure TEMP_1
-      #if defined(TEMP_1_PIN) && (TEMP_1_PIN > -1)
-        raw_temp_1_value += ADC;
-      #endif
-      temp_state = 6;
-      break;
-    case 6: // Prepare TEMP_2
-      #if defined(TEMP_2_PIN) && (TEMP_2_PIN > -1)
-        #if TEMP_2_PIN > 7
-          ADCSRB = 1<<MUX5;
-        #else
-          ADCSRB = 0;
-        #endif
-        ADMUX = ((1 << REFS0) | (TEMP_2_PIN & 0x07));
-        ADCSRA |= 1<<ADSC; // Start conversion
-      #endif
-      lcd_buttons_update();
-      temp_state = 7;
-      break;
-    case 7: // Measure TEMP_2
-      #if defined(TEMP_2_PIN) && (TEMP_2_PIN > -1)
-        raw_temp_2_value += ADC;
-      #endif
-      temp_state = 0;
-      temp_count++;
-      break;
-    case 8: //Startup, delay initial temp reading a tiny bit so the hardware can settle.
-      temp_state = 0;
-      break;
-//    default:
-//      SERIAL_ERROR_START;
-//      SERIAL_ERRORLNPGM("Temp measurement error!");
-//      break;
-  }
-#elif defined(ARDUINO_ARCH_SAM)
-  switch(temp_state) {
-    case 0: // Prepare TEMP_0
-      #if defined(TEMP_0_PIN) && (TEMP_0_PIN > -1)
+	    // while((ADC->ADC_ISR & 0x80)==0); // wait for conversion
 	    temp_read = analogRead (TEMP_0_PIN);
-		max_temp[0] = max( temp_read, max_temp[0]);
-		min_temp[0] = min( temp_read, min_temp[0]);
-		
 		raw_temp_0_value += temp_read;
+		
+		max_temp[0] = MAX(max_temp[0], temp_read);
+		min_temp[0] = MIN(min_temp[0], temp_read);
+		
 		// A low-pass filter
         // raw_temp_0_value += (analogRead (TEMP_0_PIN) << 4) - last_temp_0_value;
 		// last_temp_0_value = raw_temp_0_value >> 3;
@@ -1334,11 +1263,13 @@ HAL_TEMP_TIMER_ISR
       break;
     case 1: // Measure TEMP_0
       #if defined(TEMP_BED_PIN) && (TEMP_BED_PIN > -1)
+	    // while((ADC->ADC_ISR & 0x80)==0); // wait for conversion
 		temp_read =  analogRead (TEMP_BED_PIN);
-		max_temp[1] = max( temp_read, max_temp[1]);
-		min_temp[1] = min( temp_read, min_temp[1]);
-		
 		raw_temp_bed_value += temp_read;
+		
+		max_temp[1] = MAX(max_temp[1], temp_read);
+		min_temp[1] = MIN(min_temp[1], temp_read);
+		
 		// raw_temp_bed_value += (analogRead (TEMP_BED_PIN) << 4) - last_temp_bed_value;
 		// last_temp_bed_value = raw_temp_bed_value >> 3;
       #endif
@@ -1346,11 +1277,11 @@ HAL_TEMP_TIMER_ISR
       break;
     case 2: // Prepare TEMP_BED
       #if defined(TEMP_0_PIN) && (TEMP_0_PIN > -1)
-        temp_read = analogRead (TEMP_0_PIN);
-		max_temp[0] = max( temp_read, max_temp[0]);
-		min_temp[0] = min( temp_read, min_temp[0]);
+        // temp_read = analogRead (TEMP_0_PIN);
+		// max_temp[0] = MAX(max_temp[0], temp_read);
+		// min_temp[0] = MIN(min_temp[0], temp_read);
 		
-		raw_temp_0_value += temp_read;
+		// raw_temp_0_value += temp_read;
 		// A low-pass filter
 		// raw_temp_0_value += (analogRead (TEMP_0_PIN) << 4) - last_temp_0_value;
 		// last_temp_0_value = raw_temp_0_value >> 3;
@@ -1363,11 +1294,11 @@ HAL_TEMP_TIMER_ISR
       break;
     case 3: // Measure TEMP_BED
       #if defined(TEMP_BED_PIN) && (TEMP_BED_PIN > -1)
-	    temp_read =  analogRead (TEMP_BED_PIN);
-		max_temp[1] = max( temp_read, max_temp[1]);
-		min_temp[1] = min( temp_read, min_temp[1]);
+	    // temp_read =  analogRead (TEMP_BED_PIN);
+		// max_temp[1] = MAX(max_temp[1], temp_read);
+		// min_temp[1] = MIN(min_temp[1], temp_read);
 		
-		raw_temp_bed_value += temp_read;
+		// raw_temp_bed_value += temp_read;
         // raw_temp_bed_value += (analogRead (TEMP_BED_PIN) << 4) - last_temp_bed_value;
 		// last_temp_bed_value = raw_temp_bed_value >> 3;
       #endif
@@ -1402,10 +1333,11 @@ HAL_TEMP_TIMER_ISR
       break;
     case 8: //Startup, delay initial temp reading a tiny bit so the hardware can settle.
       temp_state = 0;
-	  delayMicroseconds(5);
-	  current_temperature_raw[0] = (OVERSAMPLENR * 977 ) << 4; //first temperature 25 deg
-	  current_temperature_bed_raw = OVERSAMPLENR * 977 ;
+	  delayMicroseconds(25);
+	  // current_temperature_raw[0] = (OVERSAMPLENR * 977 ) << 4; //first temperature 25 deg
+	  // current_temperature_bed_raw = OVERSAMPLENR * 977 ;
 	  REG_ADC_MR = (REG_ADC_MR & 0xFFF0FFFF) | 0x00040000; //64Clocks
+	  // REG_ADC_MR = (REG_ADC_MR & 0xFFFFFF0F) | 0x00000080; //enable FREERUN mode
 	  analogReadResolution(12);
 	   
       break;
@@ -1415,17 +1347,22 @@ HAL_TEMP_TIMER_ISR
 //      break;
   }
 
-#endif
 
-  if(temp_count >= OVERSAMPLENR + 1) // 8 * 16 * 1/(16000000/64/256)  = 131ms.
+  if(temp_count >= (OVERSAMPLENR + 2)) // 8 * 16 * 1/(16000000/64/256)  = 131ms.
   {
     if (!temp_meas_ready) //Only update the raw values if they have been read. Else we could be updating them during reading.
     {
-      //current_temperature_raw[0] = raw_temp_0_value;
-		current_temperature_raw[0] = (raw_temp_0_value >> 3) - ((max_temp[0] + min_temp[0]) >> 3);
-	  // current_temperature_raw[0] = (((raw_temp_0_value * 4 ) ) + (( current_temperature_raw[0] * 12 ) << 1 ) + 16 ) >> 5; //moving average
-	  //current_temperature_raw[0] = last_temp_0_value;
-	  // current_temperature_raw[0] = (((last_temp_0_value * 4 ) ) + (( current_temperature_raw[0] * 12 ) << 1 ) + 16 ) >> 5; //moving average
+      char adc_sensor = 0;
+      raw_median_temp[adc_sensor][median_counter] = (raw_temp_0_value + (OVERSAMPLENR) - (min_temp[adc_sensor] + max_temp[adc_sensor])) >> 2;
+      max_temp[adc_sensor] = 0;
+      min_temp[adc_sensor] = 100000;
+	  
+	  int sum = 0;
+	  for(int i = 0; i < MEDIAN_COUNT; i++)
+	  {
+		  sum += raw_median_temp[adc_sensor][i];
+	  }
+	  current_temperature_raw[adc_sensor] = sum / MEDIAN_COUNT;
 	  
 #if EXTRUDERS > 1
       current_temperature_raw[1] = raw_temp_1_value;
@@ -1436,68 +1373,83 @@ HAL_TEMP_TIMER_ISR
 #if EXTRUDERS > 2
       current_temperature_raw[2] = raw_temp_2_value;
 #endif
-      //current_temperature_bed_raw = raw_temp_bed_value;
-	  // current_temperature_bed_raw = (((raw_temp_bed_value * 4) ) + (( current_temperature_bed_raw * 12) << 1 ) + 16 ) >> 5; //moving average
-	  current_temperature_bed_raw = (raw_temp_bed_value >> 3) - ((max_temp[1] + min_temp[1]) >> 3);
-	  //current_temperature_bed_raw = last_temp_bed_value;
+	  adc_sensor = 1;
+	  raw_median_temp[adc_sensor][median_counter] = (raw_temp_bed_value + (OVERSAMPLENR) - (min_temp[adc_sensor] + max_temp[adc_sensor])) >> 2;
+	  max_temp[adc_sensor] = 0;
+	  min_temp[adc_sensor] = 100000;
+	  
+	  sum = 0;
+	  for(int i = 0; i < MEDIAN_COUNT; i++)
+	  {
+		  sum += raw_median_temp[adc_sensor][i];
+	  }
+	  current_temperature_bed_raw = sum / MEDIAN_COUNT;
 	  
     }
     
+	median_counter++;
+	if (median_counter >= MEDIAN_COUNT)
+	{
+		median_counter = 0;
+	}
+	
     temp_meas_ready = true;
     temp_count = 0;
     raw_temp_0_value = 0; // We don't need to reset with the low-pass-filter running!
     raw_temp_1_value = 0;
     raw_temp_2_value = 0;
     raw_temp_bed_value = 0;
-	for(int i = 0; i < 2; i++) 
-	  {
-		max_temp[i] = 0;
-		min_temp[i] = 10000;
-	  }
+
 
 #if HEATER_0_RAW_LO_TEMP > HEATER_0_RAW_HI_TEMP
-    if(current_temperature_raw[0] <= maxttemp_raw[0]) {
+    if(current_temperature_raw[0] <= maxttemp_raw[0])
 #else
-    if(current_temperature_raw[0] >= maxttemp_raw[0]) {
+    if(current_temperature_raw[0] >= maxttemp_raw[0])
 #endif
+	{
         max_temp_error(0);
     }
 #if HEATER_0_RAW_LO_TEMP > HEATER_0_RAW_HI_TEMP
-    if(current_temperature_raw[0] >= minttemp_raw[0]) {
+    if(current_temperature_raw[0] >= minttemp_raw[0])
 #else
-    if(current_temperature_raw[0] <= minttemp_raw[0]) {
+    if(current_temperature_raw[0] <= minttemp_raw[0])
 #endif
+	{
         min_temp_error(0);
     }
 #if EXTRUDERS > 1
 #if HEATER_1_RAW_LO_TEMP > HEATER_1_RAW_HI_TEMP
-    if(current_temperature_raw[1] <= maxttemp_raw[1]) {
+    if(current_temperature_raw[1] <= maxttemp_raw[1])
 #else
-    if(current_temperature_raw[1] >= maxttemp_raw[1]) {
+    if(current_temperature_raw[1] >= maxttemp_raw[1])
 #endif
+    {
         max_temp_error(1);
     }
 #if HEATER_1_RAW_LO_TEMP > HEATER_1_RAW_HI_TEMP
-    if(current_temperature_raw[1] >= minttemp_raw[1]) {
+    if(current_temperature_raw[1] >= minttemp_raw[1])
 #else
-    if(current_temperature_raw[1] <= minttemp_raw[1]) {
+    if(current_temperature_raw[1] <= minttemp_raw[1])
 #endif
+	{
         min_temp_error(1);
     }
 #endif
 #if EXTRUDERS > 2
 #if HEATER_2_RAW_LO_TEMP > HEATER_2_RAW_HI_TEMP
-    if(current_temperature_raw[2] <= maxttemp_raw[2]) {
+    if(current_temperature_raw[2] <= maxttemp_raw[2])
 #else
-    if(current_temperature_raw[2] >= maxttemp_raw[2]) {
+    if(current_temperature_raw[2] >= maxttemp_raw[2])
 #endif
+	{
         max_temp_error(2);
     }
 #if HEATER_2_RAW_LO_TEMP > HEATER_2_RAW_HI_TEMP
-    if(current_temperature_raw[2] >= minttemp_raw[2]) {
+    if(current_temperature_raw[2] >= minttemp_raw[2])
 #else
-    if(current_temperature_raw[2] <= minttemp_raw[2]) {
+    if(current_temperature_raw[2] <= minttemp_raw[2])
 #endif
+	{
         min_temp_error(2);
     }
 #endif
@@ -1505,10 +1457,11 @@ HAL_TEMP_TIMER_ISR
   /* No bed MINTEMP error? */
 #if defined(BED_MAXTEMP) && (TEMP_SENSOR_BED != 0)
 # if HEATER_BED_RAW_LO_TEMP > HEATER_BED_RAW_HI_TEMP
-    if(current_temperature_bed_raw <= bed_maxttemp_raw) {
+    if(current_temperature_bed_raw <= bed_maxttemp_raw)
 #else
-    if(current_temperature_bed_raw >= bed_maxttemp_raw) {
+    if(current_temperature_bed_raw >= bed_maxttemp_raw)
 #endif
+	{
        target_temperature_bed = 0;
        bed_max_temp_error();
     }
