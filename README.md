@@ -9,7 +9,7 @@ Todo:
 This Version has some additional Functions.
 - Max. speed is 320.000 steps/s (you can test more in adv_config)
 - speed_lookuptable for fast speed
-- slow speed higher accuracay by using HAL_TIMER_RATE/step_rate-division (this is slower as lookuptable but works well at low speed)
+- slow speed higher accuracy by using HAL_TIMER_RATE/step_rate-division (this is slower as lookuptable but works well at low speed)
 - Faster READ/WRITE
 - Average building of last 10 temperatures
 - Modified ISR
