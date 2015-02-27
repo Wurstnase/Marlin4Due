@@ -1273,7 +1273,9 @@ HAL_TEMP_TIMER_ISR
 		// raw_temp_bed_value += (analogRead (TEMP_BED_PIN) << 4) - last_temp_bed_value;
 		// last_temp_bed_value = raw_temp_bed_value >> 3;
       #endif
-      temp_state = 2;
+      // temp_state = 2;
+      temp_state = 0;
+      temp_count++;
       break;
     case 2: // Prepare TEMP_BED
       #if defined(TEMP_0_PIN) && (TEMP_0_PIN > -1)
