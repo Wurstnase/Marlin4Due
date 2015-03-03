@@ -1155,11 +1155,11 @@ HAL_TEMP_TIMER_ISR
   static unsigned char temp_state = 8;
   static unsigned char pwm_count = (1 << SOFT_PWM_SCALE);
   static unsigned char soft_pwm_0;
-  static int max_temp[2];
-  static int min_temp[2];
+  static int max_temp[2] = { 0 };
+  static int min_temp[2] = { 123000 };
   static int temp_read = 0;
   static unsigned char median_counter = 0;
-  static unsigned long raw_median_temp[2][MEDIAN_COUNT];
+  static unsigned long raw_median_temp[2][MEDIAN_COUNT] = { { 3950 * OVERSAMPLENR } };
   static bool first_start = true;
   
   // Initialize some variables only at start!
@@ -1169,7 +1169,7 @@ HAL_TEMP_TIMER_ISR
 	  {
 		  for (int j = 0; j < MEDIAN_COUNT; j++)
 		  {
-			  raw_median_temp[i][j] = 900 * OVERSAMPLENR;
+			  raw_median_temp[i][j] = 3600 * OVERSAMPLENR;
 		  }
 		  max_temp[i] = 0;
 		  min_temp[i] = 123000;
@@ -1273,7 +1273,9 @@ HAL_TEMP_TIMER_ISR
 		// raw_temp_bed_value += (analogRead (TEMP_BED_PIN) << 4) - last_temp_bed_value;
 		// last_temp_bed_value = raw_temp_bed_value >> 3;
       #endif
-      temp_state = 2;
+      //temp_state = 2;
+	  temp_state = 0;
+      temp_count++;
       break;
     case 2: // Prepare TEMP_BED
       #if defined(TEMP_0_PIN) && (TEMP_0_PIN > -1)
@@ -1353,16 +1355,16 @@ HAL_TEMP_TIMER_ISR
     if (!temp_meas_ready) //Only update the raw values if they have been read. Else we could be updating them during reading.
     {
       char adc_sensor = 0;
-      raw_median_temp[adc_sensor][median_counter] = (raw_temp_0_value + (OVERSAMPLENR) - (min_temp[adc_sensor] + max_temp[adc_sensor])) >> 2;
+      raw_median_temp[adc_sensor][median_counter] = (raw_temp_0_value - (min_temp[adc_sensor] + max_temp[adc_sensor]));
       max_temp[adc_sensor] = 0;
       min_temp[adc_sensor] = 100000;
 	  
-	  int sum = 0;
+	  unsigned long sum = 0;
 	  for(int i = 0; i < MEDIAN_COUNT; i++)
 	  {
 		  sum += raw_median_temp[adc_sensor][i];
 	  }
-	  current_temperature_raw[adc_sensor] = sum / MEDIAN_COUNT;
+	  current_temperature_raw[adc_sensor] = (sum / MEDIAN_COUNT + 4) >> 2;
 	  
 #if EXTRUDERS > 1
       current_temperature_raw[1] = raw_temp_1_value;
@@ -1374,7 +1376,7 @@ HAL_TEMP_TIMER_ISR
       current_temperature_raw[2] = raw_temp_2_value;
 #endif
 	  adc_sensor = 1;
-	  raw_median_temp[adc_sensor][median_counter] = (raw_temp_bed_value + (OVERSAMPLENR) - (min_temp[adc_sensor] + max_temp[adc_sensor])) >> 2;
+	  raw_median_temp[adc_sensor][median_counter] = (raw_temp_bed_value - (min_temp[adc_sensor] + max_temp[adc_sensor]));
 	  max_temp[adc_sensor] = 0;
 	  min_temp[adc_sensor] = 100000;
 	  
@@ -1383,7 +1385,7 @@ HAL_TEMP_TIMER_ISR
 	  {
 		  sum += raw_median_temp[adc_sensor][i];
 	  }
-	  current_temperature_bed_raw = sum / MEDIAN_COUNT;
+	  current_temperature_bed_raw = (sum / MEDIAN_COUNT + 4) >> 2;
 	  
     }
     

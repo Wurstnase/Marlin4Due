@@ -29,6 +29,7 @@
 // --------------------------------------------------------------------------
 
 #include "HAL.h"
+#include "Configuration.h"
 // #include "DueTimer.h"
 
 #include <Wire.h>
@@ -262,7 +263,7 @@ void HAL_temp_timer_start (uint8_t timer_num)
 	// TC_FindMckDivisor(20000, VARIANT_MCK, &tc_count, &tc_clock, VARIANT_MCK);
 	TC_Configure (tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK4);
 
-	uint32_t rc = VARIANT_MCK / 128 / 6250;
+	uint32_t rc = VARIANT_MCK / 128 / 500;
 	TC_SetRC(tc, channel, rc);
 	TC_Start(tc, channel);
 

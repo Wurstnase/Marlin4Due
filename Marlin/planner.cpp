@@ -594,13 +594,10 @@ void plan_buffer_line(const float &x, const float &y, const float &z, const floa
   block->busy = false;
 
   // Number of steps for each axis
-static long head_x, head_y, head_event_count_st; 
-head_x = labs(target[X_AXIS]-position[X_AXIS]);
-head_y = labs(target[Y_AXIS]-position[Y_AXIS]);
 #ifndef COREXY
 // default non-h-bot planning
-block->steps_x = head_x;
-block->steps_y = head_y;
+block->steps_x = labs(target[X_AXIS]-position[X_AXIS]);
+block->steps_y = labs(target[Y_AXIS]-position[Y_AXIS]);
 #else
 // corexy planning
 // these equations follow the form of the dA and dB equations on http://www.corexy.com/theory.html
