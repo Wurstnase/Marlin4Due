@@ -8,10 +8,11 @@ Todo:
 
 This Version has some additional Functions.
 - Max. speed is 320.000 steps/s (you can test more in adv_config)
+- speed_lookuptable for fast speed
+- slow speed higher accuracy by using HAL_TIMER_RATE/step_rate-division (this is slower as lookuptable but works well at low speed)
 - Faster READ/WRITE
-- A low-pass filter for Temp_0
-- A moving average for Temp_bed
+- Average building of last 10 temperatures
 - Modified ISR
   - HAL_step_isr with 42MHz
-  - HAL_temp_isr with ~650kHz
+  - HAL_temp_isr with ~650kHz (running at 6kHz)
 - under config_adv you can choose your frequency when double stepping begins
