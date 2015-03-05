@@ -80,7 +80,6 @@
 #define SPI_SD_INIT_RATE SPI_INIT_SPEED
 
 #endif
-
 //------------------------------------------------------------------------------
 /**
  * Set the SS pin high for hardware SPI.  If SS is chip select for another SPI
@@ -103,7 +102,6 @@
  */
 #define USE_SOFTWARE_SPI 0
 // define software SPI pins so Mega can use unmodified 168/328 shields
-
 /** Software SPI chip select pin for the SD */
 uint8_t const SOFT_SPI_CS_PIN = 10;
 /** Software SPI Master Out Slave In pin */
@@ -118,13 +116,17 @@ uint8_t const SOFT_SPI_SCK_PIN = 13;
  * a pure virtual function is called.
  */
 #define USE_CXA_PURE_VIRTUAL 1
+
+/** Number of UTF-16 characters per entry */
+#define FILENAME_LENGTH 13
+
 /**
  * Defines for long (vfat) filenames
  */
 /** Number of VFAT entries used. Every entry has 13 UTF-16 characters */
 #define MAX_VFAT_ENTRIES (2)
 /** Total size of the buffer used to store the long filenames */
-#define LONG_FILENAME_LENGTH (13*MAX_VFAT_ENTRIES+1)
+#define LONG_FILENAME_LENGTH (FILENAME_LENGTH*MAX_VFAT_ENTRIES+1)
 #endif  // SdFatConfig_h
 
 

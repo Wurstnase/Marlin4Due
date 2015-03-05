@@ -240,30 +240,14 @@ void HAL_temp_timer_start (uint8_t timer_num)
 
 	pmc_set_writeprotect(false);
 	pmc_enable_periph_clk((uint32_t)irq);
-// void HAL_temp_timer_start()
-// {
-	// uint32_t     tc_count, tc_clock;
-	// uint8_t timer_num;
-
-	// Timer for Temperature
-	// Timer 4 HAL.h -> TEMP_TIMER_NUM
-	// timer_num = TEMP_TIMER_NUM;
-	
-	// TC *tc = TimerConfig [timer_num].pTimerRegs;
-	// IRQn_Type irq = TimerConfig [timer_num].IRQ_Id;
-	// uint32_t channel = TimerConfig [timer_num].channel;
-
-	// pmc_set_writeprotect(false);
 	
 	NVIC_SetPriorityGrouping(4);
 	
-	// pmc_enable_periph_clk((uint32_t)irq);
 	NVIC_SetPriority(irq, NVIC_EncodePriority(4, 3, 0));
 	
-	// TC_FindMckDivisor(20000, VARIANT_MCK, &tc_count, &tc_clock, VARIANT_MCK);
 	TC_Configure (tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK4);
 
-	uint32_t rc = VARIANT_MCK / 128 / 500;
+	uint32_t rc = VARIANT_MCK / 128 / (512*12);
 	TC_SetRC(tc, channel, rc);
 	TC_Start(tc, channel);
 

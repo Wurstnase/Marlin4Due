@@ -43,7 +43,7 @@ block_t *current_block;  // A pointer to the block currently being traced
 //===========================================================================
 //=============================private variables ============================
 //===========================================================================
-//static makes it inpossible to be called from outside of this file by extern.!
+//static makes it impossible to be called from outside of this file by extern.!
 
 // Variables used by The Stepper Driver Interrupt
 static unsigned char out_bits;        // The next stepping-bits to be output
@@ -55,12 +55,11 @@ volatile static unsigned long step_events_completed; // The number of step event
 #ifdef ADVANCE
   static long advance_rate, advance, final_advance = 0;
   static long old_advance = 0;
-  static long e_steps[3];
+  static long e_steps[4];
 #endif
 static long acceleration_time, deceleration_time;
 //static unsigned long accelerate_until, decelerate_after, acceleration_rate, initial_rate, final_rate, nominal_rate;
-static unsigned long acc_step_rate; // needed for deceleration start point
-
+static unsigned long acc_step_rate; // needed for deccelaration start point
 static char step_loops;
 static unsigned long OCR1A_nominal;
 static unsigned short step_loops_nominal;
@@ -95,91 +94,13 @@ volatile signed char count_direction[NUM_AXIS] = { 1, 1, 1, 1};
 
 #define CHECK_ENDSTOPS  if(check_endstops)
 
-// --------------------------------------------------------------------------
-#if defined(ARDUINO_ARCH_AVR)
-// intRes = intIn1 * intIn2 >> 16
-// uses:
-// r26 to store 0
-// r27 to store the byte 1 of the 24 bit result
-#define MultiU16X8toH16(intRes, charIn1, intIn2) \
-asm volatile ( \
-"clr r26 \n\t" \
-"mul %A1, %B2 \n\t" \
-"movw %A0, r0 \n\t" \
-"mul %A1, %A2 \n\t" \
-"add %A0, r1 \n\t" \
-"adc %B0, r26 \n\t" \
-"lsr r0 \n\t" \
-"adc %A0, r26 \n\t" \
-"adc %B0, r26 \n\t" \
-"clr r1 \n\t" \
-: \
-"=&r" (intRes) \
-: \
-"d" (charIn1), \
-"d" (intIn2) \
-: \
-"r26" \
-)
-
-// intRes = longIn1 * longIn2 >> 24
-// uses:
-// r26 to store 0
-// r27 to store the byte 1 of the 48bit result
-#define MultiU24X24toH16(intRes, longIn1, longIn2) \
-asm volatile ( \
-"clr r26 \n\t" \
-"mul %A1, %B2 \n\t" \
-"mov r27, r1 \n\t" \
-"mul %B1, %C2 \n\t" \
-"movw %A0, r0 \n\t" \
-"mul %C1, %C2 \n\t" \
-"add %B0, r0 \n\t" \
-"mul %C1, %B2 \n\t" \
-"add %A0, r0 \n\t" \
-"adc %B0, r1 \n\t" \
-"mul %A1, %C2 \n\t" \
-"add r27, r0 \n\t" \
-"adc %A0, r1 \n\t" \
-"adc %B0, r26 \n\t" \
-"mul %B1, %B2 \n\t" \
-"add r27, r0 \n\t" \
-"adc %A0, r1 \n\t" \
-"adc %B0, r26 \n\t" \
-"mul %C1, %A2 \n\t" \
-"add r27, r0 \n\t" \
-"adc %A0, r1 \n\t" \
-"adc %B0, r26 \n\t" \
-"mul %B1, %A2 \n\t" \
-"add r27, r1 \n\t" \
-"adc %A0, r26 \n\t" \
-"adc %B0, r26 \n\t" \
-"lsr r27 \n\t" \
-"adc %A0, r26 \n\t" \
-"adc %B0, r26 \n\t" \
-"clr r1 \n\t" \
-: \
-"=&r" (intRes) \
-: \
-"d" (longIn1), \
-"d" (longIn2) \
-: \
-"r26" , "r27" \
-)
-
-
+#define MultiU16X8toH16(intRes, charIn1, intIn2)   intRes = ((charIn1) * (intIn2)) >> 16
+#define MultiU24X24toH16(intRes, longIn1, longIn2) intRes = ((uint64_t)(longIn1) * (longIn2)) >> 24
 // Some useful constants
 
+//#define ENABLE_STEPPER_DRIVER_INTERRUPT()  TIMSK1 |= (1<<OCIE1A)
+//#define DISABLE_STEPPER_DRIVER_INTERRUPT() TIMSK1 &= ~(1<<OCIE1A)
 
-// --------------------------------------------------------------------------
-#else if defined(ARDUINO_ARCH_SAM)
-
-#define MultiU16X8toH16(intRes, charIn1, intIn2)   intRes = ((charIn1) * (intIn2)) >> 16
-
-#define MultiU24X24toH16(intRes, longIn1, longIn2) intRes = ((uint64_t)(longIn1) * (longIn2)) >> 24
-
-#endif
-// --------------------------------------------------------------------------
 
 
 void checkHitEndstops()
@@ -199,7 +120,7 @@ void checkHitEndstops()
      SERIAL_ECHOPAIR(" Z:",(float)endstops_trigsteps[Z_AXIS]/axis_steps_per_unit[Z_AXIS]);
      LCD_MESSAGEPGM(MSG_ENDSTOPS_HIT "Z");
    }
-   SERIAL_ECHOLN("");
+   SERIAL_EOL;
    endstop_x_hit=false;
    endstop_y_hit=false;
    endstop_z_hit=false;
@@ -212,6 +133,8 @@ void checkHitEndstops()
      setTargetHotend0(0);
      setTargetHotend1(0);
      setTargetHotend2(0);
+     setTargetHotend3(0);
+     setTargetBed(0);
    }
 #endif
  }
@@ -254,11 +177,11 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   unsigned long timer;
   if(step_rate > MAX_STEP_FREQUENCY) step_rate = MAX_STEP_FREQUENCY;
 
-  if(step_rate > (2 * DOUBLE_FREQUENCY)) { // If steprate > 20kHz >> step 4 times
+  if(step_rate > (2 * DOUBLE_STEP_FREQUENCY)) { // If steprate > 2*DOUBLE_STEP_FREQUENCY >> step 4 times (config_adv ~ 96kHz)
     step_rate = (step_rate >> 2);
     step_loops = 4;
   }
-  else if(step_rate > DOUBLE_FREQUENCY) { // If steprate > 10kHz >> step 2 times
+  else if(step_rate > DOUBLE_STEP_FREQUENCY) { // If steprate > DOUBLE_STEP_FREQUENCY >> step 2 times
     step_rate = (step_rate >> 1);
     step_loops = 2;
   }
@@ -266,11 +189,10 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
     step_loops = 1;
   }
 
-// #if defined(ARDUINO_ARCH_AVR)
   if(step_rate < (32)) step_rate = (32);
-  // step_rate -= (1); // Correct for minimal speed
+  
   if(step_rate >= (8*256)){ // higher step rate
-    step_rate -= (32); // Correct for minimal speed
+    step_rate -= (32); // Correct for minimal speed (lookuptable for Due!)
     unsigned long table_address = (unsigned long)&speed_lookuptable_fast[(unsigned int)(step_rate>>8)][0];
     unsigned long tmp_step_rate = (step_rate & 0x00ff);
     unsigned long gain = (unsigned long)pgm_read_word_near(table_address+2);
@@ -278,28 +200,15 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
     timer = (unsigned long)pgm_read_word_near(table_address) - timer;
   }
   else { // lower step rates
-    // unsigned long table_address = (unsigned long)&speed_lookuptable_slow[0][0];
+    timer = HAL_TIMER_RATE / step_rate;
+    // unsigned short table_address = (unsigned short)&speed_lookuptable_slow[0][0];
     // table_address += ((step_rate)>>1) & 0xfffc;
-    // timer = (unsigned long)pgm_read_word_near(table_address);
-    // timer -= (((unsigned long)pgm_read_word_near(table_address+2) * (unsigned char)(step_rate & 0x0007))>>3);
-	timer = HAL_TIMER_RATE / step_rate;
+    // timer = (unsigned short)pgm_read_word_near(table_address);
+    // timer -= (((unsigned short)pgm_read_word_near(table_address+2) * (unsigned char)(step_rate & 0x0007))>>3);
   }
-  if(timer < 100) { timer = 100; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(20kHz this should never happen)
-// #endif
-// #if defined(ARDUINO_ARCH_SAM)
-  // if(step_rate < 210) step_rate = 210;
-  // timer = HAL_TIMER_RATE / step_rate;
-  // if(timer < 100) { timer = 100; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(420kHz this should never happen)
-// #endif
-  return (timer);
+  if(timer < 100) { timer = 100; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(420kHz this should never happen)
+  return timer;
 }
-
-#ifdef DEBUG_STEPPER
-  static long dec_steps, acc_steps, nom_steps, dec_rate, acc_rate, nom_rate, dec_timer, acc_timer, nom_timer;
-  static bool last_acc = true;
-  static bool first_dec = true;
-  static bool first_nom = true;
-#endif
 
 // Initializes the trapezoid generator from the current block. Called whenever a new
 // block begins.
@@ -326,22 +235,17 @@ FORCE_INLINE void trapezoid_generator_reset() {
 //    SERIAL_ECHOPGM("advance rate :");
 //    SERIAL_ECHO(current_block->advance_rate/256.0);
 //    SERIAL_ECHOPGM("initial advance :");
-//  SERIAL_ECHO(current_block->initial_advance/256.0);
+//    SERIAL_ECHO(current_block->initial_advance/256.0);
 //    SERIAL_ECHOPGM("final advance :");
 //    SERIAL_ECHOLN(current_block->final_advance/256.0);
-	// SERIAL_ECHO_START;
-	// SERIAL_ECHOPGM("OCR1A: ");
-	// SERIAL_ECHOLN(OCR1A_nominal);
 
 }
 
 // "The Stepper Driver Interrupt" - This timer interrupt is the workhorse.
 // It pops blocks from the block_buffer and executes them by pulsing the stepper pins appropriately.
-//ISR(TIMER1_COMPA_vect)
 HAL_STEP_TIMER_ISR
 {
   HAL_timer_isr_prologue (STEP_TIMER_NUM);
-
   // If there is no current block, attempt to pop one from the buffer
   if (current_block == NULL) {
     // Anything in the buffer?
@@ -358,7 +262,7 @@ HAL_STEP_TIMER_ISR
       #ifdef Z_LATE_ENABLE
         if(current_block->steps_z > 0) {
           enable_z();
-          OCR1A = 2000; //1ms wait
+          HAL_timer_set_count (STEP_TIMER_NUM, HAL_TIMER_RATE / 1000); //1ms wait
           return;
         }
       #endif
@@ -368,8 +272,7 @@ HAL_STEP_TIMER_ISR
 //      #endif
     }
     else {
-        //OCR1A=2000; // 1kHz.
-    	HAL_timer_set_count (STEP_TIMER_NUM, HAL_TIMER_RATE / 1000); // 1kHz
+        HAL_timer_set_count (STEP_TIMER_NUM, HAL_TIMER_RATE / 1000); // 1kHz
     }
   }
 
@@ -555,15 +458,12 @@ HAL_STEP_TIMER_ISR
       }
     }
 
-
     #ifndef ADVANCE
-      if ((out_bits & (1<<E_AXIS)) != 0)
-	  {  // -direction
+      if ((out_bits & (1<<E_AXIS)) != 0) {  // -direction
         REV_E_DIR();
         count_direction[E_AXIS]=-1;
       }
-      else
-	  { // +direction
+      else { // +direction
         NORM_E_DIR();
         count_direction[E_AXIS]=1;
       }
@@ -572,11 +472,6 @@ HAL_STEP_TIMER_ISR
 
 
     for(int8_t i=0; i < step_loops; i++) { // Take multiple steps per interrupt (For high speed moves)
-      #ifdef ARDUINO_ARCH_AVR
-      #ifndef AT90USB
-      MSerial.checkRx(); // Check for serial chars.
-      #endif
-	  #endif
 
       #ifdef ADVANCE
       counter_e += current_block->steps_e;
@@ -591,7 +486,59 @@ HAL_STEP_TIMER_ISR
       }
       #endif //ADVANCE
 
-        counter_x += current_block->steps_x;
+      counter_x += current_block->steps_x;
+#ifdef CONFIG_STEPPERS_TOSHIBA
+	/* The toshiba stepper controller require much longer pulses
+	 * tjerfore we 'stage' decompose the pulses between high, and
+	 * low instead of doing each in turn. The extra tests add enough
+	 * lag to allow it work with without needing NOPs */ 
+      if (counter_x > 0) {
+        WRITE(X_STEP_PIN, HIGH);
+      }
+
+      counter_y += current_block->steps_y;
+      if (counter_y > 0) {
+        WRITE(Y_STEP_PIN, HIGH);
+      }
+
+      counter_z += current_block->steps_z;
+      if (counter_z > 0) {
+        WRITE(Z_STEP_PIN, HIGH);
+      }
+
+      #ifndef ADVANCE
+        counter_e += current_block->steps_e;
+        if (counter_e > 0) {
+          WRITE_E_STEP(HIGH);
+        }
+      #endif //!ADVANCE
+
+      if (counter_x > 0) {
+        counter_x -= current_block->step_event_count;
+        count_position[X_AXIS]+=count_direction[X_AXIS];   
+        WRITE(X_STEP_PIN, LOW);
+      }
+
+      if (counter_y > 0) {
+        counter_y -= current_block->step_event_count;
+        count_position[Y_AXIS]+=count_direction[Y_AXIS];
+        WRITE(Y_STEP_PIN, LOW);
+      }
+
+      if (counter_z > 0) {
+        counter_z -= current_block->step_event_count;
+        count_position[Z_AXIS]+=count_direction[Z_AXIS];
+        WRITE(Z_STEP_PIN, LOW);
+      }
+
+      #ifndef ADVANCE
+        if (counter_e > 0) {
+          counter_e -= current_block->step_event_count;
+          count_position[E_AXIS]+=count_direction[E_AXIS];
+          WRITE_E_STEP(LOW);
+        }
+      #endif //!ADVANCE
+#else
         if (counter_x > 0) {
         #ifdef DUAL_X_CARRIAGE
           if (extruder_duplication_enabled){
@@ -668,39 +615,26 @@ HAL_STEP_TIMER_ISR
           WRITE_E_STEP(INVERT_E_STEP_PIN);
         }
       #endif //!ADVANCE
+#endif // CONFIG_STEPPERS_TOSHIBA
       step_events_completed += 1;
       if(step_events_completed >= current_block->step_event_count) break;
     }
-    // Calculate new timer value
+    // Calculare new timer value
     unsigned long timer;
     unsigned long step_rate;
-    if (step_events_completed <= (unsigned long int)current_block->accelerate_until)
-	{
+    if (step_events_completed <= (unsigned long int)current_block->accelerate_until) {
 
       MultiU24X24toH16(acc_step_rate, acceleration_time, current_block->acceleration_rate);
       acc_step_rate += current_block->initial_rate;
 
       // upper limit
-      if(acc_step_rate > current_block->nominal_rate) 
+      if(acc_step_rate > current_block->nominal_rate)
         acc_step_rate = current_block->nominal_rate;
 
       // step_rate to timer interval
       timer = calc_timer(acc_step_rate);
       HAL_timer_set_count (STEP_TIMER_NUM, timer);
-	  
       acceleration_time += timer;
-	  #ifdef DEBUG_STEPPER
-	  if (step_events_completed == ((unsigned long int)current_block->accelerate_until - 160))
-	  {
-		acc_rate = acc_step_rate;
-		acc_steps = step_events_completed;
-		acc_timer = timer;
-		// SERIAL_ECHO("st_ev_com/cur_blo->acc_unt: "); SERIAL_ECHO(step_events_completed); 
-		// SERIAL_ECHO(":"); SERIAL_ECHOLN(current_block->accelerate_until);
-		last_acc = false;
-		first_nom = true;
-	  }
-	  #endif
       #ifdef ADVANCE
         for(int8_t i=0; i < step_loops; i++) {
           advance += advance_rate;
@@ -719,11 +653,11 @@ HAL_STEP_TIMER_ISR
         step_rate = current_block->final_rate;
       }
       else {
-        step_rate = acc_step_rate - step_rate; // Decelerate from acceleration end point.
+        step_rate = acc_step_rate - step_rate; // Decelerate from aceleration end point.
       }
 
       // lower limit
-      if(step_rate < current_block->final_rate) 
+      if(step_rate < current_block->final_rate)
         step_rate = current_block->final_rate;
 
       // step_rate to timer interval
@@ -739,49 +673,15 @@ HAL_STEP_TIMER_ISR
         e_steps[current_block->active_extruder] += ((advance >>8) - old_advance);
         old_advance = advance >>8;
       #endif //ADVANCE
-	  // if (step_events_completed == ((unsigned long int)current_block->decelerate_after + 1)) {
-		  // SERIAL_ECHO("st_ev_com/cur_blo->dec_aft: "); SERIAL_ECHO(step_events_completed); 
-		  // SERIAL_ECHO(":"); SERIAL_ECHOLN(current_block->decelerate_after);
-		  // first_dec = true;
-	  // }
-	  #ifdef DEBUG_STEPPER
-	  if (step_events_completed == ((unsigned long int)current_block->decelerate_after + 160)) {
-		// first_dec = false;
-		dec_rate = step_rate;
-		dec_steps = deceleration_time;
-		dec_timer = timer;
-		first_nom = true;
-	  }
-	  #endif
     }
     else {
-    	HAL_timer_set_count (STEP_TIMER_NUM, OCR1A_nominal);
+      HAL_timer_set_count (STEP_TIMER_NUM, OCR1A_nominal);
       // ensure we're running at the correct step rate, even if we just came off an acceleration
       step_loops = step_loops_nominal;
-	  #ifdef DEBUG_STEPPER
-	  if (first_nom)
-	  {
-		first_nom = false;
-		nom_rate = current_block->nominal_rate;
-		nom_steps = step_events_completed;
-		nom_timer = OCR1A_nominal;
-	  }
-	  #endif
     }
 
     // If current block is finished, reset pointer
-    if (step_events_completed >= current_block->step_event_count)
-	{
-	  #ifdef DEBUG_STEPPER
-	    SERIAL_ECHOLN("---------- timer end -----------");
-	    SERIAL_ECHOPGM("acc_rate/acc_steps/acc_timer: "); SERIAL_ECHO(acc_rate); SERIAL_ECHO(" / "); SERIAL_ECHOLN(acc_steps); SERIAL_ECHO(" / "); SERIAL_ECHOLN(acc_timer);
-	    SERIAL_ECHOPGM("dec_rate/dec_steps/dec_timer: "); SERIAL_ECHO(dec_rate); SERIAL_ECHO(" / "); SERIAL_ECHOLN(dec_steps); SERIAL_ECHO(" / "); SERIAL_ECHOLN(dec_timer);
-	    SERIAL_ECHOPGM("nom_rate/nom_steps/nom_timer: "); SERIAL_ECHO(nom_rate); SERIAL_ECHO(" / "); SERIAL_ECHOLN(nom_steps); SERIAL_ECHO(" / "); SERIAL_ECHOLN(nom_timer);
-	    SERIAL_ECHOPGM("current_block->accelerate_until: "); SERIAL_ECHOLN(current_block->accelerate_until);
-	    SERIAL_ECHOPGM("current_block->decelerate_after: "); SERIAL_ECHOLN(current_block->decelerate_after);
-	    SERIAL_ECHOLN("---------------------------------");
-	    last_acc = false;
-	  #endif
+    if (step_events_completed >= current_block->step_event_count) {
       current_block = NULL;
       plan_discard_current_block();
     }
@@ -841,6 +741,22 @@ HAL_STEP_TIMER_ISR
         }
       }
  #endif
+ #if EXTRUDERS > 3
+      if (e_steps[3] != 0) {
+        WRITE(E3_STEP_PIN, INVERT_E_STEP_PIN);
+        if (e_steps[3] < 0) {
+          WRITE(E3_DIR_PIN, INVERT_E3_DIR);
+          e_steps[3]++;
+          WRITE(E3_STEP_PIN, !INVERT_E_STEP_PIN);
+        }
+        else if (e_steps[3] > 0) {
+          WRITE(E3_DIR_PIN, !INVERT_E3_DIR);
+          e_steps[3]--;
+          WRITE(E3_STEP_PIN, !INVERT_E_STEP_PIN);
+        }
+      }
+ #endif
+
     }
   }
 #endif // ADVANCE
@@ -879,6 +795,9 @@ void st_init()
   #endif
   #if defined(E2_DIR_PIN) && (E2_DIR_PIN > -1)
     SET_OUTPUT(E2_DIR_PIN);
+  #endif
+  #if defined(E3_DIR_PIN) && (E3_DIR_PIN > -1)
+    SET_OUTPUT(E3_DIR_PIN);
   #endif
 
   //Initialize Enable Pins - steppers default to disabled.
@@ -921,132 +840,100 @@ void st_init()
     SET_OUTPUT(E2_ENABLE_PIN);
     if(!E_ENABLE_ON) WRITE(E2_ENABLE_PIN,HIGH);
   #endif
+  #if defined(E3_ENABLE_PIN) && (E3_ENABLE_PIN > -1)
+    SET_OUTPUT(E3_ENABLE_PIN);
+    if(!E_ENABLE_ON) WRITE(E3_ENABLE_PIN,HIGH);
+  #endif
 
   //endstops and pullups
 
   #if defined(X_MIN_PIN) && X_MIN_PIN > -1
     SET_INPUT(X_MIN_PIN);
     #ifdef ENDSTOPPULLUP_XMIN
-		PULLUP(X_MIN_PIN,HIGH);
-      // WRITE(X_MIN_PIN,HIGH);
+      PULLUP(X_MIN_PIN,HIGH);
     #endif
   #endif
 
   #if defined(Y_MIN_PIN) && Y_MIN_PIN > -1
     SET_INPUT(Y_MIN_PIN);
     #ifdef ENDSTOPPULLUP_YMIN
-		PULLUP(Y_MIN_PIN,HIGH);
-      // WRITE(Y_MIN_PIN,HIGH);
+      PULLUP(Y_MIN_PIN,HIGH);
     #endif
   #endif
 
   #if defined(Z_MIN_PIN) && Z_MIN_PIN > -1
     SET_INPUT(Z_MIN_PIN);
     #ifdef ENDSTOPPULLUP_ZMIN
-		PULLUP(Z_MIN_PIN,HIGH);
-      // WRITE(Z_MIN_PIN,HIGH);
+      PULLUP(Z_MIN_PIN,HIGH);
     #endif
   #endif
 
   #if defined(X_MAX_PIN) && X_MAX_PIN > -1
     SET_INPUT(X_MAX_PIN);
     #ifdef ENDSTOPPULLUP_XMAX
-		PULLUP(X_MAX_PIN,HIGH);
-      // WRITE(X_MAX_PIN,HIGH);
+      PULLUP(X_MAX_PIN,HIGH);
     #endif
   #endif
 
   #if defined(Y_MAX_PIN) && Y_MAX_PIN > -1
     SET_INPUT(Y_MAX_PIN);
     #ifdef ENDSTOPPULLUP_YMAX
-		PULLUP(Y_MAX_PIN,HIGH);
-      // WRITE(Y_MAX_PIN,HIGH);
+      PULLUP(Y_MAX_PIN,HIGH);
     #endif
   #endif
 
   #if defined(Z_MAX_PIN) && Z_MAX_PIN > -1
     SET_INPUT(Z_MAX_PIN);
     #ifdef ENDSTOPPULLUP_ZMAX
-		PULLUP(Z_MAX_PIN,HIGH);
-      // WRITE(Z_MAX_PIN,HIGH);
+      PULLUP(Z_MAX_PIN,HIGH);
     #endif
   #endif
 
 
   //Initialize Step Pins
   #if defined(X_STEP_PIN) && (X_STEP_PIN > -1)
-    SET_OUTPUT(X_STEP_PIN);
-    WRITE(X_STEP_PIN,INVERT_X_STEP_PIN);
+    OUT_WRITE(X_STEP_PIN,INVERT_X_STEP_PIN);
     disable_x();
   #endif
   #if defined(X2_STEP_PIN) && (X2_STEP_PIN > -1)
-    SET_OUTPUT(X2_STEP_PIN);
-    WRITE(X2_STEP_PIN,INVERT_X_STEP_PIN);
+    OUT_WRITE(X2_STEP_PIN,INVERT_X_STEP_PIN);
     disable_x();
   #endif
   #if defined(Y_STEP_PIN) && (Y_STEP_PIN > -1)
-    SET_OUTPUT(Y_STEP_PIN);
-    WRITE(Y_STEP_PIN,INVERT_Y_STEP_PIN);
+    OUT_WRITE(Y_STEP_PIN,INVERT_Y_STEP_PIN);
     #if defined(Y_DUAL_STEPPER_DRIVERS) && defined(Y2_STEP_PIN) && (Y2_STEP_PIN > -1)
-      SET_OUTPUT(Y2_STEP_PIN);
-      WRITE(Y2_STEP_PIN,INVERT_Y_STEP_PIN);
+      OUT_WRITE(Y2_STEP_PIN,INVERT_Y_STEP_PIN);
     #endif
     disable_y();
   #endif
   #if defined(Z_STEP_PIN) && (Z_STEP_PIN > -1)
-    SET_OUTPUT(Z_STEP_PIN);
-    WRITE(Z_STEP_PIN,INVERT_Z_STEP_PIN);
+    OUT_WRITE(Z_STEP_PIN,INVERT_Z_STEP_PIN);
     #if defined(Z_DUAL_STEPPER_DRIVERS) && defined(Z2_STEP_PIN) && (Z2_STEP_PIN > -1)
-      SET_OUTPUT(Z2_STEP_PIN);
-      WRITE(Z2_STEP_PIN,INVERT_Z_STEP_PIN);
+      OUT_WRITE(Z2_STEP_PIN,INVERT_Z_STEP_PIN);
     #endif
     disable_z();
   #endif
   #if defined(E0_STEP_PIN) && (E0_STEP_PIN > -1)
-    SET_OUTPUT(E0_STEP_PIN);
-    WRITE(E0_STEP_PIN,INVERT_E_STEP_PIN);
+    OUT_WRITE(E0_STEP_PIN,INVERT_E_STEP_PIN);
     disable_e0();
   #endif
   #if defined(E1_STEP_PIN) && (E1_STEP_PIN > -1)
-    SET_OUTPUT(E1_STEP_PIN);
-    WRITE(E1_STEP_PIN,INVERT_E_STEP_PIN);
+    OUT_WRITE(E1_STEP_PIN,INVERT_E_STEP_PIN);
     disable_e1();
   #endif
   #if defined(E2_STEP_PIN) && (E2_STEP_PIN > -1)
-    SET_OUTPUT(E2_STEP_PIN);
-    WRITE(E2_STEP_PIN,INVERT_E_STEP_PIN);
+    OUT_WRITE(E2_STEP_PIN,INVERT_E_STEP_PIN);
     disable_e2();
   #endif
+  #if defined(E3_STEP_PIN) && (E3_STEP_PIN > -1)
+    OUT_WRITE(E3_STEP_PIN,INVERT_E_STEP_PIN);
+    disable_e3();
+  #endif
 
-#if defined(ARDUINO_ARCH_AVR)  // waveform generation = 0100 = CTC
-  TCCR1B &= ~(1<<WGM13);
-  TCCR1B |=  (1<<WGM12);
-  TCCR1A &= ~(1<<WGM11);
-  TCCR1A &= ~(1<<WGM10);
-
-  // output mode = 00 (disconnected)
-  TCCR1A &= ~(3<<COM1A0);
-  TCCR1A &= ~(3<<COM1B0);
-
-  // Set the timer pre-scaler
-  // Generally we use a divider of 8, resulting in a 2MHz timer
-  // frequency on a 16MHz MCU. If you are going to change this, be
-  // sure to regenerate speed_lookuptable.h with
-  // create_speed_lookuptable.py
-  TCCR1B = (TCCR1B & ~(0x07<<CS10)) | (2<<CS10);
-
-  OCR1A = 0x4000;
-  TCNT1 = 0;
-#elif defined (ARDUINO_ARCH_SAM)
-  //todo: Due
-
-  //HAL_step_timer_start (STEP_TIMER_NUM, 244); // Neu 28.01.2015 Nico
   HAL_step_timer_start();
-
-#endif
-
   ENABLE_STEPPER_DRIVER_INTERRUPT();
 
+  #if 0 // old AVR-stuff; needs rework
   #ifdef ADVANCE
   #if defined(TCCR0A) && defined(WGM01)
     TCCR0A &= ~(1<<WGM01);
@@ -1055,9 +942,11 @@ void st_init()
     e_steps[0] = 0;
     e_steps[1] = 0;
     e_steps[2] = 0;
+    e_steps[3] = 0;
     TIMSK0 |= (1<<OCIE0A);
   #endif //ADVANCE
-
+  #endif
+  
   enable_endstops(true); // Start with endstops active. After homing they can be disabled
   sei();
 }
@@ -1116,6 +1005,7 @@ void finishAndDisableSteppers()
   disable_e0();
   disable_e1();
   disable_e2();
+  disable_e3();
 }
 
 void quickStop()
@@ -1152,9 +1042,9 @@ void babystep(const uint8_t axis,const bool direction)
     #ifdef DUAL_X_CARRIAGE
       WRITE(X2_STEP_PIN, !INVERT_X_STEP_PIN);
     #endif
-    {
-    delayMicroseconds(1); //wait a tiny bit
-    }
+
+    delayMicroseconds(1U); // wait 1 microsecond
+
     WRITE(X_STEP_PIN, INVERT_X_STEP_PIN);
     #ifdef DUAL_X_CARRIAGE
       WRITE(X2_STEP_PIN, INVERT_X_STEP_PIN);
@@ -1184,9 +1074,9 @@ void babystep(const uint8_t axis,const bool direction)
     #ifdef DUAL_Y_CARRIAGE
       WRITE(Y2_STEP_PIN, !INVERT_Y_STEP_PIN);
     #endif
-    {
-    delayMicroseconds(1); //wait a tiny bit
-    }
+
+    delayMicroseconds(1U); // wait 1 microsecond
+
     WRITE(Y_STEP_PIN, INVERT_Y_STEP_PIN);
     #ifdef DUAL_Y_CARRIAGE
       WRITE(Y2_STEP_PIN, INVERT_Y_STEP_PIN);
@@ -1216,10 +1106,9 @@ void babystep(const uint8_t axis,const bool direction)
     #ifdef Z_DUAL_STEPPER_DRIVERS
       WRITE(Z2_STEP_PIN, !INVERT_Z_STEP_PIN);
     #endif
-    //wait a tiny bit
-    {
-    delayMicroseconds(1); //absolutely useless
-    }
+
+    delayMicroseconds(1U); // wait 1 microsecond
+
     WRITE(Z_STEP_PIN, INVERT_Z_STEP_PIN);
     #ifdef Z_DUAL_STEPPER_DRIVERS
       WRITE(Z2_STEP_PIN, INVERT_Z_STEP_PIN);
@@ -1252,10 +1141,8 @@ void babystep(const uint8_t axis,const bool direction)
     WRITE(Y_STEP_PIN, !INVERT_Y_STEP_PIN); 
     WRITE(Z_STEP_PIN, !INVERT_Z_STEP_PIN); 
     
-    //wait a tiny bit
-    {
-    delayMicroseconds(1); //absolutely useless
-    }
+    delayMicroseconds(1U); // wait 1 microsecond
+
     WRITE(X_STEP_PIN, INVERT_X_STEP_PIN); 
     WRITE(Y_STEP_PIN, INVERT_Y_STEP_PIN); 
     WRITE(Z_STEP_PIN, INVERT_Z_STEP_PIN);
@@ -1336,7 +1223,7 @@ void microstep_init()
   pinMode(Y_MS1_PIN,OUTPUT);
   pinMode(Y_MS2_PIN,OUTPUT);
   pinMode(Z_MS1_PIN,OUTPUT);
-  pinMode(Z_MS2_PIN,OUTPUT);  
+  pinMode(Z_MS2_PIN,OUTPUT);
   pinMode(E0_MS1_PIN,OUTPUT);
   pinMode(E0_MS2_PIN,OUTPUT);
   for(int i=0;i<=4;i++) microstep_mode(i,microstep_modes[i]);

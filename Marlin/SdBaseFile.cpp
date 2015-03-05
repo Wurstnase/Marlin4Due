@@ -294,7 +294,7 @@ bool SdBaseFile::getFilename(char* name) {
   return true;
 }
 //------------------------------------------------------------------------------
-void SdBaseFile::getpos(FatPos_t* pos) {
+void SdBaseFile::getpos(FatPos* pos) {
   pos->position = curPosition_;
   pos->cluster = curCluster_;
 }
@@ -407,7 +407,6 @@ bool SdBaseFile::make83Name(const char* str, uint8_t* name, const char** ptr) {
         goto fail;
       }
 #endif  // __AVR__
-
       // check size and only allow ASCII printable characters
       if (i > n || c < 0X21 || c > 0X7E)goto fail;
       // only upper case allowed in 8.3 names - convert lower to upper
@@ -936,7 +935,7 @@ bool SdBaseFile::openRoot(SdVolume* vol) {
  * \return The byte if no error and not at eof else -1;
  */
 int SdBaseFile::peek() {
-  FatPos_t pos;
+  FatPos pos;
   getpos(&pos);
   int c = read();
   if (c >= 0) setpos(&pos);
@@ -1023,7 +1022,7 @@ void SdBaseFile::printFatTime( uint16_t fatTime) {
  * the value zero, false, is returned for failure.
  */
 bool SdBaseFile::printName() {
-  char name[13];
+  char name[FILENAME_LENGTH];
   if (!getFilename(name)) return false;
   MYSERIAL.print(name);
   return true;
@@ -1146,7 +1145,7 @@ int8_t SdBaseFile::readDir(dir_t* dir, char* longFilename) {
     	if (VFAT->firstClusterLow == 0 && (VFAT->sequenceNumber & 0x1F) > 0 && (VFAT->sequenceNumber & 0x1F) <= MAX_VFAT_ENTRIES)
     	{
 			//TODO: Store the filename checksum to verify if a none-long filename aware system modified the file table.
-    		n = ((VFAT->sequenceNumber & 0x1F) - 1) * 13;
+    		n = ((VFAT->sequenceNumber & 0x1F) - 1) * FILENAME_LENGTH;
 			longFilename[n+0] = VFAT->name1[0];
 			longFilename[n+1] = VFAT->name1[1];
 			longFilename[n+2] = VFAT->name1[2];
@@ -1162,7 +1161,7 @@ int8_t SdBaseFile::readDir(dir_t* dir, char* longFilename) {
 			longFilename[n+12] = VFAT->name3[1];
 			//If this VFAT entry is the last one, add a NUL terminator at the end of the string
 			if (VFAT->sequenceNumber & 0x40)
-				longFilename[n+13] = '\0';
+				longFilename[n+FILENAME_LENGTH] = '\0';
 		}
     }
     // return if normal file or subdirectory
@@ -1503,7 +1502,7 @@ bool SdBaseFile::seekSet(uint32_t pos) {
   return false;
 }
 //------------------------------------------------------------------------------
-void SdBaseFile::setpos(FatPos_t* pos) {
+void SdBaseFile::setpos(FatPos* pos) {
   curPosition_ = pos->position;
   curCluster_ = pos->cluster;
 }

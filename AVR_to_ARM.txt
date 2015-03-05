@@ -1,0 +1,118 @@
+
+
+Files
+======
+
+
+Common to all platforms
+-----------------------
+
+File marked [*] have target dependent code selected by #if :
+- ARDUINO_ARCH_AVR    AVR-parts removed
+- ARDUINO_ARCH_SAM		Arduino Due (RADDS, RAMPS-FD) 
+
+
+cardreader.cpp 
+cardreader.h
+Configuration.h
+Configuration_adv.h			[*] double_stepping_freq
+ConfigurationStore.cpp
+ConfigurationStore.h
+DOGMbitmaps.h
+dogm_font_data_marlin.h
+dogm_lcd_implementation.h
+language.h
+Marlin.h          [*] done
+Marlin.ino
+Marlin_main.cpp
+motion_control.cpp
+motion_control.h
+planner.cpp
+planner.h
+Sd2Card.cpp  			[*] needs some testing
+Sd2Card.h      		[*] done
+Sd2PinMap.h       [*] done
+SdBaseFile.cpp 
+SdBaseFile.h 
+SdFatConfig.h     [*] done
+SdFatStructs.h 
+SdFile.cpp 
+SdFile.h 
+SdInfo.h 
+SdVolume.cpp 
+SdVolume.h
+Servo.h
+stepper.cpp       [*] done
+stepper.h
+temperature.cpp   [*] done but needs some testing
+temperature.h
+thermistortables.h
+ultralcd.cpp
+ultralcd_implementation_hitahi_HD44780.h
+ultralcd_st7920_u8glib_rrd.h
+ultralcd.h
+watchdog.h
+
+
+
+AVR specific
+------------
+
+fastio.h
+HAL.cpp
+HAL.h
+pins.h
+
+Servo.cpp
+ServoTimers.h
+
+MarlinSerial.cpp
+MarlinSerial.h
+speed_lookuptable.h
+
+Due specific
+------------
+
+fastio.h
+HAL.cpp
+HAL.h
+pins.h
+Servo.cpp
+ServoTimers.h
+
+TODO
+----
+BlinkM.cpp						- should be common 
+BlinkM.h 
+digipot_mcp4451.cpp   - may be required for Duet?
+LiquidCrystalRus.cpp 
+LiquidCrystalRus.h 
+qr_solve.cpp 
+qr_solve.h 
+SdFatUtil.cpp					- not used? 
+SdFatUtil.h           - not used?
+vector_3.cpp 
+vector_3.h 
+watchdog.cpp          - requires arduino core change
+
+
+Libraries used
+==============
+
+AVR
+---
+
+Wire
+SPI
+LiquidCrystal
+Servo from 1.5.6, modified for Marlin
+u8glib
+
+Due
+---
+
+Wire
+SPI
+LiquidCrystal
+Servo from 1.5.6, modified for Marlin
+u8glib v1.16

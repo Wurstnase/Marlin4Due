@@ -27,26 +27,14 @@
 #ifndef	_FASTIO_H
 #define	_FASTIO_H
 
-
-
 // --------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------
 
-// ----- From Repetier v092 -----
-#define PULLUP(IO,v)            {pinMode(IO, (v!=LOW ? INPUT_PULLUP : INPUT)); }
-
-// #if defined(ARDUINO) && ARDUINO >= 100
-// #include "Arduino.h"
-// #else
-// #include "WProgram.h"
-// #define COMPAT_PRE1
-// #endif
-
+/// Read a pin
 #define	READ(pin)  PIO_Get(g_APinDescription[pin].pPort, PIO_INPUT, g_APinDescription[pin].ulPin)
-//#define	WRITE(pin, v) PIO_SetOutput(g_APinDescription[pin].pPort, g_APinDescription[pin].ulPin, v, 0, PIO_PULLUP)
+/// write to a pin
 #define	WRITE(pin, v) do{if(v) {g_APinDescription[pin].pPort->PIO_SODR = g_APinDescription[pin].ulPin;} else {g_APinDescription[pin].pPort->PIO_CODR = g_APinDescription[pin].ulPin; }}while(0)
- 
 
 #define	SET_INPUT(pin) pmc_enable_periph_clk(g_APinDescription[pin].ulPeripheralId); \
     PIO_Configure(g_APinDescription[pin].pPort, PIO_INPUT, g_APinDescription[pin].ulPin, 0) 
@@ -54,25 +42,11 @@
 #define	SET_OUTPUT(pin) PIO_Configure(g_APinDescription[pin].pPort, PIO_OUTPUT_1, \
 	g_APinDescription[pin].ulPin, g_APinDescription[pin].ulPinConfiguration)
 
+/// toggle a pin	
 #define TOGGLE(pin) WRITE(pin,!READ(pin))
 
-// #define LOW         0
-// #define HIGH        1
-
-// ----- Repetier end ------
-
-/// Read a pin
-// #define READ(IO) digitalRead(IO)
-/// Write to a pin
-// #define WRITE(IO, v) digitalWrite(IO,v)
-
-/// toggle a pin
-// #define TOGGLE(IO)
-
-/// set pin as input
-// #define SET_INPUT(IO) pinMode (IO,INPUT)
-/// set pin as output
-// #define SET_OUTPUT(IO) pinMode (IO,OUTPUT)
+// Write doesn't work for pullups
+#define PULLUP(IO,v) {pinMode(IO, (v!=LOW ? INPUT_PULLUP : INPUT)); }
 
 /// check if pin is an input
 #define GET_INPUT(IO)
@@ -81,5 +55,8 @@
 
 /// check if pin is an timer
 #define GET_TIMER(IO)
+
+// Shorthand
+#define OUT_WRITE(IO, v) { SET_OUTPUT(IO); WRITE(IO, v); }
 
 #endif	/* _FASTIO_H */

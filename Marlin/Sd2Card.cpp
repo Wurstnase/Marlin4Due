@@ -22,83 +22,9 @@
 #ifdef SDSUPPORT
 #include "Sd2Card.h"
 //------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
 #ifndef SOFTWARE_SPI
 // functions for hardware SPI
 //------------------------------------------------------------------------------
-
-#ifdef ARCH_ARDUINO_AVR
-
-// make sure SPCR rate is in expected bits
-#if (SPR0 != 0 || SPR1 != 1)
-#error unexpected SPCR bits
-#endif
-/**
- * Initialize hardware SPI
- */
-static void spiInit(void) {
-	// set a default rate
-	spiSetSckRate (SPI_HALF_SPEED);
-}
-//------------------------------------------------------------------------------
-
-/**
- *
- * The SPI clock will be set to F_CPU/pow(2, 1 + sckRateID). The maximum
- * SPI rate is F_CPU/2 for \a sckRateID = 0 and the minimum rate is F_CPU/128
- * for \a scsRateID = 6.
- *
- */
-static void spiSetSckRate (uint8_t spiRate) {
-  // See avr processor documentation
-  SPCR = (1 << SPE) | (1 << MSTR) | (spiRate >> 1);
-  SPSR = spiRate & 1 || spiRate == 6 ? 0 : 1 << SPI2X;
-}
-
-//------------------------------------------------------------------------------
-/** SPI receive a byte */
-static uint8_t spiRec() {
-  SPDR = 0XFF;
-  while (!(SPSR & (1 << SPIF))) { /* Intentionally left empty */ }
-  return SPDR;
-}
-//------------------------------------------------------------------------------
-/** SPI read data - only one call so force inline */
-static inline __attribute__((always_inline))
-void spiRead(uint8_t* buf, uint16_t nbyte) {
-  if (nbyte-- == 0) return;
-  SPDR = 0XFF;
-  for (uint16_t i = 0; i < nbyte; i++) {
-    while (!(SPSR & (1 << SPIF))) { /* Intentionally left empty */ }
-    buf[i] = SPDR;
-    SPDR = 0XFF;
-  }
-  while (!(SPSR & (1 << SPIF))) { /* Intentionally left empty */ }
-  buf[nbyte] = SPDR;
-}
-//------------------------------------------------------------------------------
-/** SPI send a byte */
-static void spiSend(uint8_t b) {
-  SPDR = b;
-  while (!(SPSR & (1 << SPIF))) { /* Intentionally left empty */ }
-}
-//------------------------------------------------------------------------------
-/** SPI send block - only one call so force inline */
-static inline __attribute__((always_inline))
-  void spiSendBlock(uint8_t token, const uint8_t* buf) {
-  SPDR = token;
-  for (uint16_t i = 0; i < 512; i += 2) {
-    while (!(SPSR & (1 << SPIF))) { /* Intentionally left empty */ }
-    SPDR = buf[i];
-    while (!(SPSR & (1 << SPIF))) { /* Intentionally left empty */ }
-    SPDR = buf[i + 1];
-  }
-  while (!(SPSR & (1 << SPIF))) { /* Intentionally left empty */ }
-}
-
-#elif defined (ARDUINO_ARCH_SAM)
-
 #include <SPI.h>
 
 static void spiInit(void) {
@@ -139,13 +65,6 @@ static inline __attribute__((always_inline))
   }
 
 }
-
-#else
-#error Unsupported architecture
-#endif
-
-
-
 //------------------------------------------------------------------------------
 #else  // SOFTWARE_SPI
 //------------------------------------------------------------------------------
@@ -278,7 +197,7 @@ void Sd2Card::chipSelectHigh() {
 //------------------------------------------------------------------------------
 void Sd2Card::chipSelectLow() {
 #ifndef SOFTWARE_SPI
-  setSckRate(spiRate_);
+  spiInit();
 #endif  // SOFTWARE_SPI
   digitalWrite(chipSelectPin_, LOW);
 }
@@ -372,9 +291,9 @@ bool Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
 #if SET_SPI_SS_HIGH
   digitalWrite(SS_PIN, HIGH);
 #endif  // SET_SPI_SS_HIGH
-  spiInit();
   // set SCK rate for initialization commands
   setSckRate(SPI_SD_INIT_RATE);
+  spiInit();
 #endif  // SOFTWARE_SPI
 
   // must supply min of 74 clock cycles with CS high.
@@ -635,22 +554,21 @@ bool Sd2Card::readStop() {
 /**
  * Set the SPI clock rate.
  *
- * \param[in] sckRateID A value in a range depending on platform
+ * \param[in] sckRateID A value in the range [0, 6].
+ *
+ * The SPI clock will be set to F_CPU/pow(2, 1 + sckRateID). The maximum
+ * SPI rate is F_CPU/2 for \a sckRateID = 0 and the minimum rate is F_CPU/128
+ * for \a scsRateID = 6.
  *
  * \return The value one, true, is returned for success and the value zero,
  * false, is returned for an invalid value of \a sckRateID.
  */
 bool Sd2Card::setSckRate(uint8_t sckRateID) {
-
-#if 0
   if (sckRateID > 6) {
     error(SD_CARD_ERROR_SCK_RATE);
     return false;
   }
-#endif
-  spiSetSckRate (sckRateID);
   spiRate_ = sckRateID;
-
   return true;
 }
 //------------------------------------------------------------------------------
