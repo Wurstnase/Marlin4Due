@@ -107,7 +107,7 @@
 
 #define FAN_PIN            -1
 
-#define CONTROLLERFAN_PIN  -1 //Pin used for the fan to cool controller
+//#define CONTROLLERFAN_PIN  -1 //Pin used for the fan to cool controller
 
 #define PS_ON_PIN          40
 
