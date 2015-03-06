@@ -1,6 +1,8 @@
 # Marlin4Due 3D Printer Firmware
 <img align="right" src="Documentation/Logo/Marlin%20Logo%20GitHub.png" />
 
+##### [Github-Discussion](https://github.com/MarlinFirmware/Marlin/issues/626)
+
 ### New features are:
 * Steprates up to 320.000 steps/s (top for 1/128 stepper driver)
 * smoother temperature (median of last 5 values)
