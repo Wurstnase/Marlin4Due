@@ -6,9 +6,11 @@
 * smoother temperature (median of last 5 values)
  
 ### known issues:
-* watchdog doesn't work, don't activate it
-* some Display timing issues
+  * watchdog doesn't work, don't activate it
+  * some Display timing issues
 
+---
+# Marlin 3D Printer Firmware
   * [Configuration & Compilation](/Documentation/Compilation.md)
   * Supported
     * [Features](/Documentation/Features.md)
