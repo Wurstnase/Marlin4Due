@@ -1,7 +1,13 @@
 # Marlin4Due 3D Printer Firmware
 <img align="right" src="Documentation/Logo/Marlin%20Logo%20GitHub.png" />
 
-###I'm trying to move all actual stuff from Marlin to Marlin4Due. Actually nothing is tested!
+### New features are:
+* Steprates up to 320.000 steps/s (top for 1/128 stepper driver)
+* smoother temperature (median of last 5 values)
+ 
+### known issues:
+* watchdog doesn't work, don't activate it
+* some Display timing issues
 
   * [Configuration & Compilation](/Documentation/Compilation.md)
   * Supported
