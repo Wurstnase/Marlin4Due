@@ -392,8 +392,8 @@ static void lcd_implementation_init(
 #else
   #if (LCD_PINS_RS != -1) && (LCD_PINS_ENABLE != -1)
       // required for RAMPS-FD, but does no harm for other targets
-      pinMode (LCD_PINS_RS, OUTPUT);
-      pinMode (LCD_PINS_ENABLE, OUTPUT);
+      SET_OUTPUT(LCD_PINS_RS);
+      SET_OUTPUT(LCD_PINS_ENABLE);
 	#endif
     lcd.begin(LCD_WIDTH, LCD_HEIGHT);
 #endif

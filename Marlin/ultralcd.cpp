@@ -440,6 +440,7 @@ void lcd_set_home_offsets() {
   static void lcd_babystep_y() { _lcd_babystep(Y_AXIS, PSTR(MSG_BABYSTEPPING_Y)); }
   static void lcd_babystep_z() { _lcd_babystep(Z_AXIS, PSTR(MSG_BABYSTEPPING_Z)); }
 
+
 #endif //BABYSTEPPING
 
 static void lcd_tune_menu() {
@@ -529,6 +530,7 @@ void lcd_preheat_abs0() { _lcd_preheat(0, absPreheatHotendTemp, absPreheatHPBTem
 
 void lcd_preheat_pla_bedonly() { _lcd_preheat(0, 0, plaPreheatHPBTemp, plaPreheatFanSpeed); }
 void lcd_preheat_abs_bedonly() { _lcd_preheat(0, 0, absPreheatHPBTemp, absPreheatFanSpeed); }
+
 
 static void lcd_preheat_pla_menu() {
   START_MENU();
@@ -1148,18 +1150,18 @@ void lcd_init() {
 
     SET_INPUT(BTN_EN1);
     SET_INPUT(BTN_EN2);
-    WRITE(BTN_EN1,HIGH);
-    WRITE(BTN_EN2,HIGH);
+    PULLUP(BTN_EN1,HIGH);
+    PULLUP(BTN_EN2,HIGH);
   #if BTN_ENC > 0
     SET_INPUT(BTN_ENC);
-    WRITE(BTN_ENC,HIGH);
+    PULLUP(BTN_ENC,HIGH);
   #endif
   #ifdef REPRAPWORLD_KEYPAD
     pinMode(SHIFT_CLK,OUTPUT);
     pinMode(SHIFT_LD,OUTPUT);
     pinMode(SHIFT_OUT,INPUT);
-    WRITE(SHIFT_OUT,HIGH);
-    WRITE(SHIFT_LD,HIGH);
+    PULLUP(SHIFT_OUT,HIGH);
+    PULLUP(SHIFT_LD,HIGH);
   #endif
 #else  // Not NEWPANEL
   #ifdef SR_LCD_2W_NL // Non latching 2 wire shift register
@@ -1170,9 +1172,9 @@ void lcd_init() {
      pinMode(SHIFT_LD,OUTPUT);
      pinMode(SHIFT_EN,OUTPUT);
      pinMode(SHIFT_OUT,INPUT);
-     WRITE(SHIFT_OUT,HIGH);
-     WRITE(SHIFT_LD,HIGH);
-     WRITE(SHIFT_EN,LOW);
+     PULLUP(SHIFT_OUT,HIGH);
+     PULLUP(SHIFT_LD,HIGH);
+     PULLUP(SHIFT_EN,LOW);
   #else
      #ifdef ULTIPANEL
      #error ULTIPANEL requires an encoder
@@ -1182,7 +1184,7 @@ void lcd_init() {
 
   #if defined(SDSUPPORT) && defined(SDCARDDETECT) && (SDCARDDETECT > 0)
     pinMode(SDCARDDETECT, INPUT);
-    WRITE(SDCARDDETECT, HIGH);
+    PULLUP(SDCARDDETECT, HIGH);
     lcd_oldcardstatus = IS_SD_INSERTED;
   #endif //(SDCARDDETECT > 0)
 
