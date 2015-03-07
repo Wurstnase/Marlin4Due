@@ -154,11 +154,11 @@
 	  #define LCD_PINS_D6 		46
 	  #define LCD_PINS_D7 		47
 
-	  #ifdef REPRAP_DISCOUNT_SMART_CONTROLLER
+	  #ifdef RADDS_DISPLAY
 			#define BEEPER 41
 
-			#define BTN_EN1 52
-			#define BTN_EN2 50
+			#define BTN_EN1 50
+			#define BTN_EN2 52
 			#define BTN_ENC 48
 
 			#define SDCARDDETECT 14

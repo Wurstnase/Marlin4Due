@@ -585,6 +585,9 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 //#define LCD_FEEDBACK_FREQUENCY_HZ 1000	// this is the tone frequency the buzzer plays when on UI feedback. ie Screen Click
 //#define LCD_FEEDBACK_FREQUENCY_DURATION_MS 100 // the duration the buzzer plays the UI feedback sound. ie Screen Click
 
+// Original RADDS Display from Willy
+#define RADDS_DISPLAY
+
 // PanelOne from T3P3 (via RAMPS 1.4 AUX2/AUX3)
 // http://reprap.org/wiki/PanelOne
 //#define PANEL_ONE
@@ -601,7 +604,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 
 // The RepRapDiscount Smart Controller (white PCB)
 // http://reprap.org/wiki/RepRapDiscount_Smart_Controller
-#define REPRAP_DISCOUNT_SMART_CONTROLLER
+//#define REPRAP_DISCOUNT_SMART_CONTROLLER
 
 // The GADGETS3D G3D LCD/SD Controller (blue PCB)
 // http://reprap.org/wiki/RAMPS_1.3/1.4_GADGETS3D_Shield_with_Panel
@@ -662,6 +665,15 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
  #define ULTIPANEL
  #define NEWPANEL
 #endif
+
+#if defined(RADDS_DISPLAY)
+  #define ENCODER_PULSES_PER_STEP 2
+  #define ENCODER_STEPS_PER_MENU_ITEM 1
+  
+  #define ULTIPANEL
+  #define NEWPANEL
+#endif
+  
 
 #if defined(REPRAPWORLD_KEYPAD)
   #define NEWPANEL
