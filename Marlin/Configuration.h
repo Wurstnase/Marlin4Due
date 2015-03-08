@@ -51,7 +51,7 @@ Here are some standard links for getting your machine calibrated:
 #define SERIAL_PORT 0
 
 // This determines the communication speed of the printer
-#define BAUDRATE 115200
+#define BAUDRATE 250000
 
 // This enables the serial port associated to the Bluetooth interface
 //#define BTENABLED              // Enable BT interface on AT90USB devices
@@ -63,7 +63,7 @@ Here are some standard links for getting your machine calibrated:
 #endif
 
 // Define this to set a custom name for your generic Mendel,
-#define CUSTOM_MENDEL_NAME "Marlin4Due"
+// #define CUSTOM_MENDEL_NAME "Marlin4Due"
 
 // Define this to set a unique identifier for this printer, (Used by some programs to differentiate between machines)
 // You can use an online service to generate a random UUID. (eg http://www.uuidgenerator.net/version4)
@@ -123,11 +123,11 @@ Here are some standard links for getting your machine calibrated:
 //     #define DUMMY_THERMISTOR_998_VALUE 25
 //     #define DUMMY_THERMISTOR_999_VALUE 100
 
-#define TEMP_SENSOR_0 5
-#define TEMP_SENSOR_1 0
+#define TEMP_SENSOR_0 -1
+#define TEMP_SENSOR_1 -1
 #define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_3 0
-#define TEMP_SENSOR_BED 1
+#define TEMP_SENSOR_BED 0
 
 // This makes temp sensor 1 a redundant sensor for sensor 0. If the temperatures difference between these sensors is to high the print will be aborted.
 //#define TEMP_SENSOR_1_AS_REDUNDANT
@@ -173,7 +173,7 @@ Here are some standard links for getting your machine calibrated:
 // Comment the following line to disable PID and enable bang-bang.
 #define PIDTEMP
 #define BANG_MAX 255 // limits current to nozzle while in bang-bang mode; 255=full current
-#define PID_MAX 170 // limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
+#define PID_MAX PID_MAX // limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
 #ifdef PIDTEMP
   //#define PID_DEBUG // Sends debug data to the serial port.
   //#define PID_OPENLOOP 1 // Puts PID in open loop. M104/M140 sets the output power from 0 to PID_MAX
@@ -188,9 +188,9 @@ Here are some standard links for getting your machine calibrated:
 
 // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
 // E3D
-    #define  DEFAULT_Kp 16.53
-    #define  DEFAULT_Ki 1.82
-    #define  DEFAULT_Kd 37.48
+    #define  DEFAULT_Kp 27.82
+    #define  DEFAULT_Ki 3.78
+    #define  DEFAULT_Kd 51.20
 
 // MakerGear
 //    #define  DEFAULT_Kp 7.0
@@ -296,7 +296,7 @@ your extruder heater takes 2 minutes to hit the target on heating.
 //===========================================================================
 
 // Uncomment the following line to enable CoreXY kinematics
-//#define COREXY
+// #define COREXY
 
 // coarse Endstop Settings
 #define ENDSTOPPULLUPS // Comment this out (using // at the start of the line) to disable the endstop pullup resistors
@@ -331,10 +331,10 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 //#define DISABLE_MIN_ENDSTOPS
 
 // For Inverting Stepper Enable Pins (Active Low) use 0, Non Inverting (Active High) use 1
-#define X_ENABLE_ON 1
-#define Y_ENABLE_ON 1
-#define Z_ENABLE_ON 1
-#define E_ENABLE_ON 1 // For all extruders
+#define X_ENABLE_ON 0
+#define Y_ENABLE_ON 0
+#define Z_ENABLE_ON 0
+#define E_ENABLE_ON 0 // For all extruders
 
 // Disables axis when it's not being used.
 #define DISABLE_X false
@@ -357,15 +357,15 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 #define Y_HOME_DIR -1
 #define Z_HOME_DIR -1
 
-#define min_software_endstops false // If true, axis won't move to coordinates less than HOME_POS.
-#define max_software_endstops false  // If true, axis won't move to coordinates greater than the defined lengths below.
+#define min_software_endstops true // If true, axis won't move to coordinates less than HOME_POS.
+#define max_software_endstops true  // If true, axis won't move to coordinates greater than the defined lengths below.
 
 // Travel limits after homing (units are in mm)
-#define X_MAX_POS 220
+#define X_MAX_POS 205
 #define X_MIN_POS 0
-#define Y_MAX_POS 215
+#define Y_MAX_POS 205
 #define Y_MIN_POS 0
-#define Z_MAX_POS 215
+#define Z_MAX_POS 200
 #define Z_MIN_POS 0
 
 #define X_MAX_LENGTH (X_MAX_POS - X_MIN_POS)
@@ -378,7 +378,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 //===========================================================================
 
 //#define ENABLE_AUTO_BED_LEVELING // Delete the comment to enable (remove // at the start of the line)
-//#define Z_PROBE_REPEATABILITY_TEST  // If not commented out, Z-Probe Repeatability test will be included if Auto Bed Leveling is Enabled.
+#define Z_PROBE_REPEATABILITY_TEST  // If not commented out, Z-Probe Repeatability test will be included if Auto Bed Leveling is Enabled.
 
 #ifdef ENABLE_AUTO_BED_LEVELING
 
@@ -402,10 +402,10 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
   #ifdef AUTO_BED_LEVELING_GRID
 
     // set the rectangle in which to probe
-    #define LEFT_PROBE_BED_POSITION 40
-    #define RIGHT_PROBE_BED_POSITION 175
-    #define BACK_PROBE_BED_POSITION 205
-    #define FRONT_PROBE_BED_POSITION 45
+    #define LEFT_PROBE_BED_POSITION 15
+    #define RIGHT_PROBE_BED_POSITION 170
+    #define BACK_PROBE_BED_POSITION 180
+    #define FRONT_PROBE_BED_POSITION 20
 
      // set the number of grid points per dimension
      // I wouldn't see a reason to go above 3 (=9 probing points on the bed)
@@ -428,17 +428,17 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 
   // these are the offsets to the probe relative to the extruder tip (Hotend - Probe)
   // X and Y offsets must be integers
-  #define X_PROBE_OFFSET_FROM_EXTRUDER -40
-  #define Y_PROBE_OFFSET_FROM_EXTRUDER 0
-  #define Z_PROBE_OFFSET_FROM_EXTRUDER -0.3
+  #define X_PROBE_OFFSET_FROM_EXTRUDER -25
+  #define Y_PROBE_OFFSET_FROM_EXTRUDER -29
+  #define Z_PROBE_OFFSET_FROM_EXTRUDER -12.35
 
-  #define Z_RAISE_BEFORE_HOMING 2.5       // (in mm) Raise Z before homing (G28) for Probe Clearance.
+  #define Z_RAISE_BEFORE_HOMING 4       // (in mm) Raise Z before homing (G28) for Probe Clearance.
                                         // Be sure you have this distance over your Z_MAX_POS in case
 
-  #define XY_TRAVEL_SPEED 9000         // X and Y axis travel speed between probes, in mm/min
+  #define XY_TRAVEL_SPEED 8000         // X and Y axis travel speed between probes, in mm/min
 
-  #define Z_RAISE_BEFORE_PROBING 2.5    //How much the extruder will be raised before traveling to the first probing point.
-  #define Z_RAISE_BETWEEN_PROBINGS 1  //How much the extruder will be raised when traveling from between next probing points
+  #define Z_RAISE_BEFORE_PROBING 15    //How much the extruder will be raised before traveling to the first probing point.
+  #define Z_RAISE_BETWEEN_PROBINGS 2  //How much the extruder will be raised when traveling from between next probing points
 
   //#define Z_PROBE_SLED // turn on if you have a z-probe mounted on a sled like those designed by Charles Bell
   //#define SLED_DOCKING_OFFSET 5 // the extra distance the X axis must travel to pickup the sled. 0 should be fine but you can push it further if you'd like.
@@ -548,10 +548,10 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 // M501 - reads parameters from EEPROM (if you need reset them after you changed them temporarily).
 // M502 - reverts to the default "factory settings".  You still need to store them in EEPROM afterwards if you want to.
 //define this to enable EEPROM support
-#define EEPROM_SETTINGS
+//#define EEPROM_SETTINGS
 //to disable EEPROM Serial responses and decrease program space by ~1700 byte: comment this out:
 // please keep turned on if you can.
-#define EEPROM_CHITCHAT
+//#define EEPROM_CHITCHAT
 
 // Preheat Constants
 #define PLA_PREHEAT_HOTEND_TEMP 180
@@ -586,7 +586,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 //#define LCD_FEEDBACK_FREQUENCY_DURATION_MS 100 // the duration the buzzer plays the UI feedback sound. ie Screen Click
 
 // Original RADDS Display from Willy
-#define RADDS_DISPLAY
+//#define RADDS_DISPLAY
 
 // PanelOne from T3P3 (via RAMPS 1.4 AUX2/AUX3)
 // http://reprap.org/wiki/PanelOne
