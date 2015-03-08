@@ -9,7 +9,6 @@
  
 ### known issues:
   * watchdog doesn't work, don't activate it
-  * some Display timing issues
 
 ---
 # Marlin 3D Printer Firmware
