@@ -296,8 +296,8 @@ void PID_autotune(float temp, int extruder, int ncycles)
 
             SERIAL_PROTOCOLPGM(MSG_BIAS); SERIAL_PROTOCOL(bias);
             SERIAL_PROTOCOLPGM(MSG_D);    SERIAL_PROTOCOL(d);
-            SERIAL_PROTOCOLPGM(MSG_MIN);  SERIAL_PROTOCOL(min);
-            SERIAL_PROTOCOLPGM(MSG_MAX);  SERIAL_PROTOCOLLN(max);
+            SERIAL_PROTOCOLPGM(MSG_T_MIN);  SERIAL_PROTOCOL(min);
+            SERIAL_PROTOCOLPGM(MSG_T_MAX);  SERIAL_PROTOCOLLN(max);
             if (cycles > 2) {
               Ku = (4.0 * d) / (3.14159265 * (max - min) / 2.0);
               Tu = ((float)(t_low + t_high) / 1000.0);
@@ -1285,6 +1285,8 @@ HAL_TEMP_TIMER_ISR
 	  first_start = false;
 	  SERIAL_ECHOLN("First start for temperature finished.");
   }
+  
+  HAL_timer_isr_prologue (TEMP_TIMER_NUM);
   #ifndef SLOW_PWM_HEATERS
     /**
      * standard PWM modulation
@@ -1318,7 +1320,6 @@ HAL_TEMP_TIMER_ISR
         WRITE_FAN(soft_pwm_fan > 0 ? 1 : 0);
       #endif
     }
-  HAL_timer_isr_prologue (TEMP_TIMER_NUM);
 
     if (soft_pwm_0 < pwm_count) { WRITE_HEATER_0(0); }
     #if EXTRUDERS > 1
@@ -1465,6 +1466,7 @@ HAL_TEMP_TIMER_ISR
 
       lcd_buttons_update();
       temp_state = MeasureTemp_1;
+      temp_state = MeasureTemp_BED;
       break;
     case MeasureTemp_BED:
       #if defined(TEMP_BED_PIN) && (TEMP_BED_PIN > -1)
@@ -1555,7 +1557,7 @@ HAL_TEMP_TIMER_ISR
 	  char adc_sensor = 0;
 	  unsigned long sum = 0;
 
-#ifndef HEATER_0_USES_MAX6675
+      #ifndef HEATER_0_USES_MAX6675
 	  raw_median_temp[adc_sensor][median_counter] = (raw_temp_0_value - (min_temp[adc_sensor] + max_temp[adc_sensor]));
 	  for(int i = 0; i < MEDIAN_COUNT; i++)
 	  {
@@ -1563,8 +1565,8 @@ HAL_TEMP_TIMER_ISR
 	  }
 	  current_temperature_raw[adc_sensor] = (sum / MEDIAN_COUNT + 4) >> 2;
 
-#endif
-#if EXTRUDERS > 1
+      #endif
+      #if EXTRUDERS > 1
 	  adc_sensor = 1;
 	  sum = 0;
    	  raw_median_temp[adc_sensor][median_counter] = (raw_temp_1_value - (min_temp[adc_sensor] + max_temp[adc_sensor]));
@@ -1574,7 +1576,7 @@ HAL_TEMP_TIMER_ISR
 	  }
 	  current_temperature_raw[adc_sensor] = (sum / MEDIAN_COUNT + 4) >> 2;
 
-#endif
+          #endif
 #ifdef TEMP_SENSOR_1_AS_REDUNDANT
       adc_sensor = 1;
 	  sum = 0;
@@ -1585,7 +1587,7 @@ HAL_TEMP_TIMER_ISR
 	  }
 	  redundant_temperature_raw = (sum / MEDIAN_COUNT + 4) >> 2;
 
-#endif
+        #endif
 #if EXTRUDERS > 2
       adc_sensor = 2;
 	  sum = 0;
@@ -1596,7 +1598,7 @@ HAL_TEMP_TIMER_ISR
 	  }
 	  current_temperature_raw[adc_sensor] = (sum / MEDIAN_COUNT + 4) >> 2;
 
-#endif
+      #endif
 #if EXTRUDERS > 3
       adc_sensor = 3;
 	  sum = 0;
@@ -1607,7 +1609,7 @@ HAL_TEMP_TIMER_ISR
 	  }
 	  current_temperature_raw[adc_sensor] = (sum / MEDIAN_COUNT + 4) >> 2;
 
-#endif
+      #endif
 	  adc_sensor = 4;
 	  sum = 0;
    	  raw_median_temp[adc_sensor][median_counter] = (raw_temp_bed_value - (min_temp[adc_sensor] + max_temp[adc_sensor]));
