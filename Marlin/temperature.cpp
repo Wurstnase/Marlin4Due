@@ -1285,6 +1285,8 @@ HAL_TEMP_TIMER_ISR
 	  first_start = false;
 	  SERIAL_ECHOLN("First start for temperature finished.");
   }
+  
+  HAL_timer_isr_prologue (TEMP_TIMER_NUM);
   #ifndef SLOW_PWM_HEATERS
     /**
      * standard PWM modulation
@@ -1318,7 +1320,6 @@ HAL_TEMP_TIMER_ISR
         WRITE_FAN(soft_pwm_fan > 0 ? 1 : 0);
       #endif
     }
-  HAL_timer_isr_prologue (TEMP_TIMER_NUM);
 
     if (soft_pwm_0 < pwm_count) { WRITE_HEATER_0(0); }
     #if EXTRUDERS > 1
