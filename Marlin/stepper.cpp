@@ -66,9 +66,9 @@ static unsigned short step_loops_nominal;
 
 volatile long endstops_trigsteps[3] = { 0 };
 volatile long endstops_stepsTotal, endstops_stepsDone;
-static volatile bool endstop_x_hit = false;
-static volatile bool endstop_y_hit = false;
-static volatile bool endstop_z_hit = false;
+static volatile bool endstop_x_hit = false,
+					 endstop_y_hit = false,
+					 endstop_z_hit = false;
 
 #ifdef ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED
   bool abort_on_endstop_hit = false;
@@ -95,7 +95,6 @@ volatile signed char count_direction[NUM_AXIS] = { 1 };
 //================================ functions ================================
 //===========================================================================
 
-#define CHECK_ENDSTOPS  if(check_endstops)
 #ifdef DUAL_X_CARRIAGE
   #define X_APPLY_DIR(v,ALWAYS) \
     if (extruder_duplication_enabled || ALWAYS) { \
@@ -143,81 +142,12 @@ volatile signed char count_direction[NUM_AXIS] = { 1 };
 #define E_APPLY_STEP(v,Q) E_STEP_WRITE(v)
 
 // intRes = intIn1 * intIn2 >> 16
-// uses:
-// r26 to store 0
-// r27 to store the byte 1 of the 24 bit result
-#define MultiU16X8toH16(intRes, charIn1, intIn2) \
-  asm volatile ( \
-    "clr r26 \n\t" \
-    "mul %A1, %B2 \n\t" \
-    "movw %A0, r0 \n\t" \
-    "mul %A1, %A2 \n\t" \
-    "add %A0, r1 \n\t" \
-    "adc %B0, r26 \n\t" \
-    "lsr r0 \n\t" \
-    "adc %A0, r26 \n\t" \
-    "adc %B0, r26 \n\t" \
-    "clr r1 \n\t" \
-    : \
-    "=&r" (intRes) \
-    : \
-    "d" (charIn1), \
-    "d" (intIn2) \
-    : \
-    "r26" \
-  )
-
 // intRes = longIn1 * longIn2 >> 24
-// uses:
-// r26 to store 0
-// r27 to store the byte 1 of the 48bit result
-#define MultiU24X24toH16(intRes, longIn1, longIn2) \
-  asm volatile ( \
-    "clr r26 \n\t" \
-    "mul %A1, %B2 \n\t" \
-    "mov r27, r1 \n\t" \
-    "mul %B1, %C2 \n\t" \
-    "movw %A0, r0 \n\t" \
-    "mul %C1, %C2 \n\t" \
-    "add %B0, r0 \n\t" \
-    "mul %C1, %B2 \n\t" \
-    "add %A0, r0 \n\t" \
-    "adc %B0, r1 \n\t" \
-    "mul %A1, %C2 \n\t" \
-    "add r27, r0 \n\t" \
-    "adc %A0, r1 \n\t" \
-    "adc %B0, r26 \n\t" \
-    "mul %B1, %B2 \n\t" \
-    "add r27, r0 \n\t" \
-    "adc %A0, r1 \n\t" \
-    "adc %B0, r26 \n\t" \
-    "mul %C1, %A2 \n\t" \
-    "add r27, r0 \n\t" \
-    "adc %A0, r1 \n\t" \
-    "adc %B0, r26 \n\t" \
-    "mul %B1, %A2 \n\t" \
-    "add r27, r1 \n\t" \
-    "adc %A0, r26 \n\t" \
-    "adc %B0, r26 \n\t" \
-    "lsr r27 \n\t" \
-    "adc %A0, r26 \n\t" \
-    "adc %B0, r26 \n\t" \
-    "clr r1 \n\t" \
-    : \
-    "=&r" (intRes) \
-    : \
-    "d" (longIn1), \
-    "d" (longIn2) \
-    : \
-    "r26" , "r27" \
-  )
 
 #define MultiU16X8toH16(intRes, charIn1, intIn2)   intRes = ((charIn1) * (intIn2)) >> 16
 #define MultiU24X24toH16(intRes, longIn1, longIn2) intRes = ((uint64_t)(longIn1) * (longIn2)) >> 24
 // Some useful constants
 
-//#define ENABLE_STEPPER_DRIVER_INTERRUPT()  TIMSK1 |= (1<<OCIE1A)
-//#define DISABLE_STEPPER_DRIVER_INTERRUPT() TIMSK1 &= ~(1<<OCIE1A)
 
 void endstops_hit_on_purpose() {
   endstop_x_hit = endstop_y_hit = endstop_z_hit = false;
@@ -308,11 +238,11 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
     timer = (unsigned long)pgm_read_word_near(table_address) - timer;
   }
   else { // lower step rates
-    timer = HAL_TIMER_RATE / step_rate;
-    // unsigned short table_address = (unsigned short)&speed_lookuptable_slow[0][0];
-    // table_address += ((step_rate)>>1) & 0xfffc;
-    // timer = (unsigned short)pgm_read_word_near(table_address);
-    // timer -= (((unsigned short)pgm_read_word_near(table_address+2) * (unsigned char)(step_rate & 0x0007))>>3);
+    // timer = HAL_TIMER_RATE / step_rate;
+    unsigned long table_address = (unsigned long)&speed_lookuptable_slow[0][0];
+    table_address += ((step_rate)>>1) & 0xfffc;
+    timer = (unsigned long)pgm_read_word_near(table_address);
+    timer -= (((unsigned long)pgm_read_word_near(table_address+2) * (unsigned char)(step_rate & 0x0007))>>3);
   }
   if(timer < 100) { timer = 100; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(420kHz this should never happen)
   return timer;
@@ -350,8 +280,7 @@ FORCE_INLINE void trapezoid_generator_reset() {
 
 // "The Stepper Driver Interrupt" - This timer interrupt is the workhorse.
 // It pops blocks from the block_buffer and executes them by pulsing the stepper pins appropriately.
-HAL_STEP_TIMER_ISR
-{
+HAL_STEP_TIMER_ISR {
   HAL_timer_isr_prologue (STEP_TIMER_NUM);
   // If there is no current block, attempt to pop one from the buffer
   if (!current_block) {
