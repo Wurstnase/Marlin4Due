@@ -433,10 +433,7 @@ HAL_STEP_TIMER_ISR {
 
     // Take multiple steps per interrupt (For high speed moves)
     for (int8_t i=0; i < step_loops; i++) {
-      #ifndef AT90USB
-        MSerial.checkRx(); // Check for serial chars.
-      #endif
-
+		
       #ifdef ADVANCE
         counter_e += current_block->steps_e;
         if (counter_e > 0) {
