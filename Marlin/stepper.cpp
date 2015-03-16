@@ -228,9 +228,9 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   }
 
   if(step_rate < (32)) step_rate = (32);
+  step_rate -= (32); // Correct for minimal speed (lookuptable for Due!)
   
   if (step_rate >= (8 * 256)) { // higher step rate
-    step_rate -= (32); // Correct for minimal speed (lookuptable for Due!)
     unsigned long table_address = (unsigned long)&speed_lookuptable_fast[(unsigned int)(step_rate>>8)][0];
     unsigned long tmp_step_rate = (step_rate & 0x00ff);
     unsigned long gain = (unsigned long)pgm_read_word_near(table_address+2);
