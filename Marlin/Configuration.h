@@ -351,17 +351,26 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #define max_software_endstops true  // If true, axis won't move to coordinates greater than the defined lengths below.
 
 // Travel limits after homing (units are in mm)
-#define X_MAX_POS 200
 #define X_MIN_POS 0
-#define Y_MAX_POS 200
 #define Y_MIN_POS 0
-#define Z_MAX_POS 200
 #define Z_MIN_POS 0
+#define X_MAX_POS 200
+#define Y_MAX_POS 200
+#define Z_MAX_POS 200
 
 #define X_MAX_LENGTH (X_MAX_POS - X_MIN_POS)
 #define Y_MAX_LENGTH (Y_MAX_POS - Y_MIN_POS)
 #define Z_MAX_LENGTH (Z_MAX_POS - Z_MIN_POS)
 
+//===========================================================================
+//============================= Filament Runout Sensor ======================
+//===========================================================================
+//#define FILAMENT_RUNOUT_SENSOR // Uncomment for defining a filament runout sensor such as a mechanical or opto endstop to check the existence of filament
+                                 // In RAMPS uses servo pin 2. Can be changed in pins file. For other boards pin definition should be made.
+                                 // It is assumed that when logic high = filament available
+                                 //                    when logic  low = filament ran out
+//const bool FIL_RUNOUT_INVERTING = true;  // Should be uncommented and true or false should assigned
+//#define ENDSTOPPULLUP_FIL_RUNOUT // Uncomment to use internal pullup for filament runout pins if the sensor is defined.
 
 //===========================================================================
 //============================= Bed Auto Leveling ===========================
@@ -388,6 +397,11 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
   #define AUTO_BED_LEVELING_GRID
 
   #ifdef AUTO_BED_LEVELING_GRID
+
+    // Use one of these defines to specify the origin
+    // for a topographical map to be printed for your bed.
+    enum { OriginBackLeft, OriginFrontLeft, OriginBackRight, OriginFrontRight };
+    #define TOPO_ORIGIN OriginFrontLeft
 
     // The edges of the rectangle in which to probe
     #define LEFT_PROBE_BED_POSITION 15
@@ -467,12 +481,14 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 //#define MANUAL_HOME_POSITIONS  // If defined, MANUAL_*_HOME_POS below will be used
 //#define BED_CENTER_AT_0_0  // If defined, the center of the bed is at (X=0, Y=0)
 
-//Manual homing switch locations:
+// Manual homing switch locations:
 // For deltabots this means top and center of the Cartesian print volume.
-#define MANUAL_X_HOME_POS 0
-#define MANUAL_Y_HOME_POS 0
-#define MANUAL_Z_HOME_POS 0
-//#define MANUAL_Z_HOME_POS 402 // For delta: Distance between nozzle and print surface after homing.
+#ifdef MANUAL_HOME_POSITIONS
+  #define MANUAL_X_HOME_POS 0
+  #define MANUAL_Y_HOME_POS 0
+  #define MANUAL_Z_HOME_POS 0
+  //#define MANUAL_Z_HOME_POS 402 // For delta: Distance between nozzle and print surface after homing.
+#endif
 
 //// MOVEMENT SETTINGS
 #define NUM_AXIS 4 // The axis order in all axis related arrays is X, Y, Z, E
@@ -484,8 +500,9 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #define DEFAULT_MAX_FEEDRATE          {300, 300, 5, 25}    // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {3000,3000,100,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
 
-#define DEFAULT_ACCELERATION          3000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  3000   // X, Y, Z and E max acceleration in mm/s^2 for retracts
+#define DEFAULT_ACCELERATION          3000    // X, Y, Z and E acceleration in mm/s^2 for printing moves
+#define DEFAULT_RETRACT_ACCELERATION  3000   // E acceleration in mm/s^2 for retracts
+#define DEFAULT_TRAVEL_ACCELERATION   3000    // X, Y, Z acceleration in mm/s^2 for travel (non printing) moves
 
 // Offset of the extruders (uncomment if using more than one and relying on firmware to position when changing).
 // The offset has to be X=0, Y=0 for the extruder 0 hotend (default extruder).

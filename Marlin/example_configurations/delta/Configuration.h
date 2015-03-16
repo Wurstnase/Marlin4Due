@@ -28,6 +28,13 @@ Here are some standard links for getting your machine calibrated:
 // example_configurations/delta directory.
 //
 
+//===========================================================================
+//============================= SCARA Printer ===============================
+//===========================================================================
+// For a Delta printer replace the configuration files with the files in the
+// example_configurations/SCARA directory.
+//
+
 // User-specified version info of this build to display in [Pronterface, etc] terminal window during
 // startup. Implementation of an idea by Prof Braino to inform user that any changes made to this
 // build by the user have been successfully uploaded into firmware.
@@ -329,13 +336,13 @@ your extruder heater takes 2 minutes to hit the target on heating.
 #define ENDSTOPPULLUP_YMIN
 #define ENDSTOPPULLUP_ZMIN
 
-// Mechanical endstop with COM to ground and NC to Signal uses "false" here (most common setup).
-const bool X_MIN_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
-const bool Y_MIN_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
-const bool Z_MIN_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
-const bool X_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
-const bool Y_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
-const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
+// The pullups are needed if you directly connect a mechanical endswitch between the signal and ground pins.
+const bool X_MIN_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
+const bool Y_MIN_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
+const bool Z_MIN_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
+const bool X_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
+const bool Y_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
+const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
 //#define DISABLE_MAX_ENDSTOPS
 // Deltas never have min endstops
 #define DISABLE_MIN_ENDSTOPS
@@ -357,10 +364,11 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #define INVERT_X_DIR false
 #define INVERT_Y_DIR false
 #define INVERT_Z_DIR false
-#define INVERT_E0_DIR false
-#define INVERT_E1_DIR false
-#define INVERT_E2_DIR false
-#define INVERT_E3_DIR false
+
+#define INVERT_E0_DIR false   // for direct drive extruder v9 set to true, for geared extruder set to false
+#define INVERT_E1_DIR false   // for direct drive extruder v9 set to true, for geared extruder set to false
+#define INVERT_E2_DIR false   // for direct drive extruder v9 set to true, for geared extruder set to false
+#define INVERT_E3_DIR false   // for direct drive extruder v9 set to true, for geared extruder set to false
 
 // ENDSTOP SETTINGS:
 // Sets direction of endstops when homing; 1=MAX, -1=MIN
@@ -395,12 +403,10 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 
 
 // The position of the homing switches
-//#define MANUAL_HOME_POSITIONS  // If defined, MANUAL_*_HOME_POS below will be used
+#define MANUAL_HOME_POSITIONS  // If defined, MANUAL_*_HOME_POS below will be used
 //#define BED_CENTER_AT_0_0  // If defined, the center of the bed is at (X=0, Y=0)
 
 //Manual homing switch locations:
-
-#define MANUAL_HOME_POSITIONS  // MANUAL_*_HOME_POS below will be used
 // For deltabots this means top and center of the Cartesian print volume.
 #define MANUAL_X_HOME_POS 0
 #define MANUAL_Y_HOME_POS 0
@@ -418,8 +424,10 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #define DEFAULT_MAX_FEEDRATE          {500, 500, 500, 25}    // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {9000,9000,9000,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
 
-#define DEFAULT_ACCELERATION          3000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  3000   // X, Y, Z and E max acceleration in mm/s^2 for retracts
+#define DEFAULT_ACCELERATION          3000    // X, Y, Z and E acceleration in mm/s^2 for printing moves
+#define DEFAULT_RETRACT_ACCELERATION  3000   // E acceleration in mm/s^2 for retracts
+#define DEFAULT_TRAVEL_ACCELERATION   3000    // X, Y, Z acceleration in mm/s^2 for travel (non printing) moves
+
 
 // Offset of the extruders (uncomment if using more than one and relying on firmware to position when changing).
 // The offset has to be X=0, Y=0 for the extruder 0 hotend (default extruder).

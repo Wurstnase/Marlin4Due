@@ -62,7 +62,7 @@
   #include "Servo.h"
 #endif
 
-#if defined(DIGIPOTSS_PIN) && DIGIPOTSS_PIN > -1
+#if HAS_DIGIPOTSS
   #include <SPI.h>
 #endif
 
@@ -370,6 +370,10 @@ bool cancel_heatup = false;
   int meas_delay_cm = MEASUREMENT_DELAY_CM;  //distance delay setting
 #endif
 
+#ifdef FILAMENT_RUNOUT_SENSOR
+   static bool filrunoutEnqued = false;
+#endif
+
 const char errormagic[] PROGMEM = "Error:";
 const char echomagic[] PROGMEM = "echo:";
 
@@ -531,6 +535,16 @@ void setup_killpin()
   #endif
 }
 
+void setup_filrunoutpin()
+{
+#if defined(FILRUNOUT_PIN) && FILRUNOUT_PIN > -1
+   pinMode(FILRUNOUT_PIN,INPUT);
+   #if defined(ENDSTOPPULLUP_FIL_RUNOUT)
+      WRITE(FILLRUNOUT_PIN,HIGH);
+   #endif
+#endif
+}
+
 // Set home pin
 void setup_homepin(void)
 {
@@ -607,6 +621,7 @@ void servo_init()
 void setup()
 {
   setup_killpin();
+  setup_filrunoutpin();
   setup_powerhold();
   MYSERIAL.begin(BAUDRATE);
   SERIAL_PROTOCOLLNPGM("start");
@@ -1841,12 +1856,6 @@ inline void gcode_G28() {
    *     Usage: "G29 E" or "G29 e"
    *
    */
-
-  // Use one of these defines to specify the origin
-  // for a topographical map to be printed for your bed.
-  enum { OriginBackLeft, OriginFrontLeft, OriginBackRight, OriginFrontRight };
-  #define TOPO_ORIGIN OriginFrontLeft
-
   inline void gcode_G29() {
 
     // Prevent user from running a G29 without first homing in X and Y
@@ -2017,14 +2026,15 @@ inline void gcode_G28() {
 
       if (verbose_level) {
         SERIAL_PROTOCOLPGM("Eqn coefficients: a: ");
-        SERIAL_PROTOCOL(plane_equation_coefficients[0] + 0.0001);
+        SERIAL_PROTOCOL_F(plane_equation_coefficients[0], 8);
         SERIAL_PROTOCOLPGM(" b: ");
-        SERIAL_PROTOCOL(plane_equation_coefficients[1] + 0.0001);
+        SERIAL_PROTOCOL_F(plane_equation_coefficients[1], 8);
         SERIAL_PROTOCOLPGM(" d: ");
-        SERIAL_PROTOCOLLN(plane_equation_coefficients[2] + 0.0001);
+        SERIAL_PROTOCOL_F(plane_equation_coefficients[2], 8);
+        SERIAL_EOL;
         if (verbose_level > 2) {
           SERIAL_PROTOCOLPGM("Mean of sampled points: ");
-          SERIAL_PROTOCOL_F(mean, 6);
+          SERIAL_PROTOCOL_F(mean, 8);
           SERIAL_EOL;
         }
       }
@@ -2035,15 +2045,20 @@ inline void gcode_G28() {
 
         SERIAL_PROTOCOLPGM(" \nBed Height Topography: \n");
         #if TOPO_ORIGIN == OriginFrontLeft
+          SERIAL_PROTOCOLPGM("+-----------+\n");
+          SERIAL_PROTOCOLPGM("|...Back....|\n");
+          SERIAL_PROTOCOLPGM("|Left..Right|\n");
+          SERIAL_PROTOCOLPGM("|...Front...|\n");
+          SERIAL_PROTOCOLPGM("+-----------+\n");
           for (yy = auto_bed_leveling_grid_points - 1; yy >= 0; yy--)
         #else
           for (yy = 0; yy < auto_bed_leveling_grid_points; yy++)
         #endif
           {
             #if TOPO_ORIGIN == OriginBackRight
-              for (xx = auto_bed_leveling_grid_points - 1; xx >= 0; xx--)
-            #else
               for (xx = 0; xx < auto_bed_leveling_grid_points; xx++)
+            #else
+              for (xx = auto_bed_leveling_grid_points - 1; xx >= 0; xx--)
             #endif
               {
                 int ind =
@@ -3265,16 +3280,34 @@ inline void gcode_M203() {
 }
 
 /**
- * M204: Set Default Acceleration and/or Default Filament Acceleration in mm/sec^2 (M204 S3000 T7000)
+ * M204: Set Accelerations in mm/sec^2 (M204 P1200 R3000 T3000)
  *
- *    S = normal moves
- *    T = filament only moves
+ *    P = Printing moves
+ *    R = Retract only (no X, Y, Z) moves
+ *    T = Travel (non printing) moves
  *
  *  Also sets minimum segment time in ms (B20000) to prevent buffer under-runs and M20 minimum feedrate
  */
 inline void gcode_M204() {
-  if (code_seen('S')) acceleration = code_value();
-  if (code_seen('T')) retract_acceleration = code_value();
+  if (code_seen('P'))
+  {
+    acceleration = code_value();
+    SERIAL_ECHOPAIR("Setting Printing Acceleration: ", acceleration );
+    SERIAL_EOL;
+  }
+  if (code_seen('R'))
+  {
+    retract_acceleration = code_value();
+    SERIAL_ECHOPAIR("Setting Retract Acceleration: ", retract_acceleration );
+    SERIAL_EOL;
+  }
+  if (code_seen('T'))
+  {
+    travel_acceleration = code_value();
+    SERIAL_ECHOPAIR("Setting Travel Acceleration: ", travel_acceleration );
+    SERIAL_EOL;
+  }
+  
 }
 
 /**
@@ -3884,11 +3917,11 @@ inline void gcode_M400() { st_synchronize(); }
 #ifdef FILAMENT_SENSOR
 
   /**
-   * M404: Display or set the nominal filament width (3mm, 1.75mm ) N<3.0>
+   * M404: Display or set the nominal filament width (3mm, 1.75mm ) W<3.0>
    */
   inline void gcode_M404() {
     #if FILWIDTH_PIN > -1
-      if (code_seen('N')) {
+      if (code_seen('W')) {
         filament_width_nominal = code_value();
       }
       else {
@@ -4114,6 +4147,11 @@ inline void gcode_M503() {
       plan_buffer_line(lastpos[X_AXIS], lastpos[Y_AXIS], lastpos[Z_AXIS], target[E_AXIS], fr60, active_extruder); //move z back
       plan_buffer_line(lastpos[X_AXIS], lastpos[Y_AXIS], lastpos[Z_AXIS], lastpos[E_AXIS], fr60, active_extruder); //final untretract
     #endif        
+
+    #ifdef FILAMENT_RUNOUT_SENSOR
+      filrunoutEnqued = false;
+    #endif
+    
   }
 
 #endif // FILAMENTCHANGEENABLE
@@ -4168,7 +4206,7 @@ inline void gcode_M503() {
  * M907: Set digital trimpot motor current using axis codes X, Y, Z, E, B, S
  */
 inline void gcode_M907() {
-  #if defined(DIGIPOTSS_PIN) && DIGIPOTSS_PIN > -1
+  #if HAS_DIGIPOTSS
     for (int i=0;i<NUM_AXIS;i++)
       if (code_seen(axis_codes[i])) digipot_current(i, code_value());
     if (code_seen('B')) digipot_current(4, code_value());
@@ -4191,7 +4229,7 @@ inline void gcode_M907() {
   #endif
 }
 
-#if defined(DIGIPOTSS_PIN) && DIGIPOTSS_PIN > -1
+#if HAS_DIGIPOTSS
 
   /**
    * M908: Control digital trimpot directly (M908 P<pin> S<current>)
@@ -4203,7 +4241,7 @@ inline void gcode_M907() {
       );
   }
 
-#endif // DIGIPOTSS_PIN
+#endif // HAS_DIGIPOTSS
 
 // M350 Set microstepping mode. Warning: Steps per unit remains unchanged. S code sets stepping mode for all drivers.
 inline void gcode_M350() {
@@ -4790,11 +4828,11 @@ void process_commands() {
         gcode_M907();
         break;
 
-      #if defined(DIGIPOTSS_PIN) && DIGIPOTSS_PIN > -1
+      #if HAS_DIGIPOTSS
         case 908: // M908 Control digital trimpot directly.
           gcode_M908();
           break;
-      #endif // DIGIPOTSS_PIN
+      #endif // HAS_DIGIPOTSS
 
       case 350: // M350 Set microstepping mode. Warning: Steps per unit remains unchanged. S code sets stepping mode for all drivers.
         gcode_M350();
@@ -5095,41 +5133,34 @@ void prepare_arc_move(char isclockwise) {
   #endif
 #endif
 
-unsigned long lastMotor = 0; //Save the time for when a motor was turned on last
-unsigned long lastMotorCheck = 0;
+unsigned long lastMotor = 0; // Last time a motor was turned on
+unsigned long lastMotorCheck = 0; // Last time the state was checked
 
-void controllerFan()
-{
-  if ((millis() - lastMotorCheck) >= 2500) //Not a time critical function, so we only check every 2500ms
-  {
-    lastMotorCheck = millis();
-	
-    if((READ(X_ENABLE_PIN) == (X_ENABLE_ON)) || (READ(Y_ENABLE_PIN) == (Y_ENABLE_ON)) || (READ(Z_ENABLE_PIN) == (Z_ENABLE_ON)) || (soft_pwm_bed > 0)
-    #if EXTRUDERS > 2
-       || (READ(E2_ENABLE_PIN) == (E_ENABLE_ON))
-    #endif
-    #if EXTRUDER > 1
-      #if defined(X2_ENABLE_PIN) && X2_ENABLE_PIN > -1
-       || (READ(X2_ENABLE_PIN) == (X_ENABLE_ON))
+void controllerFan() {
+  uint32_t ms = millis();
+  if (ms >= lastMotorCheck + 2500) { // Not a time critical function, so we only check every 2500ms
+    lastMotorCheck = ms;
+    if (X_ENABLE_READ == X_ENABLE_ON || Y_ENABLE_READ == Y_ENABLE_ON || Z_ENABLE_READ == Z_ENABLE_ON || soft_pwm_bed > 0
+      || E0_ENABLE_READ == E_ENABLE_ON // If any of the drivers are enabled...
+      #if EXTRUDERS > 1
+        || E1_ENABLE_READ == E_ENABLE_ON
+        #if defined(X2_ENABLE_PIN) && X2_ENABLE_PIN > -1
+          || X2_ENABLE_READ == X_ENABLE_ON
+        #endif
+        #if EXTRUDERS > 2
+          || E2_ENABLE_READ == E_ENABLE_ON
+          #if EXTRUDERS > 3
+            || E3_ENABLE_READ == E_ENABLE_ON
+          #endif
+        #endif
       #endif
-       || (READ(E1_ENABLE_PIN) == (E_ENABLE_ON))
-    #endif
-       || (READ(E0_ENABLE_PIN) == (E_ENABLE_ON))) //If any of the drivers are enabled...
-    {
-      lastMotor = millis(); //... set time to NOW so the fan will turn on
+    ) {
+      lastMotor = ms; //... set time to NOW so the fan will turn on
     }
-
-    if ((millis() - lastMotor) >= (CONTROLLERFAN_SECS*1000UL) || lastMotor == 0) //If the last time any driver was enabled, is longer since than CONTROLLERSEC...
-    {
-        digitalWrite(CONTROLLERFAN_PIN, 0);
-        analogWrite(CONTROLLERFAN_PIN, 0);
-    }
-    else
-    {
-        // allows digital or PWM fan output to be used (see M42 handling)
-        digitalWrite(CONTROLLERFAN_PIN, CONTROLLERFAN_SPEED);
-        analogWrite(CONTROLLERFAN_PIN, CONTROLLERFAN_SPEED);
-    }
+    uint8_t speed = (lastMotor == 0 || ms >= lastMotor + (CONTROLLERFAN_SECS * 1000UL)) ? 0 : CONTROLLERFAN_SPEED;
+    // allows digital or PWM fan output to be used (see M42 handling)
+    digitalWrite(CONTROLLERFAN_PIN, speed);
+    analogWrite(CONTROLLERFAN_PIN, speed);
   }
 }
 #endif
@@ -5253,6 +5284,12 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) //default argument s
    const int KILL_DELAY = 10000;
 #endif
 
+#if defined(FILRUNOUT_PIN) && FILRUNOUT_PIN > -1
+    if(card.sdprinting) {
+      if(!(READ(FILRUNOUT_PIN))^FIL_RUNOUT_INVERTING)
+      filrunout();        }
+#endif
+
 #if defined(HOME_PIN) && HOME_PIN > -1
    static int homeDebounceCount = 0;   // poor man's debouncing count
    const int HOME_DEBOUNCE_DELAY = 10000;
@@ -5339,7 +5376,7 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) //default argument s
     if( (millis() - previous_millis_cmd) >  EXTRUDER_RUNOUT_SECONDS*1000 )
     if(degHotend(active_extruder)>EXTRUDER_RUNOUT_MINTEMP)
     {
-     bool oldstatus=READ(E0_ENABLE_PIN);
+     bool oldstatus=E0_ENABLE_READ;
      enable_e0();
      float oldepos=current_position[E_AXIS];
      float oldedes=destination[E_AXIS];
@@ -5351,7 +5388,7 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) //default argument s
      plan_set_e_position(oldepos);
      previous_millis_cmd=millis();
      st_synchronize();
-     WRITE(E0_ENABLE_PIN,oldstatus);
+     E0_ENABLE_WRITE(oldstatus);
     }
   #endif
   #if defined(DUAL_X_CARRIAGE)
@@ -5400,6 +5437,16 @@ void kill()
   suicide();
   while(1) { /* Intentionally left empty */ } // Wait for reset
 }
+
+#ifdef FILAMENT_RUNOUT_SENSOR
+   void filrunout()
+   {
+      if filrunoutEnqued == false {
+         filrunoutEnqued = true;
+         enquecommand("M600");
+      }
+   }
+#endif
 
 void Stop()
 {
