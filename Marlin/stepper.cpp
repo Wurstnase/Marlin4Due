@@ -66,9 +66,9 @@ static unsigned short step_loops_nominal;
 
 volatile long endstops_trigsteps[3] = { 0 };
 volatile long endstops_stepsTotal, endstops_stepsDone;
-static volatile bool endstop_x_hit = false,
-					 endstop_y_hit = false,
-					 endstop_z_hit = false;
+static volatile bool endstop_x_hit = false;
+static volatile bool endstop_y_hit = false;
+static volatile bool endstop_z_hit = false;
 
 #ifdef ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED
   bool abort_on_endstop_hit = false;
@@ -433,7 +433,7 @@ HAL_STEP_TIMER_ISR {
 
     // Take multiple steps per interrupt (For high speed moves)
     for (int8_t i=0; i < step_loops; i++) {
-		
+
       #ifdef ADVANCE
         counter_e += current_block->steps_e;
         if (counter_e > 0) {
@@ -905,7 +905,7 @@ void quickStop() {
         uint8_t old_pin = AXIS ##_DIR_READ; \
         AXIS ##_APPLY_DIR(INVERT_## AXIS ##_DIR^direction^INVERT, true); \
         AXIS ##_APPLY_STEP(!INVERT_## AXIS ##_STEP_PIN, true); \
-        _delay_us(1U); \
+        delayMicroseconds(1U); \
         AXIS ##_APPLY_STEP(INVERT_## AXIS ##_STEP_PIN, true); \
         AXIS ##_APPLY_DIR(old_pin, true); \
       }
