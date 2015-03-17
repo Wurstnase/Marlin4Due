@@ -814,7 +814,7 @@ void st_init() {
     E_AXIS_INIT(3);
   #endif
 
-  HAL_step_timer_start();
+  HAL_timer_start(STEP_TIMER_NUM, 1000);  // start with 1kHz
   ENABLE_STEPPER_DRIVER_INTERRUPT();
 
   #if 0 // old AVR-stuff; needs rework

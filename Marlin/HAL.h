@@ -83,6 +83,7 @@ unsigned char eeprom_read_byte(unsigned char *pos);
 // timers
 #define STEP_TIMER_NUM 3
 #define TEMP_TIMER_NUM 4
+#define ADVANCED_TIMER_NUM 5
 
 #define HAL_TIMER_RATE 		     (F_CPU/2.0)
 #define TICKS_PER_NANOSECOND   (HAL_TIMER_RATE)/1000
@@ -93,10 +94,11 @@ unsigned char eeprom_read_byte(unsigned char *pos);
 //
 #define HAL_STEP_TIMER_ISR 	void TC3_Handler()
 #define HAL_TEMP_TIMER_ISR 	void TC4_Handler()
+#define HAL_ADVANCED_TIMER_ISR void TC5_Handler()
 
 // void HAL_timer_start (void);
-void HAL_step_timer_start(void);
-//void HAL_temp_timer_start (uint8_t timer_num, uint32_t frequency);
+// void HAL_step_timer_start(void);
+void HAL_timer_start (uint8_t timer_num, uint32_t frequency);
 void HAL_temp_timer_start (uint8_t timer_num);
 //void HAL_temp_timer_start(void);
 void HAL_timer_set_count (uint8_t timer_num, uint32_t count);

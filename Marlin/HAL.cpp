@@ -199,17 +199,17 @@ static const tTimerConfig TimerConfig [NUM_HARDWARE_TIMERS] =
 // thanks for that work
 // http://forum.arduino.cc/index.php?topic=297397.0
 
-void HAL_step_timer_start()
+void HAL_timer_start(uint8_t timer_num, uint32_t frequency)
 {
   uint32_t tc_count, tc_clock;
-  uint8_t timer_num;
+  // uint8_t timer_num;
   
   pmc_set_writeprotect(false); //remove write protection on registers
   NVIC_SetPriorityGrouping(4);
   
   // Timer for stepper
   // Timer 3 HAL.h STEP_TIMER_NUM
-  timer_num = STEP_TIMER_NUM;
+  // timer_num = STEP_TIMER_NUM;
   
   // Get the ISR from table
   Tc *tc = TimerConfig [timer_num].pTimerRegs;
@@ -222,14 +222,13 @@ void HAL_step_timer_start()
   TC_Configure(tc, channel, TC_CMR_TCCLKS_TIMER_CLOCK1 | TC_CMR_CPCTRG); //set clock rate (CLOCK1 is MCK/2) and reset counter register C on match
   tc->TC_CHANNEL[channel].TC_IER |= TC_IER_CPCS; //enable interrupt on timer match with register C
 
-  tc->TC_CHANNEL[channel].TC_RC   = (VARIANT_MCK >> 1) / 1000; // start with 1kHz as frequency; //interrupt occurs every x interations of the timer counter
+  tc->TC_CHANNEL[channel].TC_RC   = (VARIANT_MCK >> 1) / frequency; // start with 1kHz as frequency; //interrupt occurs every x interations of the timer counter
   TC_Start(tc, channel); //start timer counter
   NVIC_EnableIRQ(irq); //enable Nested Vector Interrupt Controller
   
-  tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS;
-  tc->TC_CHANNEL[channel].TC_IDR =~ TC_IER_CPCS;
+  // tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS;
+  // tc->TC_CHANNEL[channel].TC_IDR =~ TC_IER_CPCS;
 }
-
 
 void HAL_temp_timer_start (uint8_t timer_num)
 {
@@ -262,7 +261,8 @@ void HAL_timer_enable_interrupt (uint8_t timer_num)
 {
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
 
-	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IER = TC_IER_CPCS;
+	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IER = TC_IER_CPCS;  // enable interrupt
+	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IDR = ~TC_IER_CPCS; // remove disable interrupt
 	
 }
 
@@ -270,7 +270,7 @@ void HAL_timer_disable_interrupt (uint8_t timer_num)
 {
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
 
-	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IDR = ~TC_IER_CPCS;
+	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IDR = TC_IER_CPCS;
 }
 
 void HAL_timer_set_count (uint8_t timer_num, uint32_t count)
@@ -301,8 +301,15 @@ int HAL_timer_get_count (uint8_t timer_num)
 }
 
 // --------------------------------------------------------------------------
-//
+// ADC
 // --------------------------------------------------------------------------
+
+void HAL_init_ADC() {
+
+  ADC->ADC_WPMR
+  pmc_enable_periph_clk(ID_ADC);
+  
+}
 
 // --------------------------------------------------------------------------
 //! @brief
