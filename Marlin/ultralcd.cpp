@@ -116,14 +116,23 @@ static void menu_action_setting_edit_callback_long5(const char* pstr, unsigned l
 
 
 /* Helper macros for menus */
-#define START_MENU() do { \
+#define START_MENU(args...) do { \
 	encoderRateMultiplierEnabled = false; \
     if (encoderPosition > 0x8000) encoderPosition = 0; \
     if (encoderPosition / ENCODER_STEPS_PER_MENU_ITEM < currentMenuViewOffset) currentMenuViewOffset = encoderPosition / ENCODER_STEPS_PER_MENU_ITEM;\
     uint8_t _lineNr = currentMenuViewOffset, _menuItemNr; \
     bool wasClicked = LCD_CLICKED;\
+	#if defined(BTN_BACK) && BTN_BACK > 0\
+      bool wasBackClicked = LCD_BACK_CLICKED;\
+      if (wasBackClicked) {\
+        lcd_quick_feedback();\
+        menu_action_back ( args );\
+		return;\
+	  }\
+	#endif\
     for(uint8_t _drawLineNr = 0; _drawLineNr < LCD_HEIGHT; _drawLineNr++, _lineNr++) { \
         _menuItemNr = 0;
+
 #define MENU_ITEM(type, label, args...) do { \
     if (_menuItemNr == _lineNr) { \
         if (lcdDrawUpdate) { \
@@ -142,6 +151,7 @@ static void menu_action_setting_edit_callback_long5(const char* pstr, unsigned l
     }\
     _menuItemNr++;\
 } while(0)
+
 #ifdef ENCODER_RATE_MULTIPLIER
   #define MENU_MULTIPLIER_ITEM(type, label, args...) do { \
     if (_menuItemNr == _lineNr) { \
@@ -164,6 +174,7 @@ static void menu_action_setting_edit_callback_long5(const char* pstr, unsigned l
     } \
     _menuItemNr++; \
   } while(0)
+
 #endif //ENCODER_RATE_MULTIPLIER
 #define MENU_ITEM_DUMMY() do { _menuItemNr++; } while(0)
 #define MENU_ITEM_EDIT(type, label, args...) MENU_ITEM(setting_edit_ ## type, label, PSTR(label) , ## args )
@@ -362,7 +373,7 @@ static void lcd_sdcard_stop() {
 
 /* Menu implementation */
 static void lcd_main_menu() {
-  START_MENU();
+  START_MENU(lcd_status_screen);
   MENU_ITEM(back, MSG_WATCH, lcd_status_screen);
   if (movesplanned() || IS_SD_PRINTING) {
     MENU_ITEM(submenu, MSG_TUNE, lcd_tune_menu);
@@ -443,7 +454,7 @@ void lcd_set_home_offsets() {
 #endif //BABYSTEPPING
 
 static void lcd_tune_menu() {
-  START_MENU();
+  START_MENU(lcd_main_menu);
   MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
   MENU_ITEM_EDIT(int3, MSG_SPEED, &feedmultiply, 10, 999);
   #if TEMP_SENSOR_0 != 0
@@ -531,7 +542,7 @@ void lcd_preheat_pla_bedonly() { _lcd_preheat(0, 0, plaPreheatHPBTemp, plaPrehea
 void lcd_preheat_abs_bedonly() { _lcd_preheat(0, 0, absPreheatHPBTemp, absPreheatFanSpeed); }
 
 static void lcd_preheat_pla_menu() {
-  START_MENU();
+  START_MENU(lcd_prepare_menu);
   MENU_ITEM(back, MSG_PREPARE, lcd_prepare_menu);
   MENU_ITEM(function, MSG_PREHEAT_PLA_N MSG_H1, lcd_preheat_pla0);
   #if TEMP_SENSOR_1 != 0 //2 extruder preheat
@@ -553,7 +564,7 @@ static void lcd_preheat_pla_menu() {
 }
 
 static void lcd_preheat_abs_menu() {
-  START_MENU();
+  START_MENU(lcd_prepare_menu);
   MENU_ITEM(back, MSG_PREPARE, lcd_prepare_menu);
   MENU_ITEM(function, MSG_PREHEAT_ABS_N MSG_H1, lcd_preheat_abs0);
   #if TEMP_SENSOR_1 != 0 //2 extruder preheat
@@ -585,7 +596,7 @@ void lcd_cooldown() {
 }
 
 static void lcd_prepare_menu() {
-  START_MENU();
+  START_MENU(lcd_main_menu);
   MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
   #ifdef SDSUPPORT
     #ifdef MENU_ADDAUTOSTART
@@ -622,7 +633,7 @@ static void lcd_prepare_menu() {
 #ifdef DELTA_CALIBRATION_MENU
 static void lcd_delta_calibrate_menu()
 {
-    START_MENU();
+    START_MENU(lcd_main_menu);
     MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
     MENU_ITEM(gcode, MSG_AUTO_HOME, PSTR("G28"));
     MENU_ITEM(gcode, MSG_DELTA_CALIBRATE_X, PSTR("G0 F8000 X-77.94 Y-45 Z0"));
@@ -675,7 +686,7 @@ static void lcd_move_e() {
 }
 
 static void lcd_move_menu_axis() {
-  START_MENU();
+  START_MENU(lcd_move_menu);
   MENU_ITEM(back, MSG_MOVE_AXIS, lcd_move_menu);
   MENU_ITEM(submenu, MSG_MOVE_X, lcd_move_x);
   MENU_ITEM(submenu, MSG_MOVE_Y, lcd_move_y);
@@ -700,7 +711,7 @@ static void lcd_move_menu_01mm() {
 }
 
 static void lcd_move_menu() {
-  START_MENU();
+  START_MENU(lcd_prepare_menu);
   MENU_ITEM(back, MSG_PREPARE, lcd_prepare_menu);
   MENU_ITEM(submenu, MSG_MOVE_10MM, lcd_move_menu_10mm);
   MENU_ITEM(submenu, MSG_MOVE_1MM, lcd_move_menu_1mm);
@@ -710,7 +721,7 @@ static void lcd_move_menu() {
 }
 
 static void lcd_control_menu() {
-  START_MENU();
+  START_MENU(lcd_main_menu);
   MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
   MENU_ITEM(submenu, MSG_TEMPERATURE, lcd_control_temperature_menu);
   MENU_ITEM(submenu, MSG_MOTION, lcd_control_motion_menu);
@@ -763,7 +774,7 @@ static void lcd_control_menu() {
 #endif //PIDTEMP
 
 static void lcd_control_temperature_menu() {
-  START_MENU();
+  START_MENU(lcd_control_menu);
   MENU_ITEM(back, MSG_CONTROL, lcd_control_menu);
   #if TEMP_SENSOR_0 != 0
     MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_NOZZLE, &target_temperature[0], 0, HEATER_0_MAXTEMP - 15);
@@ -851,7 +862,7 @@ static void lcd_control_temperature_menu() {
 }
 
 static void lcd_control_temperature_preheat_pla_settings_menu() {
-  START_MENU();
+  START_MENU(lcd_control_temperature_menu);
   MENU_ITEM(back, MSG_TEMPERATURE, lcd_control_temperature_menu);
   MENU_ITEM_EDIT(int3, MSG_FAN_SPEED, &plaPreheatFanSpeed, 0, 255);
   #if TEMP_SENSOR_0 != 0
@@ -867,7 +878,7 @@ static void lcd_control_temperature_preheat_pla_settings_menu() {
 }
 
 static void lcd_control_temperature_preheat_abs_settings_menu() {
-  START_MENU();
+  START_MENU(lcd_control_temperature_menu);
   MENU_ITEM(back, MSG_TEMPERATURE, lcd_control_temperature_menu);
   MENU_ITEM_EDIT(int3, MSG_FAN_SPEED, &absPreheatFanSpeed, 0, 255);
   #if TEMP_SENSOR_0 != 0
@@ -883,7 +894,7 @@ static void lcd_control_temperature_preheat_abs_settings_menu() {
 }
 
 static void lcd_control_motion_menu() {
-  START_MENU();
+  START_MENU(lcd_control_menu);
   MENU_ITEM(back, MSG_CONTROL, lcd_control_menu);
   #ifdef ENABLE_AUTO_BED_LEVELING
     MENU_ITEM_EDIT(float32, MSG_ZPROBE_ZOFFSET, &zprobe_zoffset, 0.5, 50);
@@ -919,7 +930,7 @@ static void lcd_control_motion_menu() {
 }
 
 static void lcd_control_volumetric_menu() {
-  START_MENU();
+  START_MENU(lcd_control_menu);
   MENU_ITEM(back, MSG_CONTROL, lcd_control_menu);
 
   MENU_ITEM_EDIT_CALLBACK(bool, MSG_VOLUMETRIC_ENABLED, &volumetric_enabled, calculate_volumetric_multipliers);
@@ -960,7 +971,7 @@ static void lcd_set_contrast() {
 #ifdef FWRETRACT
 
 static void lcd_control_retract_menu() {
-  START_MENU();
+  START_MENU(lcd_control_menu);
   MENU_ITEM(back, MSG_CONTROL, lcd_control_menu);
   MENU_ITEM_EDIT(bool, MSG_AUTORETRACT, &autoretract_enabled);
   MENU_ITEM_EDIT(float52, MSG_CONTROL_RETRACT, &retract_length, 0, 100);
@@ -994,7 +1005,7 @@ static void lcd_sd_updir() {
 void lcd_sdcard_menu() {
   if (lcdDrawUpdate == 0 && LCD_CLICKED == 0) return;	// nothing to do (so don't thrash the SD card)
   uint16_t fileCnt = card.getnrfilenames();
-  START_MENU();
+  START_MENU(lcd_main_menu);
   MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
   card.getWorkDirName();
   if (card.filename[0] == '/') {
@@ -1412,9 +1423,13 @@ void lcd_buttons_update() {
     uint8_t newbutton = 0;
     if (READ(BTN_EN1) == 0) newbutton |= EN_A;
     if (READ(BTN_EN2) == 0) newbutton |= EN_B;
+	long ms = millis()
     #if BTN_ENC > 0
-      if (millis() > blocking_enc && READ(BTN_ENC) == 0) newbutton |= EN_C;
+      if (ms > blocking_enc && READ(BTN_ENC) == 0) newbutton |= EN_C;
     #endif
+	#if BTN_BACK > 0
+	  if (ms > blocking_enc && READ(BTN_BACK) == 0) newbutton |= EN_D;
+	#endif
     buttons = newbutton;
     #ifdef LCD_HAS_SLOW_BUTTONS
       buttons |= slow_buttons;
