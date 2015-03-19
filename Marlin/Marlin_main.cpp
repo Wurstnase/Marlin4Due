@@ -143,7 +143,7 @@
 // M201 - Set max acceleration in units/s^2 for print moves (M201 X1000 Y1000)
 // M202 - Set max acceleration in units/s^2 for travel moves (M202 X1000 Y1000) Unused in Marlin!!
 // M203 - Set maximum feedrate that your machine can sustain (M203 X200 Y200 Z300 E10000) in mm/sec
-// M204 - Set default acceleration: S normal moves T filament only moves (M204 S3000 T7000) in mm/sec^2  also sets minimum segment time in ms (B20000) to prevent buffer under-runs and M20 minimum feedrate
+// M204 - Set default acceleration: P for Printing moves, R for Retract only (no X, Y, Z) moves and T for Travel (non printing) moves (ex. M204 P800 T3000 R9000) in mm/sec^2
 // M205 -  advanced settings:  minimum travel speed S=while printing T=travel only,  B=minimum segment time X= maximum xy jerk, Z=maximum Z jerk, E=maximum E jerk
 // M206 - Set additional homing offset
 // M207 - Set retract length S[positive mm] F[feedrate mm/min] Z[additional zlift/hop], stays in mm regardless of M200 setting
@@ -357,6 +357,7 @@ int fanSpeed = 0;
 
 #ifdef SCARA
   float axis_scaling[3] = { 1, 1, 1 };    // Build size scaling, default to 1
+  static float delta[3] = { 0, 0, 0 };		
 #endif        
 
 bool cancel_heatup = false;
@@ -382,10 +383,6 @@ const char echomagic[] PROGMEM = "echo:";
 
 const char axis_codes[NUM_AXIS] = {'X', 'Y', 'Z', 'E'};
 static float destination[NUM_AXIS] = { 0, 0, 0, 0 };
-
-#ifndef DELTA
-  static float delta[3] = { 0, 0, 0 };
-#endif
 
 static float offset[3] = { 0, 0, 0 };
 static bool home_all_axis = true;
@@ -1692,7 +1689,7 @@ inline void gcode_G2_G3(bool clockwise) {
  * G4: Dwell S<seconds> or P<milliseconds>
  */
 inline void gcode_G4() {
-  unsigned long codenum;
+  unsigned long codenum=0;
 
   LCD_MESSAGEPGM(MSG_DWELL);
 
@@ -2332,9 +2329,9 @@ inline void gcode_G28() {
         z_at_pt_3 = probe_pt(ABL_PROBE_PT_3_X, ABL_PROBE_PT_3_Y, current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS, ProbeRetract, verbose_level);
       }
       else {
-        z_at_pt_1 = probe_pt(ABL_PROBE_PT_1_X, ABL_PROBE_PT_1_Y, Z_RAISE_BEFORE_PROBING, verbose_level);
-        z_at_pt_2 = probe_pt(ABL_PROBE_PT_2_X, ABL_PROBE_PT_2_Y, current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS, verbose_level);
-        z_at_pt_3 = probe_pt(ABL_PROBE_PT_3_X, ABL_PROBE_PT_3_Y, current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS, verbose_level);
+        z_at_pt_1 = probe_pt(ABL_PROBE_PT_1_X, ABL_PROBE_PT_1_Y, Z_RAISE_BEFORE_PROBING, verbose_level=verbose_level);
+        z_at_pt_2 = probe_pt(ABL_PROBE_PT_2_X, ABL_PROBE_PT_2_Y, current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS, verbose_level=verbose_level);
+        z_at_pt_3 = probe_pt(ABL_PROBE_PT_3_X, ABL_PROBE_PT_3_Y, current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS, verbose_level=verbose_level);
       }
       clean_up_after_endstop_move();
       set_bed_level_equation_3pts(z_at_pt_1, z_at_pt_2, z_at_pt_3);
@@ -3527,6 +3524,13 @@ inline void gcode_M203() {
  *  Also sets minimum segment time in ms (B20000) to prevent buffer under-runs and M20 minimum feedrate
  */
 inline void gcode_M204() {
+  if (code_seen('S'))   // Kept for legacy compatibility. Should NOT BE USED for new developments.
+  {
+    acceleration = code_value();
+    travel_acceleration = acceleration;
+    SERIAL_ECHOPAIR("Setting Printing and Travelling Acceleration: ", acceleration );
+    SERIAL_EOL;
+  }
   if (code_seen('P'))
   {
     acceleration = code_value();
@@ -5576,7 +5580,7 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) //default argument s
   
 #if defined(KILL_PIN) && KILL_PIN > -1
   static int killCount = 0;   // make the inactivity button a bit less responsive
-   const int KILL_DELAY = 10000;
+   const int KILL_DELAY = 750;
 #endif
 
 #if defined(FILRUNOUT_PIN) && FILRUNOUT_PIN > -1
@@ -5587,7 +5591,7 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) //default argument s
 
 #if defined(HOME_PIN) && HOME_PIN > -1
    static int homeDebounceCount = 0;   // poor man's debouncing count
-   const int HOME_DEBOUNCE_DELAY = 10000;
+   const int HOME_DEBOUNCE_DELAY = 750;
 #endif
    
   
