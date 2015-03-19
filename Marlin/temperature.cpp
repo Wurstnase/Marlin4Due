@@ -213,6 +213,12 @@ static void updateTemperaturesFromRawValues();
   static int read_max6675();
 #endif
 
+#ifdef INVERTED_HEATER_PINS
+#define WRITE_HEATER(pin,value) WRITE(pin,!value)
+#else
+#define WRITE_HEATER(pin,value) WRITE(pin,value)
+#endif
+
 //===========================================================================
 //=============================   functions      ============================
 //===========================================================================
@@ -487,22 +493,22 @@ void checkExtruderAutoFans()
 #if !HAS_HEATER_0
   #error HEATER_0_PIN not defined for this board
 #endif
-#define WRITE_HEATER_0P(v) WRITE(HEATER_0_PIN, v)
+#define WRITE_HEATER_0P(v) WRITE_HEATER(HEATER_0_PIN, v)
 #if EXTRUDERS > 1 || defined(HEATERS_PARALLEL)
   #if !HAS_HEATER_1
     #error HEATER_1_PIN not defined for this board
   #endif
-  #define WRITE_HEATER_1(v) WRITE(HEATER_1_PIN, v)
+  #define WRITE_HEATER_1(v) WRITE_HEATER(HEATER_1_PIN, v)
   #if EXTRUDERS > 2
     #if !HAS_HEATER_2
       #error HEATER_2_PIN not defined for this board
     #endif
-    #define WRITE_HEATER_2(v) WRITE(HEATER_2_PIN, v)
+    #define WRITE_HEATER_2(v) WRITE_HEATER(HEATER_2_PIN, v)
     #if EXTRUDERS > 3
       #if !HAS_HEATER_3
         #error HEATER_3_PIN not defined for this board
       #endif
-      #define WRITE_HEATER_3(v) WRITE(HEATER_3_PIN, v)
+      #define WRITE_HEATER_3(v) WRITE_HEATER(HEATER_3_PIN, v)
     #endif
   #endif
 #endif

@@ -24,6 +24,8 @@
 
 #if MB(RADDS)
   #include "pins_RADDS.h"
+#elif MB(RAMPS_FD_V1) || MB(RAMPS_FD_V2)
+  #include "pins_RAMPS_FD.h"
 #else
   #error Unknown MOTHERBOARD value set in Configuration.h
 #endif
