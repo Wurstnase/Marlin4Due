@@ -160,6 +160,8 @@
 			#define BTN_EN1 50
 			#define BTN_EN2 52
 			#define BTN_ENC 48
+			
+			#define BTN_BACK 71
 
 			#define SDCARDDETECT 14
 	  #endif
