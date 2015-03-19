@@ -1427,7 +1427,7 @@ void lcd_buttons_update() {
     #if BTN_ENC > 0
       if (ms > blocking_enc && READ(BTN_ENC) == 0) newbutton |= EN_C;
     #endif
-	#if BTN_BACK > 0
+	#if defined(BTN_BACK) && BTN_BACK > 0
 	  if (ms > blocking_enc && READ(BTN_BACK) == 0) newbutton |= EN_D;
 	#endif
     buttons = newbutton;

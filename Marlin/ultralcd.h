@@ -62,7 +62,7 @@
     #define EN_A BIT(BLEN_A)
 
     #define LCD_CLICKED (buttons&EN_C)
-	#if defined(BTN_BACK) && BTN_BACK >0
+	#if defined(BTN_BACK) && BTN_BACK > 0
 	  #define EN_D BIT(BLEN_D)
 	  #define LCD_BACK_CLICKED (buttons&EN_D)
 	#endif
