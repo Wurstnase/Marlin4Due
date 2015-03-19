@@ -118,22 +118,31 @@ static void menu_action_setting_edit_callback_long5(const char* pstr, unsigned l
 
 
 /* Helper macros for menus */
-#define START_MENU(args...) do { \
+#if defined(BTN_BACK) && BTN_BACK > 0
+#define START_MENU(last_menu) do { \
 	encoderRateMultiplierEnabled = false; \
     if (encoderPosition > 0x8000) encoderPosition = 0; \
     if (encoderPosition / ENCODER_STEPS_PER_MENU_ITEM < currentMenuViewOffset) currentMenuViewOffset = encoderPosition / ENCODER_STEPS_PER_MENU_ITEM;\
     uint8_t _lineNr = currentMenuViewOffset, _menuItemNr; \
-    bool wasClicked = LCD_CLICKED;\
-	#if defined(BTN_BACK) && BTN_BACK > 0\
-      bool wasBackClicked = LCD_BACK_CLICKED;\
-      if (wasBackClicked) {\
-        lcd_quick_feedback();\
-        menu_action_back ( args );\
+    bool wasClicked = LCD_CLICKED; \
+      bool wasBackClicked = LCD_BACK_CLICKED; \
+      if (wasBackClicked) { \
+        lcd_quick_feedback(); \
+        menu_action_back( last_menu ); \
 		return;\
-	  }\
-	#endif\
+	  } \
     for(uint8_t _drawLineNr = 0; _drawLineNr < LCD_HEIGHT; _drawLineNr++, _lineNr++) { \
         _menuItemNr = 0;
+#else
+	#define START_MENU(last_menu) do { \
+	encoderRateMultiplierEnabled = false; \
+    if (encoderPosition > 0x8000) encoderPosition = 0; \
+    if (encoderPosition / ENCODER_STEPS_PER_MENU_ITEM < currentMenuViewOffset) currentMenuViewOffset = encoderPosition / ENCODER_STEPS_PER_MENU_ITEM;\
+    uint8_t _lineNr = currentMenuViewOffset, _menuItemNr; \
+    bool wasClicked = LCD_CLICKED; \
+    for(uint8_t _drawLineNr = 0; _drawLineNr < LCD_HEIGHT; _drawLineNr++, _lineNr++) { \
+        _menuItemNr = 0;
+#endif
 
 #define MENU_ITEM(type, label, args...) do { \
     if (_menuItemNr == _lineNr) { \
@@ -155,6 +164,7 @@ static void menu_action_setting_edit_callback_long5(const char* pstr, unsigned l
 } while(0)
 
 #ifdef ENCODER_RATE_MULTIPLIER
+
   #define MENU_MULTIPLIER_ITEM(type, label, args...) do { \
     if (_menuItemNr == _lineNr) { \
       if (lcdDrawUpdate) { \
@@ -178,6 +188,7 @@ static void menu_action_setting_edit_callback_long5(const char* pstr, unsigned l
   } while(0)
 
 #endif //ENCODER_RATE_MULTIPLIER
+
 #define MENU_ITEM_DUMMY() do { _menuItemNr++; } while(0)
 #define MENU_ITEM_EDIT(type, label, args...) MENU_ITEM(setting_edit_ ## type, label, PSTR(label) , ## args )
 #define MENU_ITEM_EDIT_CALLBACK(type, label, args...) MENU_ITEM(setting_edit_callback_ ## type, label, PSTR(label) , ## args )
@@ -1423,7 +1434,7 @@ void lcd_buttons_update() {
     uint8_t newbutton = 0;
     if (READ(BTN_EN1) == 0) newbutton |= EN_A;
     if (READ(BTN_EN2) == 0) newbutton |= EN_B;
-	long ms = millis()
+	uint32_t ms = millis();
     #if BTN_ENC > 0
       if (ms > blocking_enc && READ(BTN_ENC) == 0) newbutton |= EN_C;
     #endif
