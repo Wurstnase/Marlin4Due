@@ -1537,18 +1537,20 @@ HAL_TEMP_TIMER_ISR
     //   break;
   } // switch(temp_state)
   
-  #define SET_CURRENT_TEMP_RAW(temp_id, bool is_redundant = false) raw_median_temp[temp_id][median_counter] = (raw_temp_value[temp_id] - (min_temp[temp_id] + max_temp[temp_id])); \
+  #define SET_CURRENT_TEMP_RAW(temp_id) raw_median_temp[temp_id][median_counter] = (raw_temp_value[temp_id] - (min_temp[temp_id] + max_temp[temp_id])); \
     sum = 0; \
 	  for(int i = 0; i < MEDIAN_COUNT; i++) sum += raw_median_temp[temp_id][i]; \
-    if (is_redundant) { \
-      redundant_temperature_raw = (sum / MEDIAN_COUNT + 4) >> 2; }\
-    else { \
-      current_temperature_raw[temp_id] = (sum / MEDIAN_COUNT + 4) >> 2; }
+    current_temperature_raw[temp_id] = (sum / MEDIAN_COUNT + 4) >> 2
       
   #define SET_CURRENT_BED_RAW(temp_id) raw_median_temp[temp_id][median_counter] = (raw_temp_bed_value - (min_temp[temp_id] + max_temp[temp_id])); \
     sum = 0; \
 	  for(int i = 0; i < MEDIAN_COUNT; i++) sum += raw_median_temp[temp_id][i]; \
     current_temperature_bed_raw = (sum / MEDIAN_COUNT + 4) >> 2
+    
+  #define SET_REDUNDANT_RAW(temp_id) raw_median_temp[temp_id][median_counter] = (raw_temp_bed_value - (min_temp[temp_id] + max_temp[temp_id])); \
+    sum = 0; \
+	  for(int i = 0; i < MEDIAN_COUNT; i++) sum += raw_median_temp[temp_id][i]; \
+    redundant_temperature_raw = (sum / MEDIAN_COUNT + 4) >> 2
   
   if(temp_count >= OVERSAMPLENR + 2) // 10 * 16 * 1/(16000000/64/256)  = 164ms.
   {
@@ -1562,7 +1564,7 @@ HAL_TEMP_TIMER_ISR
         SET_CURRENT_TEMP_RAW(1);
       #endif
       #ifdef TEMP_SENSOR_1_AS_REDUNDANT
-        SET_CURRENT_TEMP_RAW(1, true);
+        SET_REDUNDANT_RAW(1);
       #endif
       #if EXTRUDERS > 2
         SET_CURRENT_TEMP_RAW(2);

@@ -284,7 +284,7 @@ HAL_STEP_TIMER_ISR {
     plan_discard_current_block();
     if ((cleaning_buffer_counter == 1) && (SD_FINISHED_STEPPERRELEASE)) enquecommands_P(PSTR(SD_FINISHED_RELEASECOMMAND));
     cleaning_buffer_counter--;
-    OCR1A = 200;
+    HAL_timer_set_count (STEP_TIMER_NUM, HAL_TIMER_RATE / 200); //5ms wait
     return;
   }
   
