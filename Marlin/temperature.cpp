@@ -1488,7 +1488,7 @@ HAL_TEMP_TIMER_ISR
     case MeasureTemp_1:
       #if HAS_TEMP_1
         READ_TEMP(1);
-		  #endif
+      #endif
       temp_state = PrepareTemp_2;
       break;
     case PrepareTemp_2:
@@ -1650,7 +1650,6 @@ HAL_TEMP_TIMER_ISR
       if (current_temperature_bed_raw GEBED bed_maxttemp_raw) {
         target_temperature_bed = 0;
         bed_max_temp_error();
-
       }
     #endif
 
