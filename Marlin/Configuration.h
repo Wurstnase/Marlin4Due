@@ -476,10 +476,12 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
                           // - Position the probe in a defined XY point before Z Homing when homing all axis (G28)
                           // - Block Z homing only when the probe is outside bed area.
 
+
   #ifdef Z_SAFE_HOMING
 
     #define Z_SAFE_HOMING_X_POINT (X_MAX_LENGTH/2)    // X point for Z homing when homing all axis (G28)
     #define Z_SAFE_HOMING_Y_POINT (Y_MAX_LENGTH/2)    // Y point for Z homing when homing all axis (G28)
+
 
   #endif
 
@@ -588,6 +590,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
                                                // 0 to disable buzzer feedback  
 
 // Original RADDS Display from Willy
+// http://max3dshop.org/index.php/default/elektronik/radds-lcd-sd-display-with-reset-and-back-buttom.html
 //#define RADDS_DISPLAY
 
 // PanelOne from T3P3 (via RAMPS 1.4 AUX2/AUX3)
@@ -728,6 +731,10 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 
 //When using an LCD, uncomment the line below to display the Filament sensor data on the last line instead of status.  Status will appear for 5 sec.
 //#define FILAMENT_LCD_DISPLAY
+
+
+
+
 
 
 
