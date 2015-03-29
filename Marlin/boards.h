@@ -1,5 +1,3 @@
-// This file contains only 32bit-Due-boards
-
 #ifndef BOARDS_H
 #define BOARDS_H
 
