@@ -1187,14 +1187,14 @@ HAL_TEMP_TIMER_ISR {
   // Initialize some variables only at start!
   if (first_start)
   {
-	  for (char i = 0; i < 5; i++)
-	  {
-		  for (int j = 0; j < MEDIAN_COUNT; j++) raw_median_temp[i][j] = 3600 * OVERSAMPLENR;
-		  max_temp[i] = 0;
-		  min_temp[i] = 123000;
-	  }
-	  first_start = false;
-	  SERIAL_ECHOLN("First start for temperature finished.");
+    for (char i = 0; i < 5; i++)
+    {
+      for (int j = 0; j < MEDIAN_COUNT; j++) raw_median_temp[i][j] = 3600 * OVERSAMPLENR;
+      max_temp[i] = 0;
+      min_temp[i] = 123000;
+    }
+    first_start = false;
+    SERIAL_ECHOLN("First start for temperature finished.");
   }
   
   HAL_timer_isr_prologue (TEMP_TIMER_NUM);
@@ -1382,6 +1382,7 @@ HAL_TEMP_TIMER_ISR {
       #endif
       temp_state = PrepareTemp_BED;
       break;
+
     case PrepareTemp_BED:
       #if HAS_TEMP_BED
       // nothing todo for Due
@@ -1459,7 +1460,7 @@ HAL_TEMP_TIMER_ISR {
 
     case StartupDelay:
       temp_state = PrepareTemp_0;
-	  analogReadResolution(12); //  ADC need some rework
+    analogReadResolution(12); //  ADC need some rework
       break;
 
     // default:
@@ -1470,22 +1471,22 @@ HAL_TEMP_TIMER_ISR {
 
   #define SET_CURRENT_TEMP_RAW(temp_id) raw_median_temp[temp_id][median_counter] = (raw_temp_value[temp_id] - (min_temp[temp_id] + max_temp[temp_id])); \
     sum = 0; \
-	  for(int i = 0; i < MEDIAN_COUNT; i++) sum += raw_median_temp[temp_id][i]; \
+    for(int i = 0; i < MEDIAN_COUNT; i++) sum += raw_median_temp[temp_id][i]; \
     current_temperature_raw[temp_id] = (sum / MEDIAN_COUNT + 4) >> 2
       
   #define SET_CURRENT_BED_RAW(temp_id) raw_median_temp[temp_id][median_counter] = (raw_temp_bed_value - (min_temp[temp_id] + max_temp[temp_id])); \
     sum = 0; \
-	  for(int i = 0; i < MEDIAN_COUNT; i++) sum += raw_median_temp[temp_id][i]; \
+    for(int i = 0; i < MEDIAN_COUNT; i++) sum += raw_median_temp[temp_id][i]; \
     current_temperature_bed_raw = (sum / MEDIAN_COUNT + 4) >> 2
     
   #define SET_REDUNDANT_RAW(temp_id) raw_median_temp[temp_id][median_counter] = (raw_temp_bed_value - (min_temp[temp_id] + max_temp[temp_id])); \
     sum = 0; \
-	  for(int i = 0; i < MEDIAN_COUNT; i++) sum += raw_median_temp[temp_id][i]; \
+    for(int i = 0; i < MEDIAN_COUNT; i++) sum += raw_median_temp[temp_id][i]; \
     redundant_temperature_raw = (sum / MEDIAN_COUNT + 4) >> 2
   
   if(temp_count >= OVERSAMPLENR + 2) { // 10 * 16 * 1/(16000000/64/256)  = 164ms.
     if (!temp_meas_ready) { //Only update the raw values if they have been read. Else we could be updating them during reading.
-  	  unsigned long sum = 0;
+      unsigned long sum = 0;
       #ifndef HEATER_0_USES_MAX6675
         SET_CURRENT_TEMP_RAW(0);
       #endif

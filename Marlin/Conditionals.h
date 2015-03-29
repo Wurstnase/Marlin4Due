@@ -46,7 +46,7 @@
     #define ULTIPANEL
     #define NEWPANEL
   #endif
-  
+
   #if defined(RADDS_DISPLAY)
     #define ENCODER_PULSES_PER_STEP 2
     #define ENCODER_STEPS_PER_MENU_ITEM 1
@@ -214,7 +214,7 @@
     #define X_HOME_POS MANUAL_X_HOME_POS
     #define Y_HOME_POS MANUAL_Y_HOME_POS
     #define Z_HOME_POS MANUAL_Z_HOME_POS
-  #else //!MANUAL_HOME_POSITIONS â€“ Use home switch positions based on homing direction and travel limits
+  #else //!MANUAL_HOME_POSITIONS – Use home switch positions based on homing direction and travel limits
     #ifdef BED_CENTER_AT_0_0
       #define X_HOME_POS X_MAX_LENGTH * X_HOME_DIR * 0.5
       #define Y_HOME_POS Y_MAX_LENGTH * Y_HOME_DIR * 0.5
@@ -373,7 +373,7 @@
 
   /**
    * Helper Macros for heaters and extruder fan
-  */
+   */
   
   #ifdef INVERTED_HEATER_PINS
     #define WRITE_HEATER(pin,value) WRITE(pin,!value)

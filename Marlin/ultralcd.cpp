@@ -223,7 +223,7 @@ static void menu_action_setting_edit_callback_long5(const char* pstr, unsigned l
   #define MENU_MULTIPLIER_ITEM_EDIT_CALLBACK(type, label, args...) MENU_ITEM(setting_edit_callback_ ## type, label, PSTR(label), ## args)
 #endif //!ENCODER_RATE_MULTIPLIER
 #define END_MENU() \
-    if (encoderLine >= _menuItemNr) encoderPosition = _menuItemNr * ENCODER_STEPS_PER_MENU_ITEM - 1; encoderLine = encoderPosition / ENCODER_STEPS_PER_MENU_ITEM;\
+    if (encoderLine >= _menuItemNr) { encoderPosition = _menuItemNr * ENCODER_STEPS_PER_MENU_ITEM - 1; encoderLine = encoderPosition / ENCODER_STEPS_PER_MENU_ITEM; }\
     if (encoderLine >= currentMenuViewOffset + LCD_HEIGHT) { currentMenuViewOffset = encoderLine - LCD_HEIGHT + 1; lcdDrawUpdate = 1; _lineNr = currentMenuViewOffset - 1; _drawLineNr = -1; } \
     } } while(0)
 
@@ -280,7 +280,7 @@ static void lcd_goto_menu(menuFunc_t menu, const uint32_t encoder=0, const bool 
 /* Main status screen. It's up to the implementation specific part to show what is needed. As this is very display dependent */
 static void lcd_status_screen()
 {
-	encoderRateMultiplierEnabled = false;
+  encoderRateMultiplierEnabled = false;
   #if defined(LCD_PROGRESS_BAR) && defined(SDSUPPORT) && !defined(DOGLCD)
     uint16_t mil = millis();
     #ifndef PROGRESS_MSG_ONCE
@@ -599,7 +599,7 @@ static void lcd_preheat_abs_menu() {
   MENU_ITEM(back, MSG_PREPARE, lcd_prepare_menu);
   MENU_ITEM(function, MSG_PREHEAT_ABS_N MSG_H1, lcd_preheat_abs0);
   #if TEMP_SENSOR_1 != 0 //2 extruder preheat
-	  MENU_ITEM(function, MSG_PREHEAT_ABS_N MSG_H2, lcd_preheat_abs1);
+    MENU_ITEM(function, MSG_PREHEAT_ABS_N MSG_H2, lcd_preheat_abs1);
   #endif //2 extruder preheat
   #if TEMP_SENSOR_2 != 0 //3 extruder preheat
     MENU_ITEM(function, MSG_PREHEAT_ABS_N MSG_H3, lcd_preheat_abs2);
@@ -659,7 +659,7 @@ static void lcd_prepare_menu() {
   #if defined(MANUAL_BED_LEVELING)
     MENU_ITEM(submenu, MSG_LEVEL_BED, lcd_level_bed);
   #endif
-	
+  
   END_MENU();
 }
 
@@ -1036,7 +1036,7 @@ static void lcd_sd_updir() {
 }
 
 void lcd_sdcard_menu() {
-  if (lcdDrawUpdate == 0 && LCD_CLICKED == 0) return;	// nothing to do (so don't thrash the SD card)
+  if (lcdDrawUpdate == 0 && LCD_CLICKED == 0) return;  // nothing to do (so don't thrash the SD card)
   uint16_t fileCnt = card.getnrfilenames();
   START_MENU(lcd_main_menu);
   MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
@@ -1457,13 +1457,13 @@ void lcd_buttons_update() {
     uint8_t newbutton = 0;
     if (READ(BTN_EN1) == 0) newbutton |= EN_A;
     if (READ(BTN_EN2) == 0) newbutton |= EN_B;
-	uint32_t ms = millis();
+  uint32_t ms = millis();
     #if BTN_ENC > 0
       if (ms > blocking_enc && READ(BTN_ENC) == 0) newbutton |= EN_C;
     #endif
-	#if defined(BTN_BACK) && BTN_BACK > 0
-	  if (ms > blocking_enc && READ(BTN_BACK) == 0) newbutton |= EN_D;
-	#endif
+  #if defined(BTN_BACK) && BTN_BACK > 0
+    if (ms > blocking_enc && READ(BTN_BACK) == 0) newbutton |= EN_D;
+  #endif
     buttons = newbutton;
     #ifdef LCD_HAS_SLOW_BUTTONS
       buttons |= slow_buttons;
@@ -1610,18 +1610,18 @@ char *ftostr32(const float &x)
 // Convert float to string with 1.234 format
 char *ftostr43(const float &x)
 {
-	long xx = x * 1000;
+  long xx = x * 1000;
     if (xx >= 0)
-		conv[0] = (xx / 1000) % 10 + '0';
-	else
-		conv[0] = '-';
-	xx = abs(xx);
-	conv[1] = '.';
-	conv[2] = (xx / 100) % 10 + '0';
-	conv[3] = (xx / 10) % 10 + '0';
-	conv[4] = (xx) % 10 + '0';
-	conv[5] = 0;
-	return conv;
+    conv[0] = (xx / 1000) % 10 + '0';
+  else
+    conv[0] = '-';
+  xx = abs(xx);
+  conv[1] = '.';
+  conv[2] = (xx / 100) % 10 + '0';
+  conv[3] = (xx / 10) % 10 + '0';
+  conv[4] = (xx) % 10 + '0';
+  conv[5] = 0;
+  return conv;
 }
 
 //Float to string with 1.23 format
