@@ -1144,7 +1144,7 @@ enum TempState {
 HAL_TEMP_TIMER_ISR {
   //these variables are only accesible from the ISR, but static, so they don't lose their value
   static unsigned char temp_count = 0;
-  static unsigned long raw_temp_value[TEMP_SENSOR_COUNT] = { 0 };
+  static unsigned long raw_temp_value[4] = { 0 };
   static unsigned long raw_temp_bed_value = 0;
   static TempState temp_state = StartupDelay;
   static unsigned char pwm_count = BIT(SOFT_PWM_SCALE);
