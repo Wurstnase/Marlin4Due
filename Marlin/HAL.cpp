@@ -91,6 +91,11 @@ void _delay_ms (int delay_ms)
 	delay (delay_ms);
 }
 
+void _delay_us (int delay_us)
+{
+  delayMicroseconds(delay_us);
+}
+
 extern "C" {
   extern unsigned int _ebss; // end of bss section
 }
