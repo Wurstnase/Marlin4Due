@@ -417,12 +417,6 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 
   #ifdef AUTO_BED_LEVELING_GRID
 
-    // Use one of these defines to specify the origin
-    // for a topographical map to be printed for your bed.
-    enum { OriginBackLeft, OriginFrontLeft, OriginBackRight, OriginFrontRight };
-    #define TOPO_ORIGIN OriginFrontLeft
-
-    // The edges of the rectangle in which to probe
     #define LEFT_PROBE_BED_POSITION 15
     #define RIGHT_PROBE_BED_POSITION 170
     #define FRONT_PROBE_BED_POSITION 20
@@ -793,7 +787,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #endif
 
 // Increase the FAN pwm frequency. Removes the PWM noise but increases heating in the FET/Arduino
-//#define FAST_PWM_FAN  // !!!Currently not implemented for Arduino Due!!!
+//#define FAST_PWM_FAN
 
 // Temperature status LEDs that display the hotend and bet temperature.
 // If all hotends and bed temperature and temperature setpoint are < 54C then the BLUE led is on.

@@ -1461,7 +1461,9 @@ HAL_TEMP_TIMER_ISR
     
   switch(temp_state) {
     case PrepareTemp_0:
-      
+      #if HAS_TEMP_0
+      // nothing todo for Due
+      #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_0;
       break;
@@ -1472,6 +1474,9 @@ HAL_TEMP_TIMER_ISR
       temp_state = PrepareTemp_BED;
       break;
     case PrepareTemp_BED:
+      #if HAS_TEMP_BED
+      // nothing todo for Due
+      #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_BED;
       break;
@@ -1482,6 +1487,9 @@ HAL_TEMP_TIMER_ISR
       temp_state = PrepareTemp_1;
       break;
     case PrepareTemp_1:
+      #if HAS_TEMP_1
+      // nothing todo for Due
+      #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_1;
       break;
@@ -1492,6 +1500,9 @@ HAL_TEMP_TIMER_ISR
       temp_state = PrepareTemp_2;
       break;
     case PrepareTemp_2:
+      #if HAS_TEMP_2
+      // nothing todo for Due
+      #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_2;
       break;
@@ -1502,6 +1513,9 @@ HAL_TEMP_TIMER_ISR
       temp_state = PrepareTemp_3;
       break;
     case PrepareTemp_3:
+      #if HAS_TEMP_3
+      // nothing todo for Due
+      #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_3;
       break;
@@ -1512,6 +1526,9 @@ HAL_TEMP_TIMER_ISR
       temp_state = Prepare_FILWIDTH;
       break;
     case Prepare_FILWIDTH:
+      #if HAS_FILAMENT_SENSOR
+      // nothing todo for Due
+      #endif
       lcd_buttons_update();
       temp_state = Measure_FILWIDTH;
       break;
@@ -1650,7 +1667,6 @@ HAL_TEMP_TIMER_ISR
       if (current_temperature_bed_raw GEBED bed_maxttemp_raw) {
         target_temperature_bed = 0;
         bed_max_temp_error();
-
       }
     #endif
 
