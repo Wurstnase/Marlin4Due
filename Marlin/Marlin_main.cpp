@@ -2326,11 +2326,11 @@ inline void gcode_G28() {
         if (do_topography_map) {
 
           SERIAL_PROTOCOLPGM(" \nBed Height Topography: \n");
-          SERIAL_PROTOCOLPGM("+-----------+\n");
-          SERIAL_PROTOCOLPGM("|...Back....|\n");
-          SERIAL_PROTOCOLPGM("|Left..Right|\n");
-          SERIAL_PROTOCOLPGM("|...Front...|\n");
-          SERIAL_PROTOCOLPGM("+-----------+\n");
+        SERIAL_PROTOCOLPGM("+-----------+\n");
+        SERIAL_PROTOCOLPGM("|...Back....|\n");
+        SERIAL_PROTOCOLPGM("|Left..Right|\n");
+        SERIAL_PROTOCOLPGM("|...Front...|\n");
+        SERIAL_PROTOCOLPGM("+-----------+\n");
 
           for (int yy = auto_bed_leveling_grid_points - 1; yy >= 0; yy--) {
             for (int xx = 0; xx < auto_bed_leveling_grid_points; xx++) {
@@ -2343,8 +2343,8 @@ inline void gcode_G28() {
               SERIAL_PROTOCOL_F(diff, 5);
             } // xx
             SERIAL_EOL;
-          } // yy
-          SERIAL_EOL;
+        } // yy
+        SERIAL_EOL;
 
         } //do_topography_map
 
