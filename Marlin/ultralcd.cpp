@@ -1239,9 +1239,9 @@ void lcd_init() {
      pinMode(SHIFT_LD,OUTPUT);
      pinMode(SHIFT_EN,OUTPUT);
      pinMode(SHIFT_OUT,INPUT);
-     WRITE(SHIFT_OUT,HIGH);
-     WRITE(SHIFT_LD,HIGH);
-     WRITE(SHIFT_EN,LOW);
+     PULLUP(SHIFT_OUT,HIGH);
+     PULLUP(SHIFT_LD,HIGH);
+     PULLUP(SHIFT_EN,LOW);
   #endif // SR_LCD_2W_NL
 #endif//!NEWPANEL
 
