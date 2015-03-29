@@ -45,6 +45,10 @@
   #define K2 (1.0-K1)
 #endif
 
+#if defined(PIDTEMPBED) || defined(PIDTEMP)
+  #define PID_dT ((OVERSAMPLENR * 12.0)/(F_CPU / 64.0 / 256.0))
+#endif
+
 //===========================================================================
 //============================= public variables ============================
 //===========================================================================
@@ -222,7 +226,7 @@ void PID_autotune(float temp, int extruder, int ncycles)
 
     unsigned long ms = millis();
 
-    if (temp_meas_ready == true) { // temp sample ready
+    if (temp_meas_ready) { // temp sample ready
       updateTemperaturesFromRawValues();
 
       input = (extruder<0)?current_temperature_bed:current_temperature[extruder];
@@ -576,6 +580,12 @@ void manage_heater() {
 
   updateTemperaturesFromRawValues();
 
+  #ifdef HEATER_0_USES_MAX6675
+    float ct = current_temperature[0];
+    if (ct > min(HEATER_0_MAXTEMP, 1023)) max_temp_error(0);
+    if (ct < max(HEATER_0_MINTEMP, 0.01)) min_temp_error(0);
+  #endif //HEATER_0_USES_MAX6675
+
   unsigned long ms = millis();
 
   // Loop through all extruders
@@ -607,7 +617,7 @@ void manage_heater() {
     #ifdef TEMP_SENSOR_1_AS_REDUNDANT
       if (fabs(current_temperature[0] - redundant_temperature) > MAX_REDUNDANT_TEMP_SENSOR_DIFF) {
         disable_heater();
-        _temp_error(-1, MSG_EXTRUDER_SWITCHED_OFF, MSG_ERR_REDUNDANT_TEMP);
+        _temp_error(0, PSTR(MSG_EXTRUDER_SWITCHED_OFF), PSTR(MSG_ERR_REDUNDANT_TEMP));
       }
     #endif //TEMP_SENSOR_1_AS_REDUNDANT
 
@@ -797,9 +807,6 @@ static void updateTemperaturesFromRawValues() {
   } 
 
 #endif
-
-
-
 
 
 void tp_init()
@@ -1135,12 +1142,6 @@ enum TempState {
 // Timer 0 is shared with millies
 //
 HAL_TEMP_TIMER_ISR {
-  #ifdef TEMP_SENSOR_1_AS_REDUNDANT
-    #define TEMP_SENSOR_COUNT 2
-  #else 
-    #define TEMP_SENSOR_COUNT EXTRUDERS
-  #endif
-
   //these variables are only accesible from the ISR, but static, so they don't lose their value
   static unsigned char temp_count = 0;
   static unsigned long raw_temp_value[TEMP_SENSOR_COUNT] = { 0 };
@@ -1521,14 +1522,10 @@ HAL_TEMP_TIMER_ISR {
 
     temp_meas_ready = true;
     temp_count = 0;
-    for (int i = 0; i < TEMP_SENSOR_COUNT; i++) raw_temp_value[i] = 0;
+    for (int i = 0; i < 4; i++) raw_temp_value[i] = 0;
     raw_temp_bed_value = 0;
 
-    #ifdef HEATER_0_USES_MAX6675
-      float ct = current_temperature[0];
-      if (ct > min(HEATER_0_MAXTEMP, 1023)) max_temp_error(0);
-      if (ct < max(HEATER_0_MINTEMP, 0.01)) min_temp_error(0);
-    #else
+    #ifndef HEATER_0_USES_MAX6675
       #if HEATER_0_RAW_LO_TEMP > HEATER_0_RAW_HI_TEMP
         #define GE0 <=
       #else
