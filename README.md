@@ -1,6 +1,13 @@
 # Marlin4Due 3D Printer Firmware
 <img align="right" src="Documentation/Logo/Marlin%20Logo%20GitHub.png" />
 
+### Story about Marlin 32bit
+Some time ago bobc started with this port. After some time sadly he stopped with the development. So I started to take his work and try to make some small modifications. After a couple of weeks I found the most importent things which speed up my new fork. Thanks to bobc for this great work! I'm not a professional programmer and without bobc I couldn't do that.
+
+Also a big thanks to all Marlin8bit-developers. Keep on working.
+
+*Wurstnase*
+
 ### New features are:
 * Steprates up to 320.000 steps/s (top for 1/128 stepper driver)
 * smoother temperature (median of last 5 values)
