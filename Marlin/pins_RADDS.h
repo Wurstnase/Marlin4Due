@@ -68,10 +68,20 @@
 
 #define KILL_PIN           -1
 
+#if defined(FILAMENT_SENSOR)  // FMM added for Filament Extruder
+  // define analog pin for the filament width sensor input
+  #define FILWIDTH_PIN        -1
+#endif
+
+#if defined(FILAMENT_RUNOUT_SENSOR)
+  #define FILRUNOUT_PIN        -1
+#endif
+
 #define HEATER_BED_PIN     7    // BED
 #define HEATER_0_PIN       13
-#define HEATER_1_PIN       12
-#define HEATER_2_PIN       11
+#define HEATER_1_PIN       -1  // 12
+#define HEATER_2_PIN       -1  // 11
+#define HEATER_3_PIN       -1
 
 #define TEMP_BED_PIN       4   // ANALOG NUMBERING
 #define TEMP_0_PIN         0   // ANALOG NUMBERING
@@ -83,18 +93,15 @@
 
   #ifdef NUM_SERVOS
     #define SERVO0_PIN         5
-
     #if NUM_SERVOS > 1
       #define SERVO1_PIN         6
-    #endif
-
-    #if NUM_SERVOS > 2
-      #define SERVO2_PIN         39
-    #endif
-
-    #if NUM_SERVOS > 3
-      #define SERVO3_PIN         40
-    #endif
+	  #if NUM_SERVOS > 2
+        #define SERVO2_PIN         39
+		#if NUM_SERVOS > 3
+	      #define SERVO3_PIN         40
+        #endif
+      #endif
+	#endif
   #endif
 
 
