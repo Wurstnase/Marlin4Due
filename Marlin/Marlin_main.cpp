@@ -1705,7 +1705,25 @@ inline void gcode_G4() {
 #endif //FWRETRACT
 
 /**
- * G28: Home all axes, one at a time
+ * G28: Home all axes according to settings
+ *
+ * Parameters
+ *
+ *  None  Home to all axes with no parameters.
+ *        With QUICK_HOME enabled XY will home together, then Z.
+ *
+ * Cartesian parameters
+ *
+ *  X   Home to the X endstop
+ *  Y   Home to the Y endstop
+ *  Z   Home to the Z endstop
+ *
+ * If numbers are included with XYZ set the position as with G92
+ * Currently adds the home_offset, which may be wrong and removed soon.
+ *
+ *  Xn  Home X, setting X to n + home_offset[X_AXIS]
+ *  Yn  Home Y, setting Y to n + home_offset[Y_AXIS]
+ *  Zn  Home Z, setting Z to n + home_offset[Z_AXIS]
  */
 inline void gcode_G28() {
   #ifdef ENABLE_AUTO_BED_LEVELING
@@ -1728,7 +1746,7 @@ inline void gcode_G28() {
 
   enable_endstops(true);
 
-  for (int i = X_AXIS; i < NUM_AXIS; i++) destination[i] = current_position[i];
+  for (int i = 0; i < NUM_AXIS; i++) destination[i] = current_position[i]; // includes E_AXIS
 
   feedrate = 0.0;
 
@@ -1759,23 +1777,25 @@ inline void gcode_G28() {
 
   #else // NOT DELTA
 
-    home_all_axis = !(code_seen(axis_codes[X_AXIS]) || code_seen(axis_codes[Y_AXIS]) || code_seen(axis_codes[Z_AXIS]));
+    bool  homeX = code_seen(axis_codes[X_AXIS]),
+          homeY = code_seen(axis_codes[Y_AXIS]),
+          homeZ = code_seen(axis_codes[Z_AXIS]);
+
+    home_all_axis = !homeX && !homeY && !homeZ; // No parameters means home all axes
 
     #if Z_HOME_DIR > 0                      // If homing away from BED do Z first
-      if (home_all_axis || code_seen(axis_codes[Z_AXIS])) {
-        HOMEAXIS(Z);
-      }
+      if (home_all_axis || homeZ) HOMEAXIS(Z);
     #endif
 
     #ifdef QUICK_HOME
-      if (home_all_axis || code_seen(axis_codes[X_AXIS] && code_seen(axis_codes[Y_AXIS]))) {  //first diagonal move
+      if (home_all_axis || (homeX && homeY)) {  //first diagonal move
         current_position[X_AXIS] = current_position[Y_AXIS] = 0;
 
-        #ifndef DUAL_X_CARRIAGE
-          int x_axis_home_dir = home_dir(X_AXIS);
-        #else
+        #ifdef DUAL_X_CARRIAGE
           int x_axis_home_dir = x_home_dir(active_extruder);
           extruder_duplication_enabled = false;
+        #else
+          int x_axis_home_dir = home_dir(X_AXIS);
         #endif
 
         sync_plan_position();
@@ -1809,7 +1829,8 @@ inline void gcode_G28() {
       }
     #endif //QUICK_HOME
 
-    if ((home_all_axis) || (code_seen(axis_codes[X_AXIS]))) {
+    // Home X
+    if (home_all_axis || homeX) {
       #ifdef DUAL_X_CARRIAGE
         int tmp_extruder = active_extruder;
         extruder_duplication_enabled = false;
@@ -1827,31 +1848,38 @@ inline void gcode_G28() {
       #endif
     }
 
-    if (home_all_axis || code_seen(axis_codes[Y_AXIS])) HOMEAXIS(Y);
+    // Home Y
+    if (home_all_axis || homeY) HOMEAXIS(Y);
 
+    // Set the X position, if included
+    // Adds the home_offset as well, which may be wrong
     if (code_seen(axis_codes[X_AXIS])) {
-      if (code_value_long() != 0) {
-          current_position[X_AXIS] = code_value()
-            #ifndef SCARA
-              + home_offset[X_AXIS]
-            #endif
-          ;
-      }
+      float v = code_value();
+      if (v) current_position[X_AXIS] = v
+        #ifndef SCARA
+          + home_offset[X_AXIS]
+        #endif
+      ;
     }
 
-    if (code_seen(axis_codes[Y_AXIS]) && code_value_long() != 0) {
-      current_position[Y_AXIS] = code_value()
+    // Set the Y position, if included
+    // Adds the home_offset as well, which may be wrong
+    if (code_seen(axis_codes[Y_AXIS])) {
+      float v = code_value();
+      if (v) current_position[Y_AXIS] = v
         #ifndef SCARA
           + home_offset[Y_AXIS]
         #endif
       ;
     }
 
-    #if Z_HOME_DIR < 0                      // If homing towards BED do Z last
+    // Home Z last if homing towards the bed
+    #if Z_HOME_DIR < 0
 
       #ifndef Z_SAFE_HOMING
 
-        if (home_all_axis || code_seen(axis_codes[Z_AXIS])) {
+        if (home_all_axis || homeZ) {
+          // Raise Z before homing Z? Shouldn't this happen before homing X or Y?
           #if defined(Z_RAISE_BEFORE_HOMING) && Z_RAISE_BEFORE_HOMING > 0
             destination[Z_AXIS] = -Z_RAISE_BEFORE_HOMING * home_dir(Z_AXIS);    // Set destination away from bed
             feedrate = max_feedrate[Z_AXIS];
@@ -1880,7 +1908,7 @@ inline void gcode_G28() {
         }
 
         // Let's see if X and Y are homed and probe is inside bed area.
-        if (code_seen(axis_codes[Z_AXIS])) {
+        if (homeZ) {
 
           if (axis_known_position[X_AXIS] && axis_known_position[Y_AXIS]) {
 
@@ -1914,13 +1942,15 @@ inline void gcode_G28() {
 
     #endif // Z_HOME_DIR < 0
 
-
-    if (code_seen(axis_codes[Z_AXIS]) && code_value_long() != 0)
-      current_position[Z_AXIS] = code_value() + home_offset[Z_AXIS];
+    // Set the Z position, if included
+    // Adds the home_offset as well, which may be wrong
+    if (code_seen(axis_codes[Z_AXIS])) {
+      float v = code_value();
+      if (v) current_position[Z_AXIS] = v + home_offset[Z_AXIS];
+    }
 
     #if defined(ENABLE_AUTO_BED_LEVELING) && (Z_HOME_DIR < 0)
-      if (home_all_axis || code_seen(axis_codes[Z_AXIS]))
-        current_position[Z_AXIS] += zprobe_zoffset;  //Add Z_Probe offset (the distance is negative)
+      if (home_all_axis || homeZ) current_position[Z_AXIS] += zprobe_zoffset;  // Add Z_Probe offset (the distance is negative)
     #endif
     sync_plan_position();
 
@@ -2080,8 +2110,8 @@ inline void gcode_G28() {
    *
    * Global Parameters:
    *
-   * E/e By default G29 engages / disengages the probe for each point.
-   *     Include "E" to engage and disengage the probe just once.
+   * E/e By default G29 will engages the probe, test the bed, then disengage.
+   *     Include "E" to engage/disengage the probe for each sample.
    *     There's no extra effect if you have a fixed probe.
    *     Usage: "G29 E" or "G29 e"
    *
@@ -2107,7 +2137,7 @@ inline void gcode_G28() {
     }
 
     bool dryrun = code_seen('D') || code_seen('d');
-    bool enhanced_g29 = code_seen('E') || code_seen('e');
+    bool engage_probe_for_each_reading = code_seen('E') || code_seen('e');
 
     #ifdef AUTO_BED_LEVELING_GRID
 
@@ -2265,16 +2295,14 @@ inline void gcode_G28() {
 
           // Enhanced G29 - Do not retract servo between probes
           ProbeAction act;
-          if (enhanced_g29) {
-            if (yProbe == front_probe_bed_position && xCount == 0)
-              act = ProbeEngage;
-            else if (yProbe == front_probe_bed_position + (yGridSpacing * (auto_bed_leveling_grid_points - 1)) && xCount == auto_bed_leveling_grid_points - 1)
-              act = ProbeRetract;
-            else
-              act = ProbeStay;
-          }
-          else
+          if (engage_probe_for_each_reading)
             act = ProbeEngageAndRetract;
+          else if (yProbe == front_probe_bed_position && xCount == 0)
+            act = ProbeEngage;
+          else if (yProbe == front_probe_bed_position + (yGridSpacing * (auto_bed_leveling_grid_points - 1)) && xCount == auto_bed_leveling_grid_points - 1)
+            act = ProbeRetract;
+          else
+            act = ProbeStay;
 
           measured_z = probe_pt(xProbe, yProbe, z_before, act, verbose_level);
 
@@ -2326,11 +2354,11 @@ inline void gcode_G28() {
         if (do_topography_map) {
 
           SERIAL_PROTOCOLPGM(" \nBed Height Topography: \n");
-        SERIAL_PROTOCOLPGM("+-----------+\n");
-        SERIAL_PROTOCOLPGM("|...Back....|\n");
-        SERIAL_PROTOCOLPGM("|Left..Right|\n");
-        SERIAL_PROTOCOLPGM("|...Front...|\n");
-        SERIAL_PROTOCOLPGM("+-----------+\n");
+          SERIAL_PROTOCOLPGM("+-----------+\n");
+          SERIAL_PROTOCOLPGM("|...Back....|\n");
+          SERIAL_PROTOCOLPGM("|Left..Right|\n");
+          SERIAL_PROTOCOLPGM("|...Front...|\n");
+          SERIAL_PROTOCOLPGM("+-----------+\n");
 
           for (int yy = auto_bed_leveling_grid_points - 1; yy >= 0; yy--) {
             for (int xx = 0; xx < auto_bed_leveling_grid_points; xx++) {
@@ -2343,8 +2371,8 @@ inline void gcode_G28() {
               SERIAL_PROTOCOL_F(diff, 5);
             } // xx
             SERIAL_EOL;
-        } // yy
-        SERIAL_EOL;
+          } // yy
+          SERIAL_EOL;
 
         } //do_topography_map
 
@@ -2356,20 +2384,17 @@ inline void gcode_G28() {
 
     #else // !AUTO_BED_LEVELING_GRID
 
-      // Probe at 3 arbitrary points
-      float z_at_pt_1, z_at_pt_2, z_at_pt_3;
+      // Actions for each probe
+      ProbeAction p1, p2, p3;
+      if (engage_probe_for_each_reading)
+        p1 = p2 = p3 = ProbeEngageAndRetract;
+      else
+        p1 = ProbeEngage, p2 = ProbeStay, p3 = ProbeRetract;
 
-      if (enhanced_g29) {
-        // Basic Enhanced G29
-        z_at_pt_1 = probe_pt(ABL_PROBE_PT_1_X, ABL_PROBE_PT_1_Y, Z_RAISE_BEFORE_PROBING, ProbeEngage, verbose_level);
-        z_at_pt_2 = probe_pt(ABL_PROBE_PT_2_X, ABL_PROBE_PT_2_Y, current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS, ProbeStay, verbose_level);
-        z_at_pt_3 = probe_pt(ABL_PROBE_PT_3_X, ABL_PROBE_PT_3_Y, current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS, ProbeRetract, verbose_level);
-      }
-      else {
-        z_at_pt_1 = probe_pt(ABL_PROBE_PT_1_X, ABL_PROBE_PT_1_Y, Z_RAISE_BEFORE_PROBING, ProbeEngageAndRetract, verbose_level);
-        z_at_pt_2 = probe_pt(ABL_PROBE_PT_2_X, ABL_PROBE_PT_2_Y, current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS, ProbeEngageAndRetract, verbose_level);
-        z_at_pt_3 = probe_pt(ABL_PROBE_PT_3_X, ABL_PROBE_PT_3_Y, current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS, ProbeEngageAndRetract, verbose_level);
-      }
+      // Probe at 3 arbitrary points
+      float z_at_pt_1 = probe_pt(ABL_PROBE_PT_1_X, ABL_PROBE_PT_1_Y, Z_RAISE_BEFORE_PROBING, p1, verbose_level),
+            z_at_pt_2 = probe_pt(ABL_PROBE_PT_2_X, ABL_PROBE_PT_2_Y, current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS, p2, verbose_level),
+            z_at_pt_3 = probe_pt(ABL_PROBE_PT_3_X, ABL_PROBE_PT_3_Y, current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS, p3, verbose_level);
       clean_up_after_endstop_move();
       if (!dryrun) set_bed_level_equation_3pts(z_at_pt_1, z_at_pt_2, z_at_pt_3);
 
@@ -2736,14 +2761,14 @@ inline void gcode_M42() {
    *
    * Usage:
    *   M48 <n#> <X#> <Y#> <V#> <E> <L#>
-   *     n = Number of samples (4-50, default 10)
+   *     P = Number of sampled points (4-50, default 10)
    *     X = Sample X position
    *     Y = Sample Y position
    *     V = Verbose level (0-4, default=1)
    *     E = Engage probe for each reading
    *     L = Number of legs of movement before probe
    *  
-   * This function assumes the bed has been homed.  Specificaly, that a G28 command
+   * This function assumes the bed has been homed.  Specifically, that a G28 command
    * as been issued prior to invoking the M48 Z-Probe repeatability measurement function.
    * Any information generated by a prior G29 Bed leveling command will be lost and need to be
    * regenerated.
@@ -2770,10 +2795,10 @@ inline void gcode_M42() {
     if (verbose_level > 0)
       SERIAL_PROTOCOLPGM("M48 Z-Probe Repeatability test\n");
 
-    if (code_seen('n')) {
+    if (code_seen('P') || code_seen('p') || code_seen('n')) { // `n` for legacy support only - please use `P`!
       n_samples = code_value();
       if (n_samples < 4 || n_samples > 50) {
-        SERIAL_PROTOCOLPGM("?Specified sample size not plausible (4-50).\n");
+        SERIAL_PROTOCOLPGM("?Sample size not plausible (4-50).\n");
         return;
       }
     }
@@ -2790,7 +2815,7 @@ inline void gcode_M42() {
     if (code_seen('X') || code_seen('x')) {
       X_probe_location = code_value() - X_PROBE_OFFSET_FROM_EXTRUDER;
       if (X_probe_location < X_MIN_POS || X_probe_location > X_MAX_POS) {
-        SERIAL_PROTOCOLPGM("?Specified X position out of range.\n");
+        SERIAL_PROTOCOLPGM("?X position out of range.\n");
         return;
       }
     }
@@ -2798,7 +2823,7 @@ inline void gcode_M42() {
     if (code_seen('Y') || code_seen('y')) {
       Y_probe_location = code_value() -  Y_PROBE_OFFSET_FROM_EXTRUDER;
       if (Y_probe_location < Y_MIN_POS || Y_probe_location > Y_MAX_POS) {
-        SERIAL_PROTOCOLPGM("?Specified Y position out of range.\n");
+        SERIAL_PROTOCOLPGM("?Y position out of range.\n");
         return;
       }
     }
@@ -2807,7 +2832,7 @@ inline void gcode_M42() {
       n_legs = code_value();
       if (n_legs == 1) n_legs = 2;
       if (n_legs < 0 || n_legs > 15) {
-        SERIAL_PROTOCOLPGM("?Specified number of legs in movement not plausible (0-15).\n");
+        SERIAL_PROTOCOLPGM("?Number of legs in movement not plausible (0-15).\n");
         return;
       }
     }
@@ -2830,7 +2855,7 @@ inline void gcode_M42() {
     // use that as a starting point for each probe.
     //
     if (verbose_level > 2)
-      SERIAL_PROTOCOL("Positioning probe for the test.\n");
+      SERIAL_PROTOCOL("Positioning the probe...\n");
 
     plan_buffer_line( X_probe_location, Y_probe_location, Z_start_location,
         ext_position,
@@ -2879,7 +2904,7 @@ inline void gcode_M42() {
         //SERIAL_ECHOPAIR("starting radius: ",radius);
         //SERIAL_ECHOPAIR("   theta: ",theta);
         //SERIAL_ECHOPAIR("   direction: ",rotational_direction);
-        //SERIAL_PROTOCOLLNPGM("");
+        //SERIAL_EOL;
 
         float dir = rotational_direction ? 1 : -1;
         for (l = 0; l < n_legs - 1; l++) {
@@ -2898,7 +2923,7 @@ inline void gcode_M42() {
           if (verbose_level > 3) {
             SERIAL_ECHOPAIR("x: ", X_current);
             SERIAL_ECHOPAIR("y: ", Y_current);
-            SERIAL_PROTOCOLLNPGM("");
+            SERIAL_EOL;
           }
 
           do_blocking_move_to( X_current, Y_current, Z_current );
@@ -4905,14 +4930,13 @@ void process_commands() {
         case 665: // M665 set delta configurations L<diagonal_rod> R<delta_radius> S<segments_per_sec>
           gcode_M665();
           break;
-        case 666: // M666 set delta endstop adjustment
+      #endif
+
+      #if defined(DELTA) || defined(Z_DUAL_ENDSTOPS)
+        case 666: // M666 set delta / dual endstop adjustment
           gcode_M666();
           break;
-      #elif defined(Z_DUAL_ENDSTOPS)
-        case 666: // M666 set delta endstop adjustment
-          gcode_M666();
-          break;
-      #endif // DELTA
+      #endif
 
       #ifdef FWRETRACT
         case 207: //M207 - set retract length S[positive mm] F[feedrate mm/min] Z[additional zlift/hop]

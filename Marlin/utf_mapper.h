@@ -23,33 +23,33 @@
       const PROGMEM uint8_t utf_recode[] =
            { // 0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f          This is fair for symbols
              0x20,0x3f,0xec,0xed,0x3f,0x5c,0x7c,0x3f,0x22,0x63,0x61,0x7f,0x3f,0x3f,0x52,0xb0,  // c2a
-  //          ' '       Â¢    Â£         Â­    l         "    c    a    Â«              R
+  //          ' '       ¢    £         ­    l         "    c    a    «              R
              0xdf,0x3f,0x32,0x33,0x27,0xe4,0xf1,0xa5,0x2c,0x31,0xdf,0x7e,0x3f,0x3f,0x3f,0x3f,  // c2b but relatively bad for letters.
-  //          Â°         2    3    `    N    p    .    ,    1    Â°    Â»
+  //          °         2    3    `    N    p    .    ,    1    °    »
              0x3f,0x3f,0x3f,0x3f,0xe1,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,  // c38
-  //                              Ã¤
+  //                              ä
              0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0xef,0x78,0x3f,0x3f,0x3f,0x3f,0xf5,0x3f,0x3f,0xe2,  // c39 missing characters display as '?'
-  //                                        Ã¶     x                       Ã¼              ÃŸ
+  //                                        ö     x                       ü              ß
              0x3f,0x3f,0x3f,0x3f,0xe1,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,  // c3a
-  //                              Ã¤
+  //                              ä
              0x3f,0xee,0x3f,0x3f,0x3f,0x3f,0xef,0xfd,0x3f,0x3f,0x3f,0x3f,0xf5,0x3f,0x3f,0x3f   // c3b
-  //               n                        Ã¶    Ã·                        Ã¼
+  //               n                        ö    ÷                        ü
            };
     #elif defined( MAPPER_E382E383 )
       const PROGMEM uint8_t utf_recode[] =
            { // 0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f
              0x3d,0xb1,0xb1,0xa8,0xb2,0xa9,0xb3,0xaa,0xb4,0xab,0xb5,0xb6,0xb6,0xb7,0xb7,0xb8,  // e382a Please test and correct
-  //          =    ã‚¢    ã‚¢    ã‚£    ã‚¤    ã‚¥    ã‚¦    ã‚§    ã‚¨    ã‚©    ã‚ª   ã‚¬    ã‚¬    ã‚­   ã‚­    ã‚¯
+  //          =    ア    ア    ィ    イ    ゥ    ウ    ェ    エ    ォ    オ   ガ    ガ    キ   キ    ク
              0xb8,0xb9,0xb9,0xba,0xba,0xbb,0xbb,0xbc,0xbc,0xbd,0xbd,0xbe,0xbe,0xbf,0xbf,0xc0,  // e382b
-  //          ã‚¯    ã‚±    ã‚±   ã‚³    ã‚³    ã‚µ    ã‚µ    ã‚·    ã‚·   ã‚¹    ã‚¹    ã‚»    ã‚»    ã‚½   ã‚½    ã‚¿
+  //          ク    ケ    ケ   コ    コ    サ    サ    シ    シ   ス    ス    セ    セ    ソ   ソ    タ
              0xc0,0xc1,0xc1,0xc2,0xc2,0xc2,0xc3,0xc3,0xc4,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,  // e3838
-  //          ã‚¿    ãƒ    ãƒ    ãƒƒ    ãƒƒ    ãƒƒ    ãƒ†   ãƒ†    ãƒˆ    ãƒˆ    ãƒŠ    ãƒ‹    ãƒŒ    ãƒ   ãƒŽ    ãƒ
+  //          タ    チ    チ    ッ    ッ    ッ    テ   テ    ト    ト    ナ    ニ    ヌ    ネ   ノ    ハ
              0xca,0xca,0xcb,0xcb,0xcb,0xcc,0xcc,0xcc,0xcd,0xcd,0xcd,0xce,0xce,0xce,0xcf,0xd0,  // e3839
-  //          ãƒ    ãƒ    ãƒ’   ãƒ’    ãƒ’     ãƒ•    ãƒ•   ãƒ•    ãƒ˜    ãƒ˜    ãƒ˜    ãƒ›    ãƒ›    ãƒ›   ãƒž    ãƒŸ
+  //          ハ    ハ    ヒ   ヒ    ヒ     フ    フ   フ    ヘ    ヘ    ヘ    ホ    ホ    ホ   マ    ミ
              0xd1,0xd2,0xd3,0xd4,0xd4,0xd5,0xd5,0xae,0xd6,0xd7,0xd8,0xd9,0xda,0xdb,0xdc,0xdc,  // e383a
-  //          ãƒ     ãƒ¡    ãƒ¢    ãƒ£   ãƒ£    ãƒ¦    ãƒ¦    ãƒ§    ãƒ¨    ãƒ©    ãƒª    ãƒ«    ãƒ¬    ãƒ­   ãƒ¯    ãƒ¯
+  //          ム    メ    モ    ャ   ャ    ユ    ユ    ョ    ヨ    ラ    リ    ル    レ    ロ   ワ    ワ
              0xec,0xa7,0xa6,0xdd,0xcc,0x3f,0x3f,0x3f,0x3f,0x3f,0xa6,0xa5,0xb0,0xa4,0xa4,0x3f   // e383b
-  //          ãƒ°    ãƒ±    ãƒ²    ãƒ³    ãƒ•    ?    ?   ?    ?    ?    ãƒ²    ãƒ»    ãƒ¼    ãƒ½    ãƒ½   ?
+  //          ヰ    ヱ    ヲ    ン    フ    ?    ?   ?    ?    ?    ヲ    ・    ー    ヽ    ヽ   ?
            };
     #elif defined( MAPPER_D0D1 )
       #error( "Cyrillic on a japanese dsplay makes no sense. There are no matching symbols.");
@@ -60,31 +60,31 @@
     :
       const PROGMEM uint8_t utf_recode[] =
            { // 0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f   This is relative complete.
-             0x20,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0x22,0xa9,0xaa,0xab,0x3f,0x3f,0xae,0x3f,  // c2aÂ Â¡Â¢Â£Â¤Â¥Â¦Â§Â¨Â©ÂªÂ«Â¬Â­Â®Â¯
-  //         ' '   Â¡    Â¢    Â£    Â¤    Â¥    Â¦    Â§    "    Â©    Âª    Â«    ?    ?    Â®    ?
-             0xb0,0xb1,0xb2,0xb3,0x27,0xb5,0xb6,0xb7,0x2c,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf,  // c2b Â°Â±Â²Â³Â´ÂµÂ¶Â·Â¸Â¹ÂºÂ»Â¼Â½Â¾Â¿
-  //          Â°    Â±    Â³    Â²    ?    Âµ    Â¶    Â·    ,    Â¹    Âº    Â»    Â¼    Â½    Â¾    Â¿
-             0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,  // c38 Ã€ÃÃƒÃ„Ã…Ã†Ã‡ÃˆÃ‰ÃŠÃ‹ÃŒÃÃŽÃ
-  //          Ã€    Ã    Ã‚    Ãƒ    Ã„    Ã…    Ã†    Ã‡    Ãˆ    Ã‰    ÃŠ    Ã‹    ÃŒ    Ã    ÃŽ    Ã
-             0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7,0xd8,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf,  // c39 ÃÃ‘Ã“Ã”Ã•Ã–Ã—Ã˜Ã™ÃšÃ›ÃœÃÃžÃŸ
-  //          Ã    Ã‘    Ã’    Ã“    Ã”    Ã•    Ã–    Ã—    Ã˜    Ã™    Ãš    Ã›    Ãœ    Ã    Ãž    ÃŸ
-             0xe0,0xe1,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7,0xe8,0xe9,0xea,0xeb,0xec,0xed,0xee,0xef,  // c3a Ã Ã¡Ã£Ã¤Ã¥Ã¦Ã§Ã¨Ã©ÃªÃ«Ã¬Ã­Ã®Ã¯ 
-  //          Ã     Ã¡    Ã¢    Ã£    Ã¤    Ã¥    Ã¦    Ã§    Ã¨    Ã©    Ãª    Ã«    Ã¬    Ã­    Ã®    Ã¯
-             0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7,0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff   // c3b Ã°Ã±Ã³Ã´ÃµÃ¶Ã·Ã¸Ã¹ÃºÃ»Ã¼Ã½Ã¾Ã¿
-  //          Ã°    Ã±    Ã²    Ã³    Ã´    Ãµ    Ã¶    Ã·    Ã¸    Ã¹    Ãº    Ã»    Ã¼    Ã½    Ã¾    Ã¿
+             0x20,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0x22,0xa9,0xaa,0xab,0x3f,0x3f,0xae,0x3f,  // c2a ¡¢£¤¥¦§¨©ª«¬­®¯
+  //         ' '   ¡    ¢    £    ¤    ¥    ¦    §    "    ©    ª    «    ?    ?    ®    ?
+             0xb0,0xb1,0xb2,0xb3,0x27,0xb5,0xb6,0xb7,0x2c,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf,  // c2b °±²³´µ¶·¸¹º»¼½¾¿
+  //          °    ±    ³    ²    ?    µ    ¶    ·    ,    ¹    º    »    ¼    ½    ¾    ¿
+             0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,  // c38 ÀÁÃÄÅÆÇÈÉÊËÌÍÎÏ
+  //          À    Á    Â    Ã    Ä    Å    Æ    Ç    È    É    Ê    Ë    Ì    Í    Î    Ï
+             0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7,0xd8,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf,  // c39 ÐÑÓÔÕÖ×ØÙÚÛÜÝÞß
+  //          Ð    Ñ    Ò    Ó    Ô    Õ    Ö    ×    Ø    Ù    Ú    Û    Ü    Ý    Þ    ß
+             0xe0,0xe1,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7,0xe8,0xe9,0xea,0xeb,0xec,0xed,0xee,0xef,  // c3a àáãäåæçèéêëìíîï 
+  //          à    á    â    ã    ä    å    æ    ç    è    é    ê    ë    ì    í    î    ï
+             0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7,0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff   // c3b ðñóôõö÷øùúûüýþÿ
+  //          ð    ñ    ò    ó    ô    õ    ö    ÷    ø    ù    ú    û    ü    ý    þ    ÿ
            };
     #elif defined( MAPPER_D0D1 )
       #define MAPPER_D0D1_MOD
       const PROGMEM uint8_t utf_recode[] =
            {//0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f
              0x41,0x80,0x42,0x92,0x81,0x45,0x82,0x83,0x84,0x85,0x4b,0x86,0x4d,0x48,0x4f,0x87,  // d0a
-  //          A    Ð‘    B    Ð“    Ð”    E    Ð–    Ð—    Ð˜    Ð™    K    Ð›    M    H    O    ÐŸ
+  //          A    Б    B    Г    Д    E    Ж    З    И    Й    K    Л    M    H    O    П
              0x50,0x43,0x54,0x88,0xd8,0x58,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x62,0x8f,0xac,0xad,  // d0b
-  //          P    C    T    Ð£    Ð¤    X    Ð§    Ñ‡    Ð¨    Ð©    Ðª    Ð«    b    Ð­    Ð®    Ð¯
+  //          P    C    T    У    Ф    X    Ч    ч    Ш    Щ    Ъ    Ы    b    Э    Ю    Я
              0x61,0x36,0x42,0x92,0x81,0x65,0x82,0xb3,0x84,0x85,0x6b,0x86,0x4d,0x48,0x6f,0x87,  // d18
-  //          a    6    B    Ð“    Ð”    e    Ð–    Â³    Ð˜    Ð™    k    Ð›    M    H    o    ÐŸ
+  //          a    6    B    Г    Д    e    Ж    ³    И    Й    k    Л    M    H    o    П
              0x70,0x63,0x54,0x79,0xd8,0x78,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x62,0x8f,0xac,0xad   // d19
-  //          p    c    T    y    Ð¤    x    Ð§    Ñ‡    Ð¨    Ð©    Ðª    Ð«    b    Ð­    Ð®    Ð¯
+  //          p    c    T    y    Ф    x    Ч    ч    Ш    Щ    Ъ    Ы    b    Э    Ю    Я
             };
     #elif defined( MAPPER_E382E383 )
       #error( "Katakana on a western display makes no sense. There are no matching symbols." );
@@ -94,25 +94,25 @@
     #if defined( MAPPER_D0D1 )
       #define MAPPER_D0D1_MOD
       // it is a Russian alphabet translation
-      // except 0401 --> 0xa2 = Ð, 0451 --> 0xb5 = Ñ‘
+      // except 0401 --> 0xa2 = Ё, 0451 --> 0xb5 = ё
       const PROGMEM uint8_t utf_recode[] =
              { 0x41,0xa0,0x42,0xa1,0xe0,0x45,0xa3,0xa4,   // unicode U+0400 to U+047f
-  //            A   Ð‘->Ð  B    Ð“    Ð”    E    Ð–    Ð—      // 0  Ð€ Ð Ð‚ Ðƒ Ð„ Ð… Ð† Ð‡
-               0xa5,0xa6,0x4b,0xa7,0x4d,0x48,0x4f,0xa8,   //    Ðˆ Ð‰ ÐŠ Ð‹ ÐŒ Ð ÐŽ Ð
-  //            Ð˜    Ð™    K    Ð›    M    H    O    ÐŸ      // 1  Ð Ð‘ Ð’ Ð“ Ð” Ð• Ð– Ð—
-               0x50,0x43,0x54,0xa9,0xaa,0x58,0xe1,0xab,   //    Ð˜ Ð™ Ðš Ð› Ðœ Ð Ðž ÐŸ
-  //            P    C    T    Ð£    Ð¤    X    Ð§    Ñ‡      // 2  Ð  Ð¡ Ð¢ Ð£ Ð¤ Ð¥ Ð“ Ð§
-               0xac,0xe2,0xad,0xae,0x62,0xaf,0xb0,0xb1,   //    Ð¨ Ð© Ðª Ð« Ð¬ Ð­ Ð® Ð¯
-  //            Ð¨    Ð©    Ðª    Ð«    b    Ð­    Ð®    Ð¯      // 3  Ð° Ð± Ð² Ð³ Ð´ Ðµ Ð¶ Ð·
-               0x61,0xb2,0xb3,0xb4,0xe3,0x65,0xb6,0xb7,   //    Ð¸ Ð¹ Ðº Ð» Ð¼ Ð½ Ð¾ Ð¿
-  //            a   Ð±->Ñ‘  Ð²    Ð³    Ð´    e    Ð¶    Ð·      // 4  Ñ€ Ñ Ñ‚ Ñƒ Ñ„ Ñ… Ñ† Ñ‡
-               0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0x6f,0xbe,   //    Ñˆ Ñ‰ ÑŠ Ñ‹ ÑŒ Ñ ÑŽ Ñ
-  //            Ð¸    Ð¹    Ðº    Ð»    Ð¼    Ð½    o    Ð¿      // 5  Ñ Ñ‘ Ñ’ Ñ“ Ñ” Ñ• Ñ– Ñ—
-               0x70,0x63,0xbf,0x79,0xe4,0x78,0xe5,0xc0,   //    Ñ˜ Ñ™ Ñš Ñ› Ñœ Ñ Ñž ÑŸ
-  //            p    c    Ñ‚    y    Ñ„    x    Ñ†    Ñ‡      // 6  Ñ  Ñ¡ Ñ¢ Ñ£ Ñ¤ Ñ¥ Ñ¦ Ñ§
-               0xc1,0xe6,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7    //    Ñª Ñ© Ñª Ñ« Ñ¬ Ñ­ Ñ® Ñ¯
-  //            Ñˆ    Ñ‰    ÑŠ    Ñ‹    ÑŒ    Ñ    ÑŽ    Ñ      // 7  Ñ° Ñ± Ñ² Ñ³ Ñ´ Ñµ Ñ¶ Ñ·
-             };                                           //    Ñ» Ñ¹ Ñº Ñ» Ñ¼ Ñ½ Ñ¾ Ñ¿
+  //            A   Б->Ё  B    Г    Д    E    Ж    З      // 0  Ѐ Ё Ђ Ѓ Є Ѕ І Ї
+               0xa5,0xa6,0x4b,0xa7,0x4d,0x48,0x4f,0xa8,   //    Ј Љ Њ Ћ Ќ Ѝ Ў Џ
+  //            И    Й    K    Л    M    H    O    П      // 1  А Б В Г Д Е Ж З
+               0x50,0x43,0x54,0xa9,0xaa,0x58,0xe1,0xab,   //    И Й К Л М Н О П
+  //            P    C    T    У    Ф    X    Ч    ч      // 2  Р С Т У Ф Х Г Ч
+               0xac,0xe2,0xad,0xae,0x62,0xaf,0xb0,0xb1,   //    Ш Щ Ъ Ы Ь Э Ю Я
+  //            Ш    Щ    Ъ    Ы    b    Э    Ю    Я      // 3  а б в г д е ж з
+               0x61,0xb2,0xb3,0xb4,0xe3,0x65,0xb6,0xb7,   //    и й к л м н о п
+  //            a   б->ё  в    г    д    e    ж    з      // 4  р с т у ф х ц ч
+               0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0x6f,0xbe,   //    ш щ ъ ы ь э ю я
+  //            и    й    к    л    м    н    o    п      // 5  ѐ ё ђ ѓ є ѕ і ї
+               0x70,0x63,0xbf,0x79,0xe4,0x78,0xe5,0xc0,   //    ј љ њ ћ ќ ѝ ў џ
+  //            p    c    т    y    ф    x    ц    ч      // 6  Ѡ ѡ Ѣ ѣ Ѥ ѥ Ѧ ѧ
+               0xc1,0xe6,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7    //    Ѫ ѩ Ѫ ѫ Ѭ ѭ Ѯ ѯ
+  //            ш    щ    ъ    ы    ь    э    ю    я      // 7  Ѱ ѱ Ѳ ѳ Ѵ ѵ Ѷ ѷ
+             };                                           //    ѻ ѹ Ѻ ѻ Ѽ ѽ Ѿ ѿ
     #elif defined( MAPPER_C2C3 )
       #error( "Western languages on a cyrillic display makes no sense. There are no matching symbols." );
     #elif defined( MAPPER_E382E383 )
@@ -162,7 +162,7 @@
   bool seen_d5 = false;
   char charset_mapper(char c){
     // it is a Russian alphabet translation
-    // except 0401 --> 0xa2 = Ð, 0451 --> 0xb5 = Ñ‘
+    // except 0401 --> 0xa2 = Ё, 0451 --> 0xb5 = ё
     uint8_t d = c;
     if ( d >= 0x80 ) { // UTF-8 handling
       if ((d >= 0xd0) && (!seen_d5)) {
@@ -172,9 +172,9 @@
       } else if (seen_d5) {
           d &= 0x3f;
           if ( !utf_hi_char && ( d == 1 )) {
-            HARDWARE_CHAR_OUT((char) 0xa2 ); // Ð
+            HARDWARE_CHAR_OUT((char) 0xa2 ); // Ё
         } else if ((utf_hi_char == 1) && (d == 0x11)) {
-            HARDWARE_CHAR_OUT((char) 0xb5 ); // Ñ‘
+            HARDWARE_CHAR_OUT((char) 0xb5 ); // ё
           } else {
             HARDWARE_CHAR_OUT((char) pgm_read_byte_near( utf_recode + d + ( utf_hi_char << 6 ) - 0x10 ) );
           }
