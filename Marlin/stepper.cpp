@@ -395,7 +395,7 @@ HAL_STEP_TIMER_ISR {
       #ifdef COREXY
         // Head direction in -X axis for CoreXY bots.
         // If DeltaX == -DeltaY, the movement is only in Y axis
-        if (current_block->steps[A_AXIS] != current_block->steps[B_AXIS] || (TEST(out_bits, A_AXIS) == TEST(out_bits, B_AXIS)))
+        if ((current_block->steps[A_AXIS] != current_block->steps[B_AXIS]) || (TEST(out_bits, A_AXIS) == TEST(out_bits, B_AXIS))) {
           if (TEST(out_bits, X_HEAD))
       #else
           if (TEST(out_bits, X_AXIS))   // stepping along -X axis (regular cartesians bot)
@@ -423,9 +423,10 @@ HAL_STEP_TIMER_ISR {
               }
           }
       #ifdef COREXY
+        }
         // Head direction in -Y axis for CoreXY bots.
         // If DeltaX == DeltaY, the movement is only in X axis
-        if (current_block->steps[A_AXIS] != current_block->steps[B_AXIS] || (TEST(out_bits, A_AXIS) != TEST(out_bits, B_AXIS)))
+        if ((current_block->steps[A_AXIS] != current_block->steps[B_AXIS]) || (TEST(out_bits, A_AXIS) != TEST(out_bits, B_AXIS))) {
           if (TEST(out_bits, Y_HEAD))
       #else
           if (TEST(out_bits, Y_AXIS))   // -direction
@@ -440,6 +441,9 @@ HAL_STEP_TIMER_ISR {
               UPDATE_ENDSTOP(y, Y, max, MAX);
             #endif
           }
+      #ifdef COREXY
+        }
+      #endif
     }
 
     if (TEST(out_bits, Z_AXIS)) {   // -direction
