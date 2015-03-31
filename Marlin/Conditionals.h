@@ -263,7 +263,7 @@
   #endif
 
   #ifdef ULTIPANEL
-   #undef SDCARDDETECTINVERTED
+    #undef SDCARDDETECTINVERTED
   #endif
 
   // Power Signal Control Definitions
