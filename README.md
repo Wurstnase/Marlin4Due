@@ -6,6 +6,8 @@ Some time ago bobc started with this port. After some time sadly he stopped with
 
 Also a big thanks to all Marlin8bit-developers. Keep on working.
 
+Last but not least, many thanks to Repetier. His ARM-port gives me a lot of inspiration.
+
 *Wurstnase*
 
 ### New features are:
