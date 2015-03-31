@@ -201,10 +201,10 @@
 
 #include "utf_mapper.h"
 
-#if defined(LCD_PROGRESS_BAR) && defined(SDSUPPORT)
+#ifdef LCD_PROGRESS_BAR
   static uint16_t progressBarTick = 0;
   #if PROGRESS_MSG_EXPIRE > 0
-    static uint16_t messageTick = 0;
+    static uint16_t expireStatusMillis = 0;
   #endif
   #define LCD_STR_PROGRESS  "\x03\x04\x05"
 #endif
@@ -222,7 +222,7 @@
 #define LCD_STR_ARROW_RIGHT ">"  /* from the default character set */
 
 static void lcd_set_custom_characters(
-  #if defined(LCD_PROGRESS_BAR) && defined(SDSUPPORT)
+  #ifdef LCD_PROGRESS_BAR
     bool progress_bar_set=true
   #endif
 ) {
@@ -307,7 +307,7 @@ static void lcd_set_custom_characters(
     B00000
   }; //thanks Sonny Mounicou
 
-  #if defined(LCD_PROGRESS_BAR) && defined(SDSUPPORT)
+  #ifdef LCD_PROGRESS_BAR
     static bool char_mode = false;
     byte progress[3][8] = { {
       B00000,
@@ -368,7 +368,7 @@ static void lcd_set_custom_characters(
 }
 
 static void lcd_implementation_init(
-  #if defined(LCD_PROGRESS_BAR) && defined(SDSUPPORT)
+  #ifdef LCD_PROGRESS_BAR
     bool progress_bar_set=true
   #endif
 ) {
@@ -403,7 +403,7 @@ static void lcd_implementation_init(
 #endif
 
     lcd_set_custom_characters(
-        #if defined(LCD_PROGRESS_BAR) && defined(SDSUPPORT)
+        #ifdef LCD_PROGRESS_BAR
             progress_bar_set
         #endif
     );
@@ -596,7 +596,7 @@ static void lcd_implementation_status_screen()
   // Status message line at the bottom
   lcd.setCursor(0, LCD_HEIGHT - 1);
 
-  #if defined(LCD_PROGRESS_BAR) && defined(SDSUPPORT)
+  #ifdef LCD_PROGRESS_BAR
 
     if (card.isFileOpen()) {
       uint16_t mil = millis(), diff = mil - progressBarTick;
