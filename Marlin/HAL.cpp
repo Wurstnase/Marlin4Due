@@ -222,7 +222,7 @@ void HAL_step_timer_start()
   uint32_t channel = TimerConfig [timer_num].channel;
   
   pmc_enable_periph_clk((uint32_t)irq); //we need a clock?
-  NVIC_SetPriority(irq, NVIC_EncodePriority(4, 1, 0));
+  NVIC_SetPriority(irq, NVIC_EncodePriority(4, 4, 0));
   
   TC_Configure(tc, channel, TC_CMR_TCCLKS_TIMER_CLOCK1 | TC_CMR_CPCTRG); //set clock rate (CLOCK1 is MCK/2) and reset counter register C on match
   tc->TC_CHANNEL[channel].TC_IER |= TC_IER_CPCS; //enable interrupt on timer match with register C
@@ -248,7 +248,7 @@ void HAL_temp_timer_start (uint8_t timer_num)
 	
 	NVIC_SetPriorityGrouping(4);
 	
-	NVIC_SetPriority(irq, NVIC_EncodePriority(4, 3, 0));
+	NVIC_SetPriority(irq, NVIC_EncodePriority(4, 6, 0));
 	
 	TC_Configure (tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK4);
 
