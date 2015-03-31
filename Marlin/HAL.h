@@ -71,9 +71,9 @@ void cli(void);
 void sei(void);
 
 void _delay_ms(int delay);
+void _delay_us(int delay_us);
 
 int freeMemory(void);
-
 
 void eeprom_write_byte(unsigned char *pos, unsigned char value);
 
