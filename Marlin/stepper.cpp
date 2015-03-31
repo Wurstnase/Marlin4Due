@@ -46,7 +46,7 @@ block_t *current_block;  // A pointer to the block currently being traced
 
 // Variables used by The Stepper Driver Interrupt
 static unsigned char out_bits;        // The next stepping-bits to be output
-static unsigned int cleaning_buffer_counter;  
+static unsigned int cleaning_buffer_counter = 0;  
 
 #ifdef Z_DUAL_ENDSTOPS
   static bool performing_homing = false, 
@@ -319,9 +319,10 @@ FORCE_INLINE void trapezoid_generator_reset() {
 // It pops blocks from the block_buffer and executes them by pulsing the stepper pins appropriately.
 HAL_STEP_TIMER_ISR {
   HAL_timer_isr_prologue (STEP_TIMER_NUM);
-
+  
   if(cleaning_buffer_counter)
   {
+    SERIAL_ECHOLN("cleaning_buffer_counter");
     current_block = NULL;
     plan_discard_current_block();
     #ifdef SD_FINISHED_RELEASECOMMAND
@@ -331,6 +332,7 @@ HAL_STEP_TIMER_ISR {
     HAL_timer_set_count (STEP_TIMER_NUM, HAL_TIMER_RATE / 200); //5ms wait
     return;
   }
+
   
   // If there is no current block, attempt to pop one from the buffer
   if (!current_block) {

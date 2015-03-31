@@ -2023,7 +2023,7 @@ inline void gcode_G28() {
 
   // Check for known positions in X and Y
   inline bool can_run_bed_leveling() {
-  	if (axis_known_position[X_AXIS] && axis_known_position[Y_AXIS]) return true;
+  	if (axis_known_position[X_AXIS] && axis_known_position[Y_AXIS] && axis_known_position[Z_AXIS]) return true;
     LCD_MESSAGEPGM(MSG_POSITION_UNKNOWN);
     SERIAL_ECHO_START;
     SERIAL_ECHOLNPGM(MSG_POSITION_UNKNOWN);

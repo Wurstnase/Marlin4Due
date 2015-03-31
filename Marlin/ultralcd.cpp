@@ -137,6 +137,7 @@ static void lcd_status_screen();
     if (encoderLine < currentMenuViewOffset) currentMenuViewOffset = encoderLine; \
     uint8_t _lineNr = currentMenuViewOffset, _menuItemNr; \
     bool wasClicked = LCD_CLICKED, itemSelected; \
+    lcd_quick_feedback(); \
     bool wasBackClicked = LCD_BACK_CLICKED; \
     if (wasBackClicked) { \
       lcd_quick_feedback(); \
@@ -153,6 +154,7 @@ static void lcd_status_screen();
     if (encoderLine < currentMenuViewOffset) currentMenuViewOffset = encoderLine; \
     uint8_t _lineNr = currentMenuViewOffset, _menuItemNr; \
     bool wasClicked = LCD_CLICKED, itemSelected; \
+    lcd_quick_feedback(); \
     for (uint8_t _drawLineNr = 0; _drawLineNr < LCD_HEIGHT; _drawLineNr++, _lineNr++) { \
       _menuItemNr = 0;
 #endif

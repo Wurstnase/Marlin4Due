@@ -30,13 +30,14 @@
 
 #include "HAL.h"
 #include "Configuration.h"
-// #include "DueTimer.h"
 
 #include <Wire.h>
+#include <malloc.h>
 
 // --------------------------------------------------------------------------
 // Externals
 // --------------------------------------------------------------------------
+extern "C" char *sbrk(int i);
 
 // --------------------------------------------------------------------------
 // Local defines
@@ -76,13 +77,13 @@ uint8_t HAL_step_timer_RC;
 // disable interrupts
 void cli(void)
 {
-	noInterrupts();
+	// noInterrupts();
 }
 
 // enable interrupts
 void sei(void)
 {
-	interrupts();
+	// interrupts();
 }
 
 void _delay_ms (int delay_ms)
@@ -96,23 +97,12 @@ void _delay_us (int delay_us)
   delayMicroseconds(delay_us);
 }
 
-extern "C" {
-  extern unsigned int _ebss; // end of bss section
-}
-
 // return free memory between end of heap (or end bss) and whatever is current
-int freeMemory()
-{
-  int free_memory;
-  int heap_end = (int)_sbrk(0);
+int freeMemory() {
+  struct mallinfo memstruct = mallinfo();
+  register char * stack_ptr asm ("sp");
 
-  if(heap_end == 0)
-    free_memory = ((int)&free_memory) - ((int)&_ebss);
-  else
-    free_memory = ((int)&free_memory) - heap_end;
-
-  return free_memory;
-
+  return (memstruct.fordblks + (int)stack_ptr -  (int)sbrk(0));
 }
 
 // --------------------------------------------------------------------------
@@ -229,10 +219,11 @@ void HAL_step_timer_start()
 
   tc->TC_CHANNEL[channel].TC_RC   = (VARIANT_MCK >> 1) / 1000; // start with 1kHz as frequency; //interrupt occurs every x interations of the timer counter
   TC_Start(tc, channel); //start timer counter
-  NVIC_EnableIRQ(irq); //enable Nested Vector Interrupt Controller
-  
+    
   tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS;
   tc->TC_CHANNEL[channel].TC_IDR =~ TC_IER_CPCS;
+  
+  NVIC_EnableIRQ(irq); //enable Nested Vector Interrupt Controller
 }
 
 
@@ -252,7 +243,7 @@ void HAL_temp_timer_start (uint8_t timer_num)
 	
 	TC_Configure (tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK4);
 
-	uint32_t rc = VARIANT_MCK / 128 / (512*12);
+	uint32_t rc = VARIANT_MCK / 128 / (500);
 	TC_SetRC(tc, channel, rc);
 	TC_Start(tc, channel);
 
@@ -293,7 +284,6 @@ void HAL_timer_set_count (uint8_t timer_num, uint32_t count)
 void HAL_timer_isr_prologue (uint8_t timer_num)
 {
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
-	
 	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_SR;
 	// TC_GetStatus (pConfig->pTimerRegs, pConfig->channel);
 }
