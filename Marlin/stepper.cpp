@@ -324,7 +324,9 @@ HAL_STEP_TIMER_ISR {
   {
     current_block = NULL;
     plan_discard_current_block();
-    if ((cleaning_buffer_counter == 1) && (SD_FINISHED_STEPPERRELEASE)) enquecommands_P(PSTR(SD_FINISHED_RELEASECOMMAND));
+    #ifdef SD_FINISHED_RELEASECOMMAND
+      if ((cleaning_buffer_counter == 1) && (SD_FINISHED_STEPPERRELEASE)) enquecommands_P(PSTR(SD_FINISHED_RELEASECOMMAND));
+    #endif
     cleaning_buffer_counter--;
     HAL_timer_set_count (STEP_TIMER_NUM, HAL_TIMER_RATE / 200); //5ms wait
     return;
