@@ -186,6 +186,7 @@ static void lcd_status_screen();
       if (lcdDrawUpdate) \
         lcd_implementation_drawmenu_ ## type(itemSelected, _drawLineNr, PSTR(label), ## args); \
       if (wasClicked && itemSelected) { \
+        lcd_quick_feedback(); \
         menu_action_ ## type(args); \
         return; \
       } \
@@ -203,6 +204,7 @@ static void lcd_status_screen();
         if (lcdDrawUpdate) \
           lcd_implementation_drawmenu_ ## type(itemSelected, _drawLineNr, PSTR(label), ## args); \
         if (wasClicked && itemSelected) { \
+          lcd_quick_feedback(); \
           encoderRateMultiplierEnabled = true; \
           lastEncoderMovementMillis = 0; \
           menu_action_ ## type(args); \
