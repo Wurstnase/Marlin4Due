@@ -229,10 +229,11 @@ void HAL_step_timer_start()
 
   tc->TC_CHANNEL[channel].TC_RC   = (VARIANT_MCK >> 1) / 1000; // start with 1kHz as frequency; //interrupt occurs every x interations of the timer counter
   TC_Start(tc, channel); //start timer counter
-  NVIC_EnableIRQ(irq); //enable Nested Vector Interrupt Controller
+    
+  //tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS;
+  //tc->TC_CHANNEL[channel].TC_IDR =~ TC_IER_CPCS;
   
-  tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS;
-  tc->TC_CHANNEL[channel].TC_IDR =~ TC_IER_CPCS;
+  NVIC_EnableIRQ(irq); //enable Nested Vector Interrupt Controller
 }
 
 
@@ -250,15 +251,15 @@ void HAL_temp_timer_start (uint8_t timer_num)
 	
 	NVIC_SetPriority(irq, NVIC_EncodePriority(4, 6, 0));
 	
-	TC_Configure (tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | TC_CMR_TCCLKS_TIMER_CLOCK4);
+	TC_Configure (tc, channel, TC_CMR_CPCTRG | TC_CMR_TCCLKS_TIMER_CLOCK4);
+  tc->TC_CHANNEL[channel].TC_IER |= TC_IER_CPCS; //enable interrupt on timer match with register C
 
-	uint32_t rc = VARIANT_MCK / 128 / (512*12);
-	TC_SetRC(tc, channel, rc);
+	tc->TC_CHANNEL[channel].TC_RC   = (VARIANT_MCK >> 7) / 2000;
 	TC_Start(tc, channel);
 
 	//enable interrupt on RC compare
-	tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS;
-	tc->TC_CHANNEL[channel].TC_IDR = ~TC_IER_CPCS;
+	//tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS;
+	//tc->TC_CHANNEL[channel].TC_IDR = ~TC_IER_CPCS;
 
 	NVIC_EnableIRQ(irq);
 }
@@ -266,16 +267,14 @@ void HAL_temp_timer_start (uint8_t timer_num)
 void HAL_timer_enable_interrupt (uint8_t timer_num)
 {
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
-
-	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IER = TC_IER_CPCS;
-	
+	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IER=TC_IER_CPCS; //enable interrupt
+	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IDR=~TC_IER_CPCS;//remove disable interrupt
 }
 
 void HAL_timer_disable_interrupt (uint8_t timer_num)
 {
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
-
-	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IDR = ~TC_IER_CPCS;
+	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IDR=TC_IER_CPCS; //disable interrupt
 }
 
 void HAL_timer_set_count (uint8_t timer_num, uint32_t count)
@@ -293,7 +292,6 @@ void HAL_timer_set_count (uint8_t timer_num, uint32_t count)
 void HAL_timer_isr_prologue (uint8_t timer_num)
 {
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
-	
 	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_SR;
 	// TC_GetStatus (pConfig->pTimerRegs, pConfig->channel);
 }
