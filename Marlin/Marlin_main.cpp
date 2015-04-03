@@ -1594,7 +1594,7 @@ void refresh_cmd_timeout(void) { previous_millis_cmd = millis(); }
     else {
 
       if (retract_zlift > 0.01) {
-        current_position[Z_AXIS] + =retract_zlift;
+        current_position[Z_AXIS] += retract_zlift;
         #ifdef DELTA
           sync_plan_position_delta();
         #else
@@ -1952,7 +1952,7 @@ inline void gcode_G28() {
               current_position[Z_AXIS] = 0;
               plan_set_position(cpx, cpy, 0, current_position[E_AXIS]);
               destination[Z_AXIS] = -Z_RAISE_BEFORE_HOMING * home_dir(Z_AXIS);    // Set destination away from bed
-              feedrate = max_feedrate[Z_AXIS];
+              feedrate = max_feedrate[Z_AXIS] * 60;  // feedrate from mm/s to mm/min
               line_to_destination();
               st_synchronize();
               HOMEAXIS(Z);
