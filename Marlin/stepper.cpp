@@ -259,6 +259,12 @@ void st_wake_up() {
   ENABLE_STEPPER_DRIVER_INTERRUPT();
 }
 
+enum st_debug { MILLIS, NEW_VALUES, STEP_RATE, TABLE_ADRESS, TMP_STEP_RATE, GAIN, TIMER };
+static unsigned long debug_stepper[6];
+debug_stepper[MILLIS] = 0;
+debug_stepper[NEW_VALUES] = 0;
+enum step_table { FAST, SLOW };
+
 FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   unsigned long timer;
   if (step_rate > MAX_STEP_FREQUENCY) step_rate = MAX_STEP_FREQUENCY;
@@ -274,11 +280,12 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   else {
     step_loops = 1;
   }
-
+  
   if(step_rate < (32)) step_rate = (32);
   step_rate -= (32); // Correct for minimal speed (lookuptable for Due!)
   
   if (step_rate >= (8 * 256)) { // higher step rate
+    step_table speed = FAST;
     unsigned long table_address = (unsigned long)&speed_lookuptable_fast[(unsigned int)(step_rate>>8)][0];
     unsigned long tmp_step_rate = (step_rate & 0x00ff);
     unsigned long gain = (unsigned long)pgm_read_word_near(table_address+2);
@@ -287,15 +294,47 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   }
   else { // lower step rates
     // timer = HAL_TIMER_RATE / step_rate;
+    step_table speed = SLOW;
     unsigned long table_address = (unsigned long)&speed_lookuptable_slow[0][0];
+    unsigned long tmp_step_rate = table_address;
     table_address += ((step_rate)>>1) & 0xfffc;
     timer = (unsigned long)pgm_read_word_near(table_address);
     timer -= (((unsigned long)pgm_read_word_near(table_address+2) * (unsigned char)(step_rate & 0x0007))>>3);
   }
   if(timer < 100) { timer = 100; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(420kHz this should never happen)
   return timer;
+
+  if (!(debug_stepper[NEW_VALUES]) && (millis() >= debug_stepper[MILLIS] + 500)) {
+    debug_stepper[MILLIS] = millis();
+    debug_stepper[STEP_RATE] = step_rate;
+    debug_stepper[TABLE_ADRESS] = table_address;
+    if (speed == FAST) {
+      debug_stepper[TMP_STEP_RATE] = tmp_step_rate;
+      debug_stepper[GAIN] = gain;
+    }
+    else {
+      debug_stepper[TMP_STEP_RATE] = tmp_step_rate;
+      debug_stepper[GAIN] = 0;
+    }
+    debug_stepper[TIMER] = timer;
+    debug_stepper[NEW_VALUES] = 1;
+  }
+
 }
 
+void print_debug() {
+  if (debug_stepper[NEW_VALUES]) {
+    SERIAL_ECHO_START;
+    SERIAL_ECHOLNPGM("Debug stepper table");
+    SERIAL_ECHOPGM("Millis: "); SERIAL_ECHOLN(debug_stepper[MILLIS]);
+    SERIAL_ECHOPGM("Step_rate: "); SERIAL_ECHOLN(debug_stepper[STEP_RATE]);
+    SERIAL_ECHOPGM("table_address: "); SERIAL_ECHOLN(debug_stepper[TABLE_ADRESS]);
+    SERIAL_ECHOPGM("tmp_step_rate: "); SERIAL_ECHOLN(debug_stepper[TMP_STEP_RATE]);
+    SERIAL_ECHOPGM("gain: "); SERIAL_ECHOLN(debug_stepper[GAIN]);
+    SERIAL_ECHOPGM("timer: "); SERIAL_ECHOLN(debug_stepper[TIMER]);
+    debug_stepper[NEW_VALUES] = 0;
+  }
+}
 // Initializes the trapezoid generator from the current block. Called whenever a new
 // block begins.
 FORCE_INLINE void trapezoid_generator_reset() {
@@ -720,7 +759,7 @@ HAL_STEP_TIMER_ISR {
 #ifdef ADVANCE
   unsigned char old_OCR0A;
   // Timer interrupt for E. e_steps is set in the main routine;
-  // Timer 0 is shared with millies
+  // Timer 0 is shared with millis
   ISR(TIMER0_COMPA_vect)
   {
     old_OCR0A += 52; // ~10kHz interrupt (250000 / 26 = 9615kHz)

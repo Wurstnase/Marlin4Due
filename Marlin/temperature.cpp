@@ -1374,13 +1374,13 @@ HAL_TEMP_TIMER_ISR {
   
   #define READ_TEMP(temp_id) temp_read = analogRead (TEMP_## temp_id ##_PIN); \
     raw_temp_value[temp_id] += temp_read; \
-    max_temp[temp_id] = MAX(max_temp[temp_id], temp_read); \
-    min_temp[temp_id] = MIN(min_temp[temp_id], temp_read)
+    max_temp[temp_id] = max(max_temp[temp_id], temp_read); \
+    min_temp[temp_id] = min(min_temp[temp_id], temp_read)
     
   #define READ_BED_TEMP(temp_id) temp_read = analogRead (TEMP_BED_PIN); \
     raw_temp_bed_value += temp_read; \
-    max_temp[temp_id] = MAX(max_temp[temp_id], temp_read); \
-    min_temp[temp_id] = MIN(min_temp[temp_id], temp_read)
+    max_temp[temp_id] = max(max_temp[temp_id], temp_read); \
+    min_temp[temp_id] = min(min_temp[temp_id], temp_read)
     
   switch(temp_state) {
     case PrepareTemp_0:
