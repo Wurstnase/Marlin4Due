@@ -29,7 +29,7 @@
 
 #include "Marlin.h"
 
-#define DEBUG_LEVELING
+// #define DEBUG_LEVELING
 
 #ifdef ENABLE_AUTO_BED_LEVELING
   #include "vector_3.h"
