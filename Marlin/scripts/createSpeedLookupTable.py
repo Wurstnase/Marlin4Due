@@ -22,7 +22,7 @@ print
 print '#include "Marlin.h"'
 print
 
-print "const uint16_t speed_lookuptable_fast[512][2] PROGMEM = {"
+print "const uint32_t speed_lookuptable_fast[512][2] PROGMEM = {"
 a = [ timer_freq / ((i*256)+(32)) for i in range(512) ]
 b = [ a[i] - a[i+1] for i in range(511) ]
 b.append(b[-1])
@@ -34,7 +34,7 @@ for i in range(64):
 print "};"
 print
 
-print "const uint16_t speed_lookuptable_slow[256][2] PROGMEM = {"
+print "const uint32_t speed_lookuptable_slow[256][2] PROGMEM = {"
 a = [ timer_freq / ((i*8)+(32)) for i in range(256) ]
 b = [ a[i] - a[i+1] for i in range(255) ]
 b.append(b[-1])
