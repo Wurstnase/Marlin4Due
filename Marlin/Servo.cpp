@@ -16,7 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#if defined(ARDUINO_ARCH_SAM)
+#include "Configuration.h"
+
+#ifdef NUM_SERVOS
 
 #include <Arduino.h>
 #include "Servo.h"
@@ -27,10 +29,9 @@
 #define TRIM_DURATION       2                               // compensation ticks to trim adjust for digitalWrite delays
 
 static servo_t servos[MAX_SERVOS];                          // static array of servo structures
+static volatile int8_t Channel[_Nbr_16timers ];             // counter for the servo being pulsed for each timer (or -1 if refresh interval)
 
 uint8_t ServoCount = 0;                                     // the total number of attached servos
-
-static volatile int8_t Channel[_Nbr_16timers ];             // counter for the servo being pulsed for each timer (or -1 if refresh interval)
 
 // convenience macros
 #define SERVO_INDEX_TO_TIMER(_servo_nbr) ((timer16_Sequence_t)(_servo_nbr / SERVOS_PER_TIMER)) // returns the timer controlling this servo
@@ -88,7 +89,7 @@ void Servo_Handler(timer16_Sequence_t timer, Tc *tc, uint8_t channel)
     Channel[timer]++;    // increment to the next channel
     if( SERVO_INDEX(timer,Channel[timer]) < ServoCount && Channel[timer] < SERVOS_PER_TIMER) {
         tc->TC_CHANNEL[channel].TC_RA = tc->TC_CHANNEL[channel].TC_CV + SERVO(timer,Channel[timer]).ticks;
-        if(SERVO(timer,Channel[timer]).Pin.isActive == true) {    // check if activated
+        if(SERVO(timer,Channel[timer]).Pin.isActive) {    // check if activated
             digitalWrite( SERVO(timer,Channel[timer]).Pin.nbr,HIGH); // its an active channel so pulse it high
         }
     }
@@ -168,11 +169,10 @@ static void finISR(timer16_Sequence_t timer)
 }
 
 
-static boolean isTimerActive(timer16_Sequence_t timer)
-{
+static boolean isTimerActive(timer16_Sequence_t timer) {
   // returns true if any servo is active on this timer
   for(uint8_t channel=0; channel < SERVOS_PER_TIMER; channel++) {
-    if(SERVO(timer,channel).Pin.isActive == true)
+    if(SERVO(timer,channel).Pin.isActive)
       return true;
   }
   return false;
@@ -180,74 +180,60 @@ static boolean isTimerActive(timer16_Sequence_t timer)
 
 /****************** end of static functions ******************************/
 
-Servo::Servo()
-{
+Servo::Servo() {
   if (ServoCount < MAX_SERVOS) {
     this->servoIndex = ServoCount++;                    // assign a servo index to this instance
     servos[this->servoIndex].ticks = usToTicks(DEFAULT_PULSE_WIDTH);   // store default values
-  } else {
+  } 
+  else
     this->servoIndex = INVALID_SERVO;  // too many servos
-  }
 }
 
-uint8_t Servo::attach(int pin)
-{
+uint8_t Servo::attach(int pin) {
   return this->attach(pin, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
 }
 
-uint8_t Servo::attach(int pin, int min, int max)
-{
-  timer16_Sequence_t timer;
-
+uint8_t Servo::attach(int pin, int min, int max) {
   if (this->servoIndex < MAX_SERVOS) {
+  #if defined(ENABLE_AUTO_BED_LEVELING) && (PROBE_SERVO_DEACTIVATION_DELAY > 0)
+    if (pin > 0) this->pin = pin; else pin = this->pin;
+  #endif
     pinMode(pin, OUTPUT);                                   // set servo pin to output
     servos[this->servoIndex].Pin.nbr = pin;
     // todo min/max check: abs(min - MIN_PULSE_WIDTH) /4 < 128
-    this->min  = (MIN_PULSE_WIDTH - min)/4; //resolution of min/max is 4 uS
-    this->max  = (MAX_PULSE_WIDTH - max)/4;
+    this->min  = (MIN_PULSE_WIDTH - min) / 4; //resolution of min/max is 4 uS
+    this->max  = (MAX_PULSE_WIDTH - max) / 4;
     // initialize the timer if it has not already been initialized
-    timer = SERVO_INDEX_TO_TIMER(servoIndex);
-    if (isTimerActive(timer) == false) {
-      initISR(timer);
-    }
+    timer16_Sequence_t timer = SERVO_INDEX_TO_TIMER(servoIndex);
+    if (!isTimerActive(timer)) initISR(timer);
     servos[this->servoIndex].Pin.isActive = true;  // this must be set after the check for isTimerActive
   }
   return this->servoIndex;
 }
 
-void Servo::detach()
-{
-  timer16_Sequence_t timer;
-
+void Servo::detach() {
   servos[this->servoIndex].Pin.isActive = false;
-  timer = SERVO_INDEX_TO_TIMER(servoIndex);
-  if(isTimerActive(timer) == false) {
+  timer16_Sequence_t timer = SERVO_INDEX_TO_TIMER(servoIndex);
+  if(!isTimerActive(timer)) {
     finISR(timer);
   }
 }
 
-void Servo::write(int value)
-{
+void Servo::write(int value) {
   // treat values less than 544 as angles in degrees (valid values in microseconds are handled as microseconds)
-  if (value < MIN_PULSE_WIDTH)
-  {
-    if (value < 0)
-      value = 0;
-    else if (value > 180)
-      value = 180;
-
+  if (value < MIN_PULSE_WIDTH) {
+    if (value < 0) value = 0;
+    if (value > 180) value = 180;
     value = map(value, 0, 180, SERVO_MIN(), SERVO_MAX());
   }
-  writeMicroseconds(value);
+  this->writeMicroseconds(value);
 }
 
-void Servo::writeMicroseconds(int value)
-{
+void Servo::writeMicroseconds(int value) {
   // calculate and store the values for the given channel
   byte channel = this->servoIndex;
-  if( (channel < MAX_SERVOS) )   // ensure channel is valid
-  {
-    if (value < SERVO_MIN())          // ensure pulse width is valid
+  if( (channel < MAX_SERVOS) ) {  // ensure channel is valid
+    if (value < SERVO_MIN())      // ensure pulse width is valid
       value = SERVO_MIN();
     else if (value > SERVO_MAX())
       value = SERVO_MAX();
@@ -258,26 +244,14 @@ void Servo::writeMicroseconds(int value)
   }
 }
 
-int Servo::read() // return the value as degrees
-{
-  return map(readMicroseconds()+1, SERVO_MIN(), SERVO_MAX(), 0, 180);
+// return the value as degrees
+int Servo::read() { return map(this->readMicroseconds()+1, SERVO_MIN(), SERVO_MAX(), 0, 180); }
+
+int Servo::readMicroseconds() {
+  return (this->servoIndex == INVALID_SERVO) ? 0 : ticksToUs(servos[this->servoIndex].ticks) + TRIM_DURATION;
 }
 
-int Servo::readMicroseconds()
-{
-  unsigned int pulsewidth;
-  if (this->servoIndex != INVALID_SERVO)
-    pulsewidth = ticksToUs(servos[this->servoIndex].ticks)  + TRIM_DURATION;
-  else
-    pulsewidth  = 0;
+bool Servo::attached() { return servos[this->servoIndex].Pin.isActive; }
 
-  return pulsewidth;
-}
-
-bool Servo::attached()
-{
-  return servos[this->servoIndex].Pin.isActive;
-}
-
-#endif // ARDUINO_ARCH_SAM
+#endif
 
