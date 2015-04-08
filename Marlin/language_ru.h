@@ -45,6 +45,7 @@
 #define MSG_MOVE_01MM                       "Move 0.1mm"
 #define MSG_MOVE_1MM                        "Move 1mm"
 #define MSG_MOVE_10MM                       "Move 10mm"
+#define MSG_LEVEL_BED                       "?????. ?????? ???????"
 #define MSG_SPEED                           "????????"
 #define MSG_NOZZLE                          LCD_STR_THERMOMETER " ???????"
 #define MSG_BED                             LCD_STR_THERMOMETER " ???????"

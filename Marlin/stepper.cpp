@@ -274,7 +274,7 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   else {
     step_loops = 1;
   }
-  
+
   if(step_rate < (32)) step_rate = (32);
   step_rate -= (32); // Correct for minimal speed (lookuptable for Due!)
   
