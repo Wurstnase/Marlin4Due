@@ -281,27 +281,18 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   if (step_rate >= (8 * 256)) { // higher step rate
     unsigned long table_address = (unsigned long)&speed_lookuptable_fast[(unsigned int)(step_rate>>8)][0];
     unsigned long tmp_step_rate = (step_rate & 0x00ff);
-    unsigned long gain = (unsigned long)pgm_read_dword_near(table_address+2);
+    unsigned long gain = (unsigned long)pgm_read_dword_near(table_address+4);
     MultiU16X8toH16(timer, tmp_step_rate, gain);
     timer = (unsigned long)pgm_read_dword_near(table_address) - timer;
   }
   else { // lower step rates
-    // timer = HAL_TIMER_RATE / step_rate;
     unsigned long table_address = (unsigned long)&speed_lookuptable_slow[0][0];
-    table_address += ((step_rate)>>1) & 0xfffc;
+    table_address += ((step_rate)) & 0xfff0;
     timer = (unsigned long)pgm_read_dword_near(table_address);
-    timer -= (((unsigned long)pgm_read_dword_near(table_address+2) * (unsigned char)(step_rate & 0x0007))>>3);
+    timer -= (((unsigned long)pgm_read_dword_near(table_address+4) * (unsigned char)(step_rate & 0x0007))>>3);
   }
   if(timer < 100) { timer = 100; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(420kHz this should never happen)
   return timer;
-}
-
-void test_dword_pgm() {
-  unsigned long table_address = (unsigned long)&speed_lookuptable_slow[0][0];
-  for (int i = 0; i < 10; i++) {
-    SERIAL_ECHO(i); SERIAL_ECHO(" : ");
-    SERIAL_ECHOLN((unsigned long)pgm_read_dword_near(table_address+i));
-  }
 }
 
 // Initializes the trapezoid generator from the current block. Called whenever a new
@@ -801,7 +792,6 @@ HAL_STEP_TIMER_ISR {
 void st_init() {
   digipot_init(); //Initialize Digipot Motor Current
   microstep_init(); //Initialize Microstepping Pins
-  test_dword_pgm();
 
   // initialise TMC Steppers
   #ifdef HAVE_TMCDRIVER
