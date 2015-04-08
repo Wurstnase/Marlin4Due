@@ -34,11 +34,11 @@ for i in range(64):
 print "};"
 print
 
-print "const uint16_t speed_lookuptable_slow[512][2] PROGMEM = {"
-a = [ timer_freq / ((i*8)+(32)) for i in range(512) ]
-b = [ a[i] - a[i+1] for i in range(511) ]
+print "const uint16_t speed_lookuptable_slow[256][2] PROGMEM = {"
+a = [ timer_freq / ((i*8)+(32)) for i in range(256) ]
+b = [ a[i] - a[i+1] for i in range(255) ]
 b.append(b[-1])
-for i in range(64):
+for i in range(32):
     print "  ",
     for j in range(8):
         print "{%d, %d}," % (a[8*i+j], b[8*i+j]),
