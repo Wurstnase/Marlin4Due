@@ -31,7 +31,7 @@ int absPreheatFanSpeed;
 typedef void (*menuFunc_t)();
 
 uint8_t lcd_status_message_level;
-char lcd_status_message[LCD_WIDTH+1] = WELCOME_MSG;
+char lcd_status_message[3*LCD_WIDTH+1] = WELCOME_MSG; // worst case is kana with up to 3*LCD_WIDTH+1
 
 #ifdef DOGLCD
   #include "dogm_lcd_implementation.h"
@@ -280,8 +280,7 @@ static void lcd_goto_menu(menuFunc_t menu, const uint32_t encoder=0, const bool 
 }
 
 /* Main status screen. It's up to the implementation specific part to show what is needed. As this is very display dependent */
-static void lcd_status_screen()
-{
+static void lcd_status_screen() {
 	encoderRateMultiplierEnabled = false;
 
   #ifdef LCD_PROGRESS_BAR
@@ -314,15 +313,7 @@ static void lcd_status_screen()
     #endif
   #endif //LCD_PROGRESS_BAR
 
-  if (lcd_status_update_delay)
-    lcd_status_update_delay--;
-  else
-    lcdDrawUpdate = 1;
-
-  if (lcdDrawUpdate) {
     lcd_implementation_status_screen();
-    lcd_status_update_delay = 10;   /* redraw the main screen every second. This is easier then trying keep track of all things that change on the screen */
-  }
 
 #ifdef ULTIPANEL
 
@@ -1186,7 +1177,9 @@ static void lcd_quick_feedback() {
       delayMicroseconds(delay);
       WRITE(BEEPER,LOW);
       delayMicroseconds(delay);
-     }
+    }
+    const int j = max(10000 - LCD_FEEDBACK_FREQUENCY_DURATION_MS * 1000, 0);
+    if (j) delayMicroseconds(j);
   #endif
 }
 
@@ -1316,7 +1309,7 @@ void lcd_update() {
       }
     }
   #endif//CARDINSERTED
-
+  
   uint32_t ms = millis();
   if (ms > lcd_next_update_millis) {
 
@@ -1367,27 +1360,36 @@ void lcd_update() {
             } // encoderRateMultiplierEnabled
           #endif //ENCODER_RATE_MULTIPLIER
 
-          lcdDrawUpdate = 1;
           encoderPosition += (encoderDiff * encoderMultiplier) / ENCODER_PULSES_PER_STEP;
           encoderDiff = 0;
         }
         timeoutToStatus = ms + LCD_TIMEOUT_TO_STATUS;
+        lcdDrawUpdate = 1;
       }
-
     #endif //ULTIPANEL
 
+    if (currentMenu == lcd_status_screen) {
+      if (!lcd_status_update_delay) {
+        lcdDrawUpdate = 1;
+        lcd_status_update_delay = 10;   /* redraw the main screen every second. This is easier then trying keep track of all things that change on the screen */
+      }
+      else {
+        lcd_status_update_delay--;
+      }
+    }
     #ifdef DOGLCD  // Changes due to different driver architecture of the DOGM display
-      blink++;     // Variable for fan animation and alive dot
-      u8g.firstPage();
-      do {
-        lcd_setFont(FONT_MENU);
-        u8g.setPrintPos(125, 0);
-        if (blink % 2) u8g.setColorIndex(1); else u8g.setColorIndex(0); // Set color for the alive dot
-        u8g.drawPixel(127, 63); // draw alive dot
-        u8g.setColorIndex(1); // black on white
-        (*currentMenu)();
-        if (!lcdDrawUpdate) break; // Terminate display update, when nothing new to draw. This must be done before the last dogm.next()
-      } while( u8g.nextPage() );
+      if (lcdDrawUpdate) {
+        blink++;     // Variable for fan animation and alive dot
+        u8g.firstPage();
+        do {
+          lcd_setFont(FONT_MENU);
+          u8g.setPrintPos(125, 0);
+          if (blink % 2) u8g.setColorIndex(1); else u8g.setColorIndex(0); // Set color for the alive dot
+          u8g.drawPixel(127, 63); // draw alive dot
+          u8g.setColorIndex(1); // black on white
+          (*currentMenu)();
+        } while( u8g.nextPage() );
+      }
     #else
       (*currentMenu)();
     #endif
@@ -1420,13 +1422,6 @@ void lcd_ignore_click(bool b) {
 }
 
 void lcd_finishstatus(bool persist=false) {
-  int len = lcd_strlen(lcd_status_message);
-  if (len > 0) {
-    while (len < LCD_WIDTH) {
-      lcd_status_message[len++] = ' ';
-    }
-  }
-  lcd_status_message[LCD_WIDTH] = '\0';
   #ifdef LCD_PROGRESS_BAR
     progressBarTick = millis();
     #if PROGRESS_MSG_EXPIRE > 0
@@ -1444,15 +1439,27 @@ void lcd_finishstatus(bool persist=false) {
   void dontExpireStatus() { expireStatusMillis = 0; }
 #endif
 
+void set_utf_strlen(char *s, uint8_t n) {
+  uint8_t i = 0, j = 0;
+  while (s[i] && (j < n)) {
+    if ((s[i] & 0xc0u) != 0x80u) j++;
+    i++;
+  }
+  while (j++ < n) s[i++] = ' ';
+  s[i] = 0;
+}
+
 void lcd_setstatus(const char* message, bool persist) {
   if (lcd_status_message_level > 0) return;
-  strncpy(lcd_status_message, message, LCD_WIDTH);
+  strncpy(lcd_status_message, message, 3*LCD_WIDTH);
+  set_utf_strlen(lcd_status_message, LCD_WIDTH);
   lcd_finishstatus(persist);
 }
 
 void lcd_setstatuspgm(const char* message, uint8_t level) {
   if (level >= lcd_status_message_level) {
-    strncpy_P(lcd_status_message, message, LCD_WIDTH);
+    strncpy_P(lcd_status_message, message, 3*LCD_WIDTH);
+    set_utf_strlen(lcd_status_message, LCD_WIDTH);
     lcd_status_message_level = level;
     lcd_finishstatus(level > 0);
   }
@@ -1817,20 +1824,23 @@ static void _lcd_level_bed()
 {
   if (encoderPosition != 0) {
     refresh_cmd_timeout();
-    current_position[Z_AXIS] += float((int)encoderPosition) * 0.05;
+    current_position[Z_AXIS] += float((int)encoderPosition) * MBL_Z_STEP;
     if (min_software_endstops && current_position[Z_AXIS] < Z_MIN_POS) current_position[Z_AXIS] = Z_MIN_POS;
     if (max_software_endstops && current_position[Z_AXIS] > Z_MAX_POS) current_position[Z_AXIS] = Z_MAX_POS;
     encoderPosition = 0;
     plan_buffer_line(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS], manual_feedrate[Z_AXIS]/60, active_extruder);
     lcdDrawUpdate = 1;
   }
-  if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR("Z"), ftostr32(current_position[Z_AXIS]));
+  if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR("Z"), ftostr43(current_position[Z_AXIS]));
   static bool debounce_click = false;
   if (LCD_CLICKED) {
     if (!debounce_click) {
       debounce_click = true;
       int ix = _lcd_level_bed_position % MESH_NUM_X_POINTS;
       int iy = _lcd_level_bed_position / MESH_NUM_X_POINTS;
+      if (iy&1) { // Zig zag
+        ix = (MESH_NUM_X_POINTS - 1) - ix;
+      }
       mbl.set_z(ix, iy, current_position[Z_AXIS]);
       _lcd_level_bed_position++;
       if (_lcd_level_bed_position == MESH_NUM_X_POINTS*MESH_NUM_Y_POINTS) {

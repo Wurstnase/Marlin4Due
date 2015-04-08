@@ -105,16 +105,16 @@ static volatile bool endstop_z_probe_hit = false; // Leaving this in even if Z_P
   static bool old_z_max_endstop = false;
 #endif
 #ifdef Z_DUAL_ENDSTOPS
-  #if HAS_Z2_MIN
+  // #if HAS_Z2_MIN
     static bool old_z2_min_endstop = false;
-  #endif
-  #if HAS_Z2_MAX
+  // #endif
+  // #if HAS_Z2_MAX
     static bool old_z2_max_endstop = false;
-  #endif
+  // #endif
 #endif
 
 #ifdef Z_PROBE_ENDSTOP // No need to check for valid pin, SanityCheck.h already does this.
-static bool old_z_probe_endstop = false;
+  static bool old_z_probe_endstop = false;
 #endif
 
 static bool check_endstops = true;
@@ -297,19 +297,6 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   return timer;
 }
 
-void print_debug() {
-  if (debug_stepper[NEW_VALUES]) {
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Debug stepper table");
-    SERIAL_ECHOPGM("Millis: "); SERIAL_ECHOLN(debug_stepper[MILLIS]);
-    SERIAL_ECHOPGM("Step_rate: "); SERIAL_ECHOLN(debug_stepper[STEP_RATE]);
-    SERIAL_ECHOPGM("table_address: "); SERIAL_ECHOLN(debug_stepper[TABLE_ADRESS]);
-    SERIAL_ECHOPGM("tmp_step_rate: "); SERIAL_ECHOLN(debug_stepper[TMP_STEP_RATE]);
-    SERIAL_ECHOPGM("gain: "); SERIAL_ECHOLN(debug_stepper[GAIN]);
-    SERIAL_ECHOPGM("timer: "); SERIAL_ECHOLN(debug_stepper[TIMER]);
-    debug_stepper[NEW_VALUES] = 0;
-  }
-}
 // Initializes the trapezoid generator from the current block. Called whenever a new
 // block begins.
 FORCE_INLINE void trapezoid_generator_reset() {
