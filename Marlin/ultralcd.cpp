@@ -58,7 +58,7 @@ static void lcd_status_screen();
   static void lcd_control_temperature_preheat_abs_settings_menu();
   static void lcd_control_motion_menu();
   static void lcd_control_volumetric_menu();
-  #ifdef DOGLCD
+  #ifdef HAS_LCD_CONTRAST
     static void lcd_set_contrast();
   #endif
   #ifdef FWRETRACT
@@ -269,9 +269,10 @@ float raw_Ki, raw_Kd;
 static void lcd_goto_menu(menuFunc_t menu, const uint32_t encoder=0, const bool feedback=true) {
   if (currentMenu != menu) {
     currentMenu = menu;
-    encoderPosition = encoder;
-    if (feedback) lcd_quick_feedback();
-
+    #if defined(NEWPANEL)
+      encoderPosition = encoder;
+      if (feedback) lcd_quick_feedback();
+    #endif
     // For LCD_PROGRESS_BAR re-initialize the custom characters
     #ifdef LCD_PROGRESS_BAR
       lcd_set_custom_characters(menu == lcd_status_screen);
@@ -757,7 +758,7 @@ static void lcd_control_menu() {
   MENU_ITEM(submenu, MSG_MOTION, lcd_control_motion_menu);
   MENU_ITEM(submenu, MSG_VOLUMETRIC, lcd_control_volumetric_menu);
 
-  #ifdef DOGLCD
+  #ifdef HAS_LCD_CONTRAST
     //MENU_ITEM_EDIT(int3, MSG_CONTRAST, &lcd_contrast, 0, 63);
     MENU_ITEM(submenu, MSG_CONTRAST, lcd_set_contrast);
   #endif
@@ -981,8 +982,7 @@ static void lcd_control_volumetric_menu() {
   END_MENU();
 }
 
-#ifdef DOGLCD
-
+#ifdef HAS_LCD_CONTRAST
   static void lcd_set_contrast() {
     if (encoderPosition != 0) {
       lcd_contrast -= encoderPosition;
@@ -994,11 +994,9 @@ static void lcd_control_volumetric_menu() {
     if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR(MSG_CONTRAST), itostr2(lcd_contrast));
     if (LCD_CLICKED) lcd_goto_menu(lcd_control_menu);
   }
-
-#endif // DOGLCD
+#endif // HAS_LCD_CONTRAST
 
 #ifdef FWRETRACT
-
   static void lcd_control_retract_menu() {
   START_MENU(lcd_control_menu);
     MENU_ITEM(back, MSG_CONTROL, lcd_control_menu);
@@ -1016,16 +1014,13 @@ static void lcd_control_volumetric_menu() {
     MENU_ITEM_EDIT(float3, MSG_CONTROL_RETRACT_RECOVERF, &retract_recover_feedrate, 1, 999);
     END_MENU();
   }
-
 #endif // FWRETRACT
 
 #if SDCARDDETECT == -1
-
   static void lcd_sd_refresh() {
     card.initsd();
     currentMenuViewOffset = 0;
   }
-
 #endif
 
 static void lcd_sd_updir() {
@@ -1283,7 +1278,9 @@ int lcd_strlen_P(const char *s) {
 }
 
 void lcd_update() {
-  static unsigned long timeoutToStatus = 0;
+  #ifdef ULTIPANEL
+    static unsigned long timeoutToStatus = 0;
+  #endif
 
   #ifdef LCD_HAS_SLOW_BUTTONS
     slow_buttons = lcd_implementation_read_slow_buttons(); // buttons which take too long to read in interrupt context
@@ -1476,7 +1473,7 @@ void lcd_setalertstatuspgm(const char* message) {
 
 void lcd_reset_alert_level() { lcd_status_message_level = 0; }
 
-#ifdef DOGLCD
+#ifdef HAS_LCD_CONTRAST
   void lcd_setcontrast(uint8_t value) {
     lcd_contrast = value & 0x3F;
     u8g.setContrast(lcd_contrast);

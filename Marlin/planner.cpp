@@ -113,9 +113,6 @@ volatile unsigned char block_buffer_tail;           // Index of the block to pro
 //===========================================================================
 //=============================private variables ============================
 //===========================================================================
-#ifdef PREVENT_DANGEROUS_EXTRUDE
-  float extrude_min_temp = EXTRUDE_MINTEMP;
-#endif
 #ifdef XY_FREQUENCY_LIMIT
   // Used for the frequency limit
   #define MAX_FREQ_TIME (1000000.0/XY_FREQUENCY_LIMIT)
@@ -508,7 +505,7 @@ float junction_deviation = 0.1;
   #ifdef PREVENT_DANGEROUS_EXTRUDE
     if (de) {
       if (degHotend(active_extruder) < extrude_min_temp) {
-        position[E_AXIS] = target[E_AXIS]; //behave as if the move really took place, but ignore E part
+        position[E_AXIS] = target[E_AXIS]; // Behave as if the move really took place, but ignore E part
         de = 0; // no difference
         SERIAL_ECHO_START;
         SERIAL_ECHOLNPGM(MSG_ERR_COLD_EXTRUDE_STOP);
@@ -983,10 +980,10 @@ float junction_deviation = 0.1;
       apply_rotation_xyz(plan_bed_level_matrix, x, y, z);
     #endif
 
-    float nx = position[X_AXIS] = lround(x * axis_steps_per_unit[X_AXIS]),
-          ny = position[Y_AXIS] = lround(y * axis_steps_per_unit[Y_AXIS]),
-          nz = position[Z_AXIS] = lround(z * axis_steps_per_unit[Z_AXIS]),
-          ne = position[E_AXIS] = lround(e * axis_steps_per_unit[E_AXIS]);
+    float nx = position[X_AXIS] = lround(x * axis_steps_per_unit[X_AXIS]);
+    float ny = position[Y_AXIS] = lround(y * axis_steps_per_unit[Y_AXIS]);
+    float nz = position[Z_AXIS] = lround(z * axis_steps_per_unit[Z_AXIS]);
+    float ne = position[E_AXIS] = lround(e * axis_steps_per_unit[E_AXIS]);
     st_set_position(nx, ny, nz, ne);
     previous_nominal_speed = 0.0; // Resets planner junction speeds. Assumes start from rest.
 
@@ -997,10 +994,6 @@ void plan_set_e_position(const float &e) {
   position[E_AXIS] = lround(e * axis_steps_per_unit[E_AXIS]);  
   st_set_e_position(position[E_AXIS]);
 }
-
-#ifdef PREVENT_DANGEROUS_EXTRUDE
-  void set_extrude_min_temp(float temp) { extrude_min_temp = temp; }
-#endif
 
 // Calculate the steps/s^2 acceleration rates, based on the mm/s^s
 void reset_acceleration_rates() {

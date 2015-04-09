@@ -101,6 +101,9 @@
     #ifdef ENABLE_AUTO_BED_LEVELING
       #error Select ENABLE_AUTO_BED_LEVELING or MESH_BED_LEVELING, not both
     #endif
+    #if MESH_NUM_X_POINTS > 7 || MESH_NUM_Y_POINTS > 7
+      #error MESH_NUM_X_POINTS and MESH_NUM_Y_POINTS need to be less than 8
+    #endif
   #endif
 
   /**
@@ -183,7 +186,7 @@
         #define Y_PROBE_ERROR
       #endif
       #ifdef Y_PROBE_ERROR
-        #error The Y axis probing range is to small to fit all the points defined in AUTO_BED_LEVELING_GRID_POINTS
+        #error The Y axis probing range is too small to fit all the points defined in AUTO_BED_LEVELING_GRID_POINTS
       #endif
 
       #undef PROBE_SIZE_X
