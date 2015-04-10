@@ -673,7 +673,7 @@ void get_command()
   if (drain_queued_commands_P()) // priority is given to non-serial commands
     return;
   
-  while( MYSERIAL.available() > 0  && buflen < BUFSIZE) {
+  while( MYSERIAL.available() && buflen < BUFSIZE) {
     serial_char = MYSERIAL.read();
     if(serial_char == '\n' ||
        serial_char == '\r' ||
@@ -774,7 +774,7 @@ void get_command()
     }
     else if(serial_char == '\\') {  //Handle escapes
        
-        if(MYSERIAL.available() > 0  && buflen < BUFSIZE) {
+        if(MYSERIAL.available() && buflen < BUFSIZE) {
             // if we have one more character, copy it over
             serial_char = MYSERIAL.read();
             cmdbuffer[bufindw][serial_count++] = serial_char;
