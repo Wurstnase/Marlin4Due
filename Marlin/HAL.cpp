@@ -30,7 +30,6 @@
 
 #include "HAL.h"
 #include "Configuration.h"
-// #include "DueTimer.h"
 
 #include <Wire.h>
 
@@ -55,7 +54,6 @@
 // --------------------------------------------------------------------------
 
 uint8_t MCUSR;
-uint8_t HAL_step_timer_RC;
 
 // --------------------------------------------------------------------------
 // Private Variables
@@ -85,15 +83,27 @@ void sei(void)
 	interrupts();
 }
 
-void _delay_ms (int delay_ms)
-{
-	//todo: port for Due?
-	delay (delay_ms);
+void _delay_ms(uint32_t delay) {
+	while (delay > 65) {
+		_delay_us(64999);
+		delay -= 65;
+	}
+	_delay_us(delay * 1000);
 }
 
-void _delay_us (int delay_us)
-{
-  delayMicroseconds(delay_us);
+// void _delay_us (int delay_us)
+// {
+  // delayMicroseconds(delay_us);
+// }
+
+static inline void _delay_us(uint32_t usec) {
+  uint32_t n = usec * (F_CPU / 3000000);
+  asm volatile(
+      "L2_%=_delayMicroseconds:"       "\n\t"
+      "subs   %0, #1"                 "\n\t"
+      "bge    L2_%=_delayMicroseconds" "\n"
+      : "+r" (n) :  
+  );
 }
 
 extern "C" {
