@@ -83,12 +83,8 @@ void sei(void)
 	interrupts();
 }
 
-void _delay_ms(uint32_t delay) {
-	while (delay > 65) {
-		_delay_us(64999);
-		delay -= 65;
-	}
-	_delay_us(delay * 1000);
+void _delay_ms(uint32_t msec) {
+	delay(msec);
 }
 
 // void _delay_us (int delay_us)
