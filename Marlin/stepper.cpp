@@ -46,7 +46,7 @@ block_t *current_block;  // A pointer to the block currently being traced
 
 // Variables used by The Stepper Driver Interrupt
 static unsigned char out_bits;        // The next stepping-bits to be output
-static unsigned int cleaning_buffer_counter = 0;  
+static unsigned int cleaning_buffer_counter;  
 
 #ifdef Z_DUAL_ENDSTOPS
   static bool performing_homing = false, 
@@ -647,7 +647,7 @@ HAL_STEP_TIMER_ISR {
       step_events_completed++;
       if (step_events_completed >= current_block->step_event_count) break;
     }
-    // Calculare new timer value
+    // Calculate new timer value
     unsigned long timer;
     unsigned long step_rate;
     if (step_events_completed <= (unsigned long int)current_block->accelerate_until) {
@@ -674,7 +674,7 @@ HAL_STEP_TIMER_ISR {
 
       #endif
     }
-    else if (step_events_completed > (unsigned long int)current_block->decelerate_after) {
+    else if (step_events_completed > (unsigned long)current_block->decelerate_after) {
       MultiU24X24toH16(step_rate, deceleration_time, current_block->acceleration_rate);
 
       if (step_rate > acc_step_rate) { // Check step_rate stays positive
@@ -719,7 +719,7 @@ HAL_STEP_TIMER_ISR {
 #ifdef ADVANCE
   unsigned char old_OCR0A;
   // Timer interrupt for E. e_steps is set in the main routine;
-  // Timer 0 is shared with millis
+  // Timer 0 is shared with millies
   ISR(TIMER0_COMPA_vect)
   {
     old_OCR0A += 52; // ~10kHz interrupt (250000 / 26 = 9615kHz)
@@ -987,10 +987,7 @@ void st_init() {
       TCCR0A &= ~BIT(WGM01);
       TCCR0A &= ~BIT(WGM00);
     #endif
-    e_steps[0] = 0;
-    e_steps[1] = 0;
-    e_steps[2] = 0;
-    e_steps[3] = 0;
+    e_steps[0] = e_steps[1] = e_steps[2] = e_steps[3] = 0;
     TIMSK0 |= BIT(OCIE0A);
   #endif //ADVANCE
   #endif
@@ -1035,7 +1032,8 @@ long st_get_position(uint8_t axis) {
 #ifdef ENABLE_AUTO_BED_LEVELING
 
   float st_get_position_mm(uint8_t axis) {
-    return st_get_position(axis) / axis_steps_per_unit[axis];
+    float steper_position_in_steps = st_get_position(axis);
+    return steper_position_in_steps / axis_steps_per_unit[axis];
   }
 
 #endif  // ENABLE_AUTO_BED_LEVELING

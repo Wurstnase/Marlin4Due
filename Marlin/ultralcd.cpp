@@ -22,7 +22,7 @@ int absPreheatHPBTemp;
 int absPreheatFanSpeed;
 
 #ifdef FILAMENT_LCD_DISPLAY
-  unsigned long message_millis = 0;
+  millis_t previous_lcd_status_ms = 0;
 #endif
 
 /* !Configuration settings */
@@ -77,8 +77,6 @@ static void lcd_status_screen();
     static void lcd_level_bed();
   #endif
 
-  static void lcd_quick_feedback();//Cause an LCD refresh, and give the user visual or audible feedback that something has happened
-
   /* Different types of actions that can be used in menu items. */
   static void menu_action_back(menuFunc_t data);
   static void menu_action_submenu(menuFunc_t data);
@@ -130,7 +128,7 @@ static void lcd_status_screen();
    * START_MENU generates the init code for a menu function
    */
 #if defined(BTN_BACK) && BTN_BACK > 0
-  #define START_MENU( last_menu ) do { \
+  #define START_MENU(last_menu) do { \
     encoderRateMultiplierEnabled = false; \
     if (encoderPosition > 0x8000) encoderPosition = 0; \
     uint8_t encoderLine = encoderPosition / ENCODER_STEPS_PER_MENU_ITEM; \
@@ -146,7 +144,7 @@ static void lcd_status_screen();
       _menuItemNr = 0;
 
 #else
-  #define START_MENU( last_menu ) do { \
+  #define START_MENU(last_menu) do { \
     encoderRateMultiplierEnabled = false; \
     if (encoderPosition > 0x8000) encoderPosition = 0; \
     uint8_t encoderLine = encoderPosition / ENCODER_STEPS_PER_MENU_ITEM; \
@@ -238,7 +236,7 @@ static void lcd_status_screen();
     volatile uint8_t slow_buttons; // Bits of the pressed buttons.
   #endif
   uint8_t currentMenuViewOffset;              /* scroll offset in the current menu */
-  uint32_t blocking_enc;
+  millis_t next_button_update_ms;
   uint8_t lastEncoderBits;
   uint32_t encoderPosition;
   #if (SDCARDDETECT > 0)
@@ -248,7 +246,7 @@ static void lcd_status_screen();
 #endif // ULTIPANEL
 
 menuFunc_t currentMenu = lcd_status_screen; /* function pointer to the currently active menu */
-uint32_t lcd_next_update_millis;
+millis_t next_lcd_update_ms;
 uint8_t lcd_status_update_delay;
 bool ignore_click = false;
 bool wait_for_unclick;
@@ -266,10 +264,10 @@ menuFunc_t callbackFunc;
 // place-holders for Ki and Kd edits
 float raw_Ki, raw_Kd;
 
-static void lcd_goto_menu(menuFunc_t menu, const uint32_t encoder=0, const bool feedback=true) {
+static void lcd_goto_menu(menuFunc_t menu, const bool feedback=false, const uint32_t encoder=0) {
   if (currentMenu != menu) {
     currentMenu = menu;
-    #if defined(NEWPANEL)
+    #ifdef NEWPANEL
       encoderPosition = encoder;
       if (feedback) lcd_quick_feedback();
     #endif
@@ -285,7 +283,7 @@ static void lcd_status_screen() {
 	encoderRateMultiplierEnabled = false;
 
   #ifdef LCD_PROGRESS_BAR
-    unsigned long ms = millis();
+    millis_t ms = millis();
     #ifndef PROGRESS_MSG_ONCE
       if (ms > progressBarTick + PROGRESS_BAR_MSG_TIME + PROGRESS_BAR_BAR_TIME) {
         progressBarTick = ms;
@@ -314,77 +312,69 @@ static void lcd_status_screen() {
     #endif
   #endif //LCD_PROGRESS_BAR
 
-    lcd_implementation_status_screen();
+  lcd_implementation_status_screen();
 
-#ifdef ULTIPANEL
+  #ifdef ULTIPANEL
 
     bool current_click = LCD_CLICKED;
 
     if (ignore_click) {
-        if (wait_for_unclick) {
-          if (!current_click) {
-              ignore_click = wait_for_unclick = false;
-          }
-          else {
-              current_click = false;
-          }
-        }
-        else if (current_click) {
-            lcd_quick_feedback();
-            wait_for_unclick = true;
-            current_click = false;
-        }
+      if (wait_for_unclick) {
+        if (!current_click)
+          ignore_click = wait_for_unclick = false;
+        else
+          current_click = false;
+      }
+      else if (current_click) {
+        lcd_quick_feedback();
+        wait_for_unclick = true;
+        current_click = false;
+      }
     }
 
-    if (current_click)
-    {
-        lcd_goto_menu(lcd_main_menu);
-        lcd_implementation_init( // to maybe revive the LCD if static electricity killed it.
-          #ifdef LCD_PROGRESS_BAR
-            currentMenu == lcd_status_screen
-          #endif
-        );
-        #ifdef FILAMENT_LCD_DISPLAY
-          message_millis = millis();  // get status message to show up for a while
+    if (current_click) {
+      lcd_goto_menu(lcd_main_menu, true);
+      lcd_implementation_init( // to maybe revive the LCD if static electricity killed it.
+        #ifdef LCD_PROGRESS_BAR
+          currentMenu == lcd_status_screen
         #endif
+      );
+      #ifdef FILAMENT_LCD_DISPLAY
+        previous_lcd_status_ms = millis();  // get status message to show up for a while
+      #endif
     }
 
-#ifdef ULTIPANEL_FEEDMULTIPLY
-    // Dead zone at 100% feedrate
-    if ((feedmultiply < 100 && (feedmultiply + int(encoderPosition)) > 100) ||
-            (feedmultiply > 100 && (feedmultiply + int(encoderPosition)) < 100))
-    {
+    #ifdef ULTIPANEL_FEEDMULTIPLY
+      // Dead zone at 100% feedrate
+      if ((feedmultiply < 100 && (feedmultiply + int(encoderPosition)) > 100) ||
+              (feedmultiply > 100 && (feedmultiply + int(encoderPosition)) < 100)) {
         encoderPosition = 0;
         feedmultiply = 100;
-    }
-
-    if (feedmultiply == 100 && int(encoderPosition) > ENCODER_FEEDRATE_DEADZONE)
-    {
-        feedmultiply += int(encoderPosition) - ENCODER_FEEDRATE_DEADZONE;
-        encoderPosition = 0;
-    }
-    else if (feedmultiply == 100 && int(encoderPosition) < -ENCODER_FEEDRATE_DEADZONE)
-    {
-        feedmultiply += int(encoderPosition) + ENCODER_FEEDRATE_DEADZONE;
-        encoderPosition = 0;
-    }
-    else if (feedmultiply != 100)
-    {
+      }
+      if (feedmultiply == 100) {
+        if (int(encoderPosition) > ENCODER_FEEDRATE_DEADZONE) {
+          feedmultiply += int(encoderPosition) - ENCODER_FEEDRATE_DEADZONE;
+          encoderPosition = 0;
+        }
+        else if (int(encoderPosition) < -ENCODER_FEEDRATE_DEADZONE) {
+          feedmultiply += int(encoderPosition) + ENCODER_FEEDRATE_DEADZONE;
+          encoderPosition = 0;
+        }
+      }
+      else {
         feedmultiply += int(encoderPosition);
         encoderPosition = 0;
-    }
-#endif //ULTIPANEL_FEEDMULTIPLY
+      }
+    #endif // ULTIPANEL_FEEDMULTIPLY
 
-    if (feedmultiply < 10)
-        feedmultiply = 10;
-    else if (feedmultiply > 999)
-        feedmultiply = 999;
-#endif //ULTIPANEL
+    feedmultiply = constrain(feedmultiply, 10, 999);
+
+  #endif //ULTIPANEL
 }
 
 #ifdef ULTIPANEL
 
-static void lcd_return_to_status() { lcd_goto_menu(lcd_status_screen, 0, false); }
+static void lcd_return_to_status() { lcd_goto_menu(lcd_status_screen); }
 
 static void lcd_sdcard_pause() { card.pauseSDPrint(); }
 
@@ -570,7 +560,7 @@ void lcd_preheat_abs0() { _lcd_preheat(0, absPreheatHotendTemp, absPreheatHPBTem
     void lcd_preheat_abs_bedonly() { _lcd_preheat(0, 0, absPreheatHPBTemp, absPreheatFanSpeed); }
 
     static void lcd_preheat_pla_menu() {
-  START_MENU(lcd_prepare_menu);
+      START_MENU(lcd_prepare_menu);
       MENU_ITEM(back, MSG_PREPARE, lcd_prepare_menu);
       MENU_ITEM(function, MSG_PREHEAT_PLA_N MSG_H1, lcd_preheat_pla0);
       #if TEMP_SENSOR_1 != 0
@@ -590,7 +580,7 @@ void lcd_preheat_abs0() { _lcd_preheat(0, absPreheatHotendTemp, absPreheatHPBTem
     }
 
     static void lcd_preheat_abs_menu() {
-  START_MENU(lcd_prepare_menu);
+      START_MENU(lcd_prepare_menu);
       MENU_ITEM(back, MSG_PREPARE, lcd_prepare_menu);
       MENU_ITEM(function, MSG_PREHEAT_ABS_N MSG_H1, lcd_preheat_abs0);
       #if TEMP_SENSOR_1 != 0
@@ -662,8 +652,8 @@ static void lcd_prepare_menu() {
 }
 
 #ifdef DELTA_CALIBRATION_MENU
-static void lcd_delta_calibrate_menu()
-{
+
+  static void lcd_delta_calibrate_menu() {
     START_MENU(lcd_main_menu);
     MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
     MENU_ITEM(gcode, MSG_AUTO_HOME, PSTR("G28"));
@@ -997,7 +987,7 @@ static void lcd_control_volumetric_menu() {
 
 #ifdef FWRETRACT
   static void lcd_control_retract_menu() {
-  START_MENU(lcd_control_menu);
+    START_MENU(lcd_control_menu);
     MENU_ITEM(back, MSG_CONTROL, lcd_control_menu);
     MENU_ITEM_EDIT(bool, MSG_AUTORETRACT, &autoretract_enabled);
     MENU_ITEM_EDIT(float52, MSG_CONTROL_RETRACT, &retract_length, 0, 100);
@@ -1146,9 +1136,9 @@ menu_edit_type(unsigned long, long5, ftostr5, 0.01)
 
 /** End of menus **/
 
-static void lcd_quick_feedback() {
+void lcd_quick_feedback() {
   lcdDrawUpdate = 2;
-  blocking_enc = millis() + 500;
+  next_button_update_ms = millis() + 500;
     
   #ifdef LCD_USE_I2C_BUZZER
     #ifndef LCD_FEEDBACK_FREQUENCY_HZ
@@ -1166,15 +1156,15 @@ static void lcd_quick_feedback() {
     #ifndef LCD_FEEDBACK_FREQUENCY_DURATION_MS
       #define LCD_FEEDBACK_FREQUENCY_DURATION_MS 2
     #endif
-    const unsigned int delay = 1000000 / LCD_FEEDBACK_FREQUENCY_HZ / 2;
-    int i = LCD_FEEDBACK_FREQUENCY_DURATION_MS * LCD_FEEDBACK_FREQUENCY_HZ / 1000;
+    const uint16_t delay = 1000000 / LCD_FEEDBACK_FREQUENCY_HZ / 2;
+    uint16_t i = LCD_FEEDBACK_FREQUENCY_DURATION_MS * LCD_FEEDBACK_FREQUENCY_HZ / 1000;
     while (i--) {
       WRITE(BEEPER,HIGH);
       delayMicroseconds(delay);
       WRITE(BEEPER,LOW);
       delayMicroseconds(delay);
     }
-    const int j = max(10000 - LCD_FEEDBACK_FREQUENCY_DURATION_MS * 1000, 0);
+    const uint16_t j = max(10000 - LCD_FEEDBACK_FREQUENCY_DURATION_MS * 1000, 0);
     if (j) delayMicroseconds(j);
   #endif
 }
@@ -1278,7 +1268,7 @@ int lcd_strlen_P(const char *s) {
 
 void lcd_update() {
   #ifdef ULTIPANEL
-    static unsigned long timeoutToStatus = 0;
+    static millis_t return_to_status_ms = 0;
   #endif
 
   #ifdef LCD_HAS_SLOW_BUTTONS
@@ -1308,8 +1298,8 @@ void lcd_update() {
     }
   #endif//CARDINSERTED
   
-  uint32_t ms = millis();
-  if (ms > lcd_next_update_millis) {
+  millis_t ms = millis();
+  if (ms > next_lcd_update_ms) {
 
     #ifdef ULTIPANEL
 
@@ -1361,7 +1351,7 @@ void lcd_update() {
           encoderPosition += (encoderDiff * encoderMultiplier) / ENCODER_PULSES_PER_STEP;
           encoderDiff = 0;
         }
-        timeoutToStatus = ms + LCD_TIMEOUT_TO_STATUS;
+        return_to_status_ms = ms + LCD_TIMEOUT_TO_STATUS;
         lcdDrawUpdate = 1;
       }
     #endif //ULTIPANEL
@@ -1397,20 +1387,24 @@ void lcd_update() {
     #endif
 
     #ifdef ULTIPANEL
+
+      // Return to Status Screen after a timeout
       if (currentMenu != lcd_status_screen &&
-        #if defined(MANUAL_BED_LEVELING)
-          currentMenu != _lcd_level_bed && 
-          currentMenu != _lcd_level_bed_homing && 
-        #endif  // MANUAL_BED_LEVELING
-          millis() > timeoutToStatus) {
+        #ifdef MANUAL_BED_LEVELING
+          currentMenu != _lcd_level_bed &&
+          currentMenu != _lcd_level_bed_homing &&
+        #endif
+        millis() > return_to_status_ms
+      ) {
         lcd_return_to_status();
         lcdDrawUpdate = 2;
       }
-    #endif //ULTIPANEL
+
+    #endif // ULTIPANEL
 
     if (lcdDrawUpdate == 2) lcd_implementation_clear();
     if (lcdDrawUpdate) lcdDrawUpdate--;
-    lcd_next_update_millis = millis() + LCD_UPDATE_INTERVAL;
+    next_lcd_update_ms = millis() + LCD_UPDATE_INTERVAL;
   }
 }
 
@@ -1429,7 +1423,7 @@ void lcd_finishstatus(bool persist=false) {
   lcdDrawUpdate = 2;
 
   #ifdef FILAMENT_LCD_DISPLAY
-    message_millis = millis();  //get status message to show up for a while
+    previous_lcd_status_ms = millis();  //get status message to show up for a while
   #endif
 }
 
@@ -1498,13 +1492,13 @@ void lcd_buttons_update() {
     uint8_t newbutton = 0;
     if (READ(BTN_EN1) == 0) newbutton |= EN_A;
     if (READ(BTN_EN2) == 0) newbutton |= EN_B;
-  uint32_t ms = millis();
     #if BTN_ENC > 0
+      millis_t ms = millis();
       if (ms > blocking_enc && READ(BTN_ENC) == 0) newbutton |= EN_C;
+      #if defined(BTN_BACK) && BTN_BACK > 0
+        if (ms > blocking_enc && READ(BTN_BACK) == 0) newbutton |= EN_D;
+      #endif
     #endif
-  #if defined(BTN_BACK) && BTN_BACK > 0
-    if (ms > blocking_enc && READ(BTN_BACK) == 0) newbutton |= EN_D;
-  #endif
     buttons = newbutton;
     #ifdef LCD_HAS_SLOW_BUTTONS
       buttons |= slow_buttons;
@@ -1827,7 +1821,7 @@ char *ftostr52(const float &x) {
       if (max_software_endstops && current_position[Z_AXIS] > Z_MAX_POS) current_position[Z_AXIS] = Z_MAX_POS;
       encoderPosition = 0;
       line_to_current();
-      lcdDrawUpdate = 1;
+      lcdDrawUpdate = 2;
     }
     if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR("Z"), ftostr43(current_position[Z_AXIS]));
     static bool debounce_click = false;
@@ -1845,7 +1839,7 @@ char *ftostr52(const float &x) {
           current_position[Z_AXIS] = MESH_HOME_SEARCH_Z;
           line_to_current();
           mbl.active = 1;
-        enqueuecommands_P(PSTR("G28"));
+          enqueuecommands_P(PSTR("G28"));
           lcd_return_to_status();
         } else {
           current_position[Z_AXIS] = MESH_HOME_SEARCH_Z;
@@ -1858,7 +1852,7 @@ char *ftostr52(const float &x) {
           current_position[X_AXIS] = mbl.get_x(ix);
           current_position[Y_AXIS] = mbl.get_y(iy);
           line_to_current();
-          lcdDrawUpdate = 1;
+          lcdDrawUpdate = 2;
         }
       }
     } else {
@@ -1867,6 +1861,7 @@ char *ftostr52(const float &x) {
   }
 
   static void _lcd_level_bed_homing() {
+    if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR("XYZ"), "Homing");
     if (axis_known_position[X_AXIS] &&
         axis_known_position[Y_AXIS] &&
         axis_known_position[Z_AXIS]) {
@@ -1878,6 +1873,7 @@ char *ftostr52(const float &x) {
       _lcd_level_bed_position = 0;
       lcd_goto_menu(_lcd_level_bed);
     }
+    lcdDrawUpdate = 2;
   }
 
   static void lcd_level_bed() {
@@ -1885,7 +1881,8 @@ char *ftostr52(const float &x) {
     axis_known_position[Y_AXIS] = false;
     axis_known_position[Z_AXIS] = false;
     mbl.reset();
-  enqueuecommands_P(PSTR("G28"));
+    enqueuecommands_P(PSTR("G28"));
+    lcdDrawUpdate = 2;
     lcd_goto_menu(_lcd_level_bed_homing);
   }
 
