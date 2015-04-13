@@ -6,7 +6,8 @@ Some time ago bobc started with this port. After some time sadly he stopped with
 
 Also a big thanks to all Marlin8bit-developers. Keep on working.
 
-Last but not least, many thanks to Repetier. His ARM-port gives me a lot of inspiration.
+Last but not least, many thanks to Repetier. ~~His ARM-port gives me a lot of inspiration.~~
+It's not just inspiration anymore. I think this ports goes now more to a mix of the ARM-part (Timer, ADC...) of Repetier and the rest (stepper control, temperature control...) with Marlin.
 
 *Wurstnase*
 
