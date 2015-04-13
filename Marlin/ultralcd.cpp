@@ -454,6 +454,7 @@ void lcd_set_home_offsets() {
 }
 
 
+
 #ifdef BABYSTEPPING
 
   static void _lcd_babystep(int axis, const char *msg) {
@@ -1494,9 +1495,9 @@ void lcd_buttons_update() {
     if (READ(BTN_EN2) == 0) newbutton |= EN_B;
     #if BTN_ENC > 0
       millis_t ms = millis();
-      if (ms > blocking_enc && READ(BTN_ENC) == 0) newbutton |= EN_C;
+      if (ms > next_button_update_ms && READ(BTN_ENC) == 0) newbutton |= EN_C;
       #if defined(BTN_BACK) && BTN_BACK > 0
-        if (ms > blocking_enc && READ(BTN_BACK) == 0) newbutton |= EN_D;
+        if (ms > next_button_update_ms && READ(BTN_BACK) == 0) newbutton |= EN_D;
       #endif
     #endif
     buttons = newbutton;

@@ -328,7 +328,7 @@ FORCE_INLINE void trapezoid_generator_reset() {
 // "The Stepper Driver Interrupt" - This timer interrupt is the workhorse.
 // It pops blocks from the block_buffer and executes them by pulsing the stepper pins appropriately.
 HAL_STEP_TIMER_ISR {
-  HAL_timer_isr_prologue (STEP_TIMER_NUM);
+  HAL_timer_isr_status (STEP_TIMER_NUM);
 
   if(cleaning_buffer_counter)
   {

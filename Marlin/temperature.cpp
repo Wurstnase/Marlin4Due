@@ -1213,7 +1213,7 @@ HAL_TEMP_TIMER_ISR {
     SERIAL_ECHOLN("First start for temperature finished.");
   }
   
-  HAL_timer_isr_prologue (TEMP_TIMER_NUM);
+  HAL_timer_isr_status (TEMP_TIMER_NUM);
   #ifndef SLOW_PWM_HEATERS
     /**
      * standard PWM modulation

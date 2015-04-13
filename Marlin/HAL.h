@@ -34,6 +34,7 @@
 #include <stdint.h>
 
 #include "Arduino.h"
+#include "fastio.h"
 
 // --------------------------------------------------------------------------
 // Defines
@@ -49,6 +50,9 @@
 
 #define strncpy_P(dest, src, num) strncpy((dest), (src), (num))
 
+#define HIGH 1
+#define LOW 0
+
 // --------------------------------------------------------------------------
 // Types
 // --------------------------------------------------------------------------
@@ -59,6 +63,7 @@
 
 // reset reason set by bootloader
 extern uint8_t MCUSR;
+static uint32_t tone_pin;
 
 // --------------------------------------------------------------------------
 // Public functions
@@ -70,19 +75,29 @@ void cli(void);
 // Enable interrupts
 void sei(void);
 
-void _delay_ms(int delay);
-void _delay_us(int delay_us);
+static inline void _delay_ms(uint32_t msec) {
+	delay(msec);
+}
+
+static inline void _delay_us(uint32_t usec) {
+  uint32_t n = usec * (F_CPU / 3000000);
+  asm volatile(
+      "L2_%=_delayMicroseconds:"       "\n\t"
+      "subs   %0, #1"                 "\n\t"
+      "bge    L2_%=_delayMicroseconds" "\n"
+      : "+r" (n) :  
+  );
+}
 
 int freeMemory(void);
-
 void eeprom_write_byte(unsigned char *pos, unsigned char value);
-
 unsigned char eeprom_read_byte(unsigned char *pos);
 
 
 // timers
-#define STEP_TIMER_NUM 3
-#define TEMP_TIMER_NUM 4
+#define STEP_TIMER_NUM 2
+#define TEMP_TIMER_NUM 3
+#define BEEPER_TIMER_NUM 4
 
 #define HAL_TIMER_RATE 		     (F_CPU/2.0)
 #define TICKS_PER_NANOSECOND   (HAL_TIMER_RATE)/1000
@@ -91,23 +106,23 @@ unsigned char eeprom_read_byte(unsigned char *pos);
 #define DISABLE_STEPPER_DRIVER_INTERRUPT()	HAL_timer_disable_interrupt (STEP_TIMER_NUM)
 
 //
-#define HAL_STEP_TIMER_ISR 	void TC3_Handler()
-#define HAL_TEMP_TIMER_ISR 	void TC4_Handler()
+#define HAL_STEP_TIMER_ISR 	void TC2_Handler()
+#define HAL_TEMP_TIMER_ISR 	void TC3_Handler()
+#define HAL_BEEPER_TIMER_ISR  void TC4_Handler()
 
-// void HAL_timer_start (void);
 void HAL_step_timer_start(void);
-//void HAL_temp_timer_start (uint8_t timer_num, uint32_t frequency);
 void HAL_temp_timer_start (uint8_t timer_num);
-//void HAL_temp_timer_start(void);
 void HAL_timer_set_count (uint8_t timer_num, uint32_t count);
 
 void HAL_timer_enable_interrupt (uint8_t timer_num);
 void HAL_timer_disable_interrupt (uint8_t timer_num);
 
-void HAL_timer_isr_prologue (uint8_t timer_num);
+void HAL_timer_isr_status (uint8_t timer_num);
 int HAL_timer_get_count (uint8_t timer_num);
 //
 
+void tone(uint8_t pin, int frequency);
+void noTone(uint8_t pin);
 
 // --------------------------------------------------------------------------
 //

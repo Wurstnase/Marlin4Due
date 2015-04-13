@@ -83,32 +83,12 @@ void sei(void)
 	interrupts();
 }
 
-void _delay_ms(uint32_t msec) {
-	delay(msec);
-}
-
-// void _delay_us (int delay_us)
-// {
-  // delayMicroseconds(delay_us);
-// }
-
-static inline void _delay_us(uint32_t usec) {
-  uint32_t n = usec * (F_CPU / 3000000);
-  asm volatile(
-      "L2_%=_delayMicroseconds:"       "\n\t"
-      "subs   %0, #1"                 "\n\t"
-      "bge    L2_%=_delayMicroseconds" "\n"
-      : "+r" (n) :  
-  );
-}
-
 extern "C" {
   extern unsigned int _ebss; // end of bss section
 }
 
 // return free memory between end of heap (or end bss) and whatever is current
-int freeMemory()
-{
+int freeMemory() {
   int free_memory;
   int heap_end = (int)_sbrk(0);
 
@@ -118,7 +98,6 @@ int freeMemory()
     free_memory = ((int)&free_memory) - heap_end;
 
   return free_memory;
-
 }
 
 // --------------------------------------------------------------------------
@@ -128,17 +107,14 @@ int freeMemory()
 static bool eeprom_initialised = false;
 static uint8_t eeprom_device_address = 0x50;
 
-static void eeprom_init(void)
-{
-	if (!eeprom_initialised)
-	{
+static void eeprom_init(void) {
+	if (!eeprom_initialised) {
 		Wire.begin();
 		eeprom_initialised = true;
 	}
 }
 
-void eeprom_write_byte(unsigned char *pos, unsigned char value)
-{
+void eeprom_write_byte(unsigned char *pos, unsigned char value) {
 	unsigned eeprom_address = (unsigned) pos;
 
 	eeprom_init();
@@ -155,8 +131,7 @@ void eeprom_write_byte(unsigned char *pos, unsigned char value)
 }
 
 
-unsigned char eeprom_read_byte(unsigned char *pos)
-{
+unsigned char eeprom_read_byte(unsigned char *pos) {
 	byte data = 0xFF;
 	unsigned eeprom_address = (unsigned) pos;
 
@@ -176,51 +151,45 @@ unsigned char eeprom_read_byte(unsigned char *pos)
 // Timers
 // --------------------------------------------------------------------------
 
-typedef struct
-{
-    Tc          *pTimerRegs;
-    uint16_t    channel;
-    IRQn_Type   IRQ_Id;
-  } tTimerConfig ;
+typedef struct {
+  Tc          *pTimerRegs;
+  uint16_t    channel;
+  IRQn_Type   IRQ_Id;
+} tTimerConfig;
 
 #define  NUM_HARDWARE_TIMERS 9
 
 static const tTimerConfig TimerConfig [NUM_HARDWARE_TIMERS] =
-  {
-    { TC0, 0, TC0_IRQn},
-    { TC0, 1, TC1_IRQn},
-    { TC0, 2, TC2_IRQn},
-    { TC1, 0, TC3_IRQn},
-    { TC1, 1, TC4_IRQn},
-    { TC1, 2, TC5_IRQn},
-    { TC2, 0, TC6_IRQn},
-    { TC2, 1, TC7_IRQn},
-    { TC2, 2, TC8_IRQn},
-  };
+{
+  { TC0, 0, TC0_IRQn},
+  { TC0, 1, TC1_IRQn},
+  { TC0, 2, TC2_IRQn},
+  { TC1, 0, TC3_IRQn},
+  { TC1, 1, TC4_IRQn},
+  { TC1, 2, TC5_IRQn},
+  { TC2, 0, TC6_IRQn},
+  { TC2, 1, TC7_IRQn},
+  { TC2, 2, TC8_IRQn},
+};
 
-  
 /*
 	Timer_clock1: Prescaler 2 -> 42MHz
 	Timer_clock2: Prescaler 8 -> 10.5MHz
 	Timer_clock3: Prescaler 32 -> 2.625MHz
 	Timer_clock4: Prescaler 128 -> 656.25kHz
 */
-	
+
 // new timer by Ps991
 // thanks for that work
 // http://forum.arduino.cc/index.php?topic=297397.0
 
-void HAL_step_timer_start()
-{
-  uint32_t tc_count, tc_clock;
-  uint8_t timer_num;
-  
+void HAL_step_timer_start() {
   pmc_set_writeprotect(false); //remove write protection on registers
   NVIC_SetPriorityGrouping(4);
   
   // Timer for stepper
   // Timer 3 HAL.h STEP_TIMER_NUM
-  timer_num = STEP_TIMER_NUM;
+  uint8_t timer_num = STEP_TIMER_NUM;
   
   // Get the ISR from table
   Tc *tc = TimerConfig [timer_num].pTimerRegs;
@@ -243,9 +212,7 @@ void HAL_step_timer_start()
 }
 
 
-void HAL_temp_timer_start (uint8_t timer_num)
-{
-		
+void HAL_temp_timer_start (uint8_t timer_num) {
 	Tc *tc = TimerConfig [timer_num].pTimerRegs;
 	IRQn_Type irq = TimerConfig [timer_num].IRQ_Id;
 	uint32_t channel = TimerConfig [timer_num].channel;
@@ -270,22 +237,19 @@ void HAL_temp_timer_start (uint8_t timer_num)
 	NVIC_EnableIRQ(irq);
 }
 
-void HAL_timer_enable_interrupt (uint8_t timer_num)
-{
+void HAL_timer_enable_interrupt (uint8_t timer_num) {
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
 	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IER=TC_IER_CPCS; //enable interrupt
 	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IDR=~TC_IER_CPCS;//remove disable interrupt
 }
 
-void HAL_timer_disable_interrupt (uint8_t timer_num)
-{
+void HAL_timer_disable_interrupt (uint8_t timer_num) {
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
 	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IDR=TC_IER_CPCS; //disable interrupt
 }
 
-void HAL_timer_set_count (uint8_t timer_num, uint32_t count)
-{
-	if(count < 210) count = 210;
+void HAL_timer_set_count (uint8_t timer_num, uint32_t count) {
+  if(count < 210) count = 210;
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
 	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_RC = count;
 	
@@ -295,18 +259,65 @@ void HAL_timer_set_count (uint8_t timer_num, uint32_t count)
 		TC_Start(pConfig->pTimerRegs, pConfig->channel);
 }
 
-void HAL_timer_isr_prologue (uint8_t timer_num)
-{
+void HAL_timer_isr_status (uint8_t timer_num) {
 	const tTimerConfig *pConfig = &TimerConfig [timer_num];
 	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_SR;
 	// TC_GetStatus (pConfig->pTimerRegs, pConfig->channel);
 }
 
-int HAL_timer_get_count (uint8_t timer_num)
-{
+int HAL_timer_get_count (uint8_t timer_num) {
 	Tc *tc = TimerConfig [timer_num].pTimerRegs;
 	uint32_t channel = TimerConfig [timer_num].channel;
 	return tc->TC_CHANNEL[channel].TC_RC;
+}
+
+// Due have no tone, this is from Repetier 0.92.3
+
+void tone(uint8_t pin, int frequency) {
+  // set up timer counter 1 channel 0 to generate interrupts for
+  // toggling output pin.  
+  
+  /*TC1, 1, TC4_IRQn*/
+  uint8_t timer_num = BEEPER_TIMER_NUM;
+  
+  Tc *tc = TimerConfig [timer_num].pTimerRegs;
+  IRQn_Type irq = TimerConfig [timer_num].IRQ_Id;
+	uint32_t channel = TimerConfig [timer_num].channel;
+  
+  SET_OUTPUT(pin);
+  tone_pin = pin;
+  pmc_set_writeprotect(false);
+  pmc_enable_periph_clk((uint32_t)irq);
+  // set interrupt to lowest possible priority
+  NVIC_SetPriority((IRQn_Type)irq, NVIC_EncodePriority(4, 6, 3));
+  TC_Configure(tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | 
+               TC_CMR_TCCLKS_TIMER_CLOCK4);  // TIMER_CLOCK4 -> 128 divisor
+  uint32_t rc = VARIANT_MCK / 128 / frequency; 
+  TC_SetRA(tc, channel, rc/2);                     // 50% duty cycle
+  TC_SetRC(tc, channel, rc);
+  TC_Start(tc, channel);
+  tc->TC_CHANNEL[channel].TC_IER=TC_IER_CPCS;
+  tc->TC_CHANNEL[channel].TC_IDR=~TC_IER_CPCS;
+  NVIC_EnableIRQ((IRQn_Type)irq);
+}
+
+void noTone(uint8_t pin) {
+  uint8_t timer_num = BEEPER_TIMER_NUM;
+  
+  Tc *tc = TimerConfig [timer_num].pTimerRegs;
+  uint32_t channel = TimerConfig [timer_num].channel;
+  
+  TC_Stop(tc, channel); 
+  WRITE(pin, LOW);
+}
+
+// IRQ handler for tone generator
+HAL_BEEPER_TIMER_ISR {
+    static bool toggle;
+
+    HAL_timer_isr_status (BEEPER_TIMER_NUM);
+    WRITE(tone_pin, toggle);
+    toggle = !toggle;
 }
 
 // --------------------------------------------------------------------------
