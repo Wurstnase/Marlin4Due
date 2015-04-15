@@ -59,4 +59,4 @@ If you find our work usefull please consider donating. Donations will be used to
 Marlin is published under the [GPL license](/Documentation/COPYING.md) because We believe in open development.
 Do not use this code in products (3D printers, CNC etc) that are closed source or are crippled by a patent.
 
-[![Flattr the 8bit Marlin](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=ErikZalm&url=https://github.com/MarlinFirmware/Marlin&title=Marlin&language=&tags=github&category=software)
+[![Flattr the 8bit Marlin](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=ErikZalm&url=https://github.com/MarlinFirmware/Marlin&title=Marlin&language=&tags=github&category=software) <- that Button is for the original 8bit-Marlin Version from MarlinFirmware
