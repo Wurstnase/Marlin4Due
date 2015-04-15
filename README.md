@@ -42,34 +42,21 @@ This firmware is a mashup between [Sprinter](https://github.com/kliment/Sprinter
 
 ## Current Status: Bug Fixing
 
-The Marlin development is currently revived. There's a long list of reported issues and pull requests, which we are working on currently.
-
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/2224/badge.svg)](https://scan.coverity.com/projects/2224)
-[![Travis Build Status](https://travis-ci.org/MarlinFirmware/Marlin.svg)](https://travis-ci.org/MarlinFirmware/Marlin)
-
-## Contact
-
-__Google Hangout:__ <a href="https://plus.google.com/hangouts/_/g2wp5duzb2y6ahikg6tmwao3kua" target="_blank">Hangout</a>
 
 ## Credits
 
-The current Marlin dev team consists of:
+The current Marlin4Due dev team consists of:
 
- - Scott Lahteine [@thinkyhead]
+ - Nico [@wurstnase]
  - 
 
 ## Donation
 
 If you find our work usefull please consider donating. Donations will be used to pay for our website http://www.marlinfirmware.org/ and to pay some food or rent money for the very active Collaborators
 
-More features have been added by:
-  - Lampmaker,
-  - Bradley Feldman,
-  - and others...
-
 ## License
 
 Marlin is published under the [GPL license](/Documentation/COPYING.md) because We believe in open development.
 Do not use this code in products (3D printers, CNC etc) that are closed source or are crippled by a patent.
 
-[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=ErikZalm&url=https://github.com/MarlinFirmware/Marlin&title=Marlin&language=&tags=github&category=software)
+[![Flattr the 8bit Marlin](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=ErikZalm&url=https://github.com/MarlinFirmware/Marlin&title=Marlin&language=&tags=github&category=software)
