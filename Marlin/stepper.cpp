@@ -644,7 +644,7 @@ HAL_STEP_TIMER_ISR {
     // Calculate new timer value
     unsigned long timer;
     unsigned long step_rate;
-    if (step_events_completed <= (unsigned long int)current_block->accelerate_until) {
+    if (step_events_completed <= (unsigned long)current_block->accelerate_until) {
 
       MultiU24X24toH16(acc_step_rate, acceleration_time, current_block->acceleration_rate);
       acc_step_rate += current_block->initial_rate;

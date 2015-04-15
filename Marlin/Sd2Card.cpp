@@ -22,9 +22,13 @@
 #ifdef SDSUPPORT
 #include "Sd2Card.h"
 //------------------------------------------------------------------------------
-#ifndef SOFTWARE_SPI
+
+//------------------------------------------------------------------------------
 // functions for hardware SPI
 //------------------------------------------------------------------------------
+
+#if defined (ARDUINO_ARCH_SAM)
+
 #include <SPI.h>
 
 static void spiInit(void) {
@@ -65,77 +69,11 @@ static inline __attribute__((always_inline))
   }
 
 }
-//------------------------------------------------------------------------------
-#else  // SOFTWARE_SPI
-//------------------------------------------------------------------------------
-/** nop to tune soft SPI timing */
-#define nop asm volatile ("nop\n\t")
-//------------------------------------------------------------------------------
-/** Soft SPI receive byte */
-static uint8_t spiRec() {
-  uint8_t data = 0;
-  // no interrupts during byte receive - about 8 us
-  cli();
-  // output pin high - like sending 0XFF
-  fastDigitalWrite(SPI_MOSI_PIN, HIGH);
 
-  for (uint8_t i = 0; i < 8; i++) {
-    fastDigitalWrite(SPI_SCK_PIN, HIGH);
+#else
+#error Unsupported architecture
+#endif
 
-    // adjust so SCK is nice
-    nop;
-    nop;
-
-    data <<= 1;
-
-    if (fastDigitalRead(SPI_MISO_PIN)) data |= 1;
-
-    fastDigitalWrite(SPI_SCK_PIN, LOW);
-  }
-  // enable interrupts
-  sei();
-  return data;
-}
-//------------------------------------------------------------------------------
-/** Soft SPI read data */
-static void spiRead(uint8_t* buf, uint16_t nbyte) {
-  for (uint16_t i = 0; i < nbyte; i++) {
-    buf[i] = spiRec();
-  }
-}
-//------------------------------------------------------------------------------
-/** Soft SPI send byte */
-static void spiSend(uint8_t data) {
-  // no interrupts during byte send - about 8 us
-  cli();
-  for (uint8_t i = 0; i < 8; i++) {
-    fastDigitalWrite(SPI_SCK_PIN, LOW);
-
-    fastDigitalWrite(SPI_MOSI_PIN, data & 0X80);
-
-    data <<= 1;
-
-    fastDigitalWrite(SPI_SCK_PIN, HIGH);
-  }
-  // hold SCK high for a few ns
-  nop;
-  nop;
-  nop;
-  nop;
-
-  fastDigitalWrite(SPI_SCK_PIN, LOW);
-  // enable interrupts
-  sei();
-}
-//------------------------------------------------------------------------------
-/** Soft SPI send block */
-  void spiSendBlock(uint8_t token, const uint8_t* buf) {
-  spiSend(token);
-  for (uint16_t i = 0; i < 512; i++) {
-    spiSend(buf[i]);
-  }
-}
-#endif  // SOFTWARE_SPI
 //------------------------------------------------------------------------------
 // send command and return error code.  Return zero for OK
 uint8_t Sd2Card::cardCommand(uint8_t cmd, uint32_t arg) {
@@ -196,9 +134,7 @@ void Sd2Card::chipSelectHigh() {
 }
 //------------------------------------------------------------------------------
 void Sd2Card::chipSelectLow() {
-#ifndef SOFTWARE_SPI
-  spiInit();
-#endif  // SOFTWARE_SPI
+  setSckRate(spiRate_);
   digitalWrite(chipSelectPin_, LOW);
 }
 //------------------------------------------------------------------------------
@@ -284,17 +220,15 @@ bool Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
   pinMode(SPI_MOSI_PIN, OUTPUT);
   pinMode(SPI_SCK_PIN, OUTPUT);
 
-#ifndef SOFTWARE_SPI
   // SS must be in output mode even it is not chip select
   pinMode(SS_PIN, OUTPUT);
   // set SS high - may be chip select for another SPI device
 #if SET_SPI_SS_HIGH
   digitalWrite(SS_PIN, HIGH);
 #endif  // SET_SPI_SS_HIGH
+  spiInit();
   // set SCK rate for initialization commands
   setSckRate(SPI_SD_INIT_RATE);
-  spiInit();
-#endif  // SOFTWARE_SPI
 
   // must supply min of 74 clock cycles with CS high.
   for (uint8_t i = 0; i < 10; i++) spiSend(0XFF);
@@ -340,11 +274,7 @@ bool Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
   }
   chipSelectHigh();
 
-#ifndef SOFTWARE_SPI
   return setSckRate(sckRateID);
-#else  // SOFTWARE_SPI
-  return true;
-#endif  // SOFTWARE_SPI
 
  fail:
   chipSelectHigh();
@@ -554,21 +484,22 @@ bool Sd2Card::readStop() {
 /**
  * Set the SPI clock rate.
  *
- * \param[in] sckRateID A value in the range [0, 6].
- *
- * The SPI clock will be set to F_CPU/pow(2, 1 + sckRateID). The maximum
- * SPI rate is F_CPU/2 for \a sckRateID = 0 and the minimum rate is F_CPU/128
- * for \a scsRateID = 6.
+ * \param[in] sckRateID A value in a range depending on platform
  *
  * \return The value one, true, is returned for success and the value zero,
  * false, is returned for an invalid value of \a sckRateID.
  */
 bool Sd2Card::setSckRate(uint8_t sckRateID) {
+
+#if 0
   if (sckRateID > 6) {
     error(SD_CARD_ERROR_SCK_RATE);
     return false;
   }
+#endif
+  spiSetSckRate (sckRateID);
   spiRate_ = sckRateID;
+
   return true;
 }
 //------------------------------------------------------------------------------

@@ -435,7 +435,7 @@ static bool drain_queued_commands_P() {
   if (!queued_commands_P) return false;
 
   // Get the next 30 chars from the sequence of gcodes to run
-  char cmd[80];
+  char cmd[30];
   strncpy_P(cmd, queued_commands_P, sizeof(cmd) - 1);
   cmd[sizeof(cmd) - 1] = '\0';
 
@@ -731,7 +731,7 @@ void get_command() {
   
   if (!MYSERIAL.available()) {
     if (commands_in_queue == 0 && ms - last_command_time > 1000) {
-	  SERIAL_ECHOLN('wait');
+      SERIAL_ECHOLNPGM(MSG_WAIT);
       last_command_time = ms;	  
     }
   }
