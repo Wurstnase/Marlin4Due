@@ -8,8 +8,8 @@
 #endif
 
 #define BOARD_RADDS			402  // RADDS
-#define BOARD_RAMPS_FDV1	403  // RAMPS-FD V1
-#define BOARD_RAMPS_FDV2	404  // RAMPS-FD V2
+#define BOARD_RAMPS_FD_V1	403  // RAMPS-FD V1
+#define BOARD_RAMPS_FD_V2	404  // RAMPS-FD V2
 
 #define MB(board) (MOTHERBOARD==BOARD_##board)
 
