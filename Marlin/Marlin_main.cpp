@@ -251,7 +251,7 @@ const char axis_codes[NUM_AXIS] = {'X', 'Y', 'Z', 'E'};
 
 static float offset[3] = { 0 };
 static bool relative_mode = false;  //Determines Absolute or Relative Coordinates
-static char serial_char;
+//static char serial_char;
 static int serial_count = 0;
 static boolean comment_mode = false;
 static char *strchr_pointer; ///< A pointer to find chars in the command string (X, Y, Z, E, etc.)
@@ -263,6 +263,7 @@ static millis_t max_inactive_time = 0;
 static millis_t stepper_inactive_time = DEFAULT_STEPPER_DEACTIVE_TIME * 1000L;
 millis_t print_job_start_ms = 0; ///< Print job start time
 millis_t print_job_stop_ms = 0;  ///< Print job stop time
+static millis_t last_command_time = 0;
 static uint8_t target_extruder;
 bool no_wait_for_cooling = true;
 bool target_direction;
@@ -726,9 +727,18 @@ void get_command() {
 
   if (drain_queued_commands_P()) return; // priority is given to non-serial commands
   
-  while (MYSERIAL.available() > 0 && commands_in_queue < BUFSIZE) {
-
-    serial_char = MYSERIAL.read();
+  millis_t ms = millis();
+  
+  if (!MYSERIAL.available()) {
+    if (commands_in_queue == 0 && ms - last_command_time > 1000) {
+      SERIAL_ECHOLNPGM(MSG_WAIT);
+      last_command_time = ms;	  
+    }
+  }
+  
+  while (MYSERIAL.available() && commands_in_queue < BUFSIZE) {
+    last_command_time = ms;
+    char serial_char = MYSERIAL.read();
 
     if (serial_char == '\n' || serial_char == '\r' ||
        serial_count >= (MAX_CMD_SIZE - 1)
@@ -822,7 +832,7 @@ void get_command() {
       serial_count = 0; //clear buffer
     }
     else if (serial_char == '\\') {  // Handle escapes
-      if (MYSERIAL.available() > 0  && commands_in_queue < BUFSIZE) {
+      if (MYSERIAL.available() && commands_in_queue < BUFSIZE) {
         // if we have one more character, copy it over
         serial_char = MYSERIAL.read();
         command_queue[cmd_queue_index_w][serial_count++] = serial_char;
@@ -848,7 +858,7 @@ void get_command() {
 
     while (!card.eof() && commands_in_queue < BUFSIZE && !stop_buffering) {
       int16_t n = card.get();
-      serial_char = (char)n;
+      char serial_char = (char)n;
       if (serial_char == '\n' || serial_char == '\r' ||
           ((serial_char == '#' || serial_char == ':') && !comment_mode) ||
           serial_count >= (MAX_CMD_SIZE - 1) || n == -1
