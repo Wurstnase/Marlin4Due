@@ -183,7 +183,7 @@ volatile signed char count_direction[NUM_AXIS] = { 1, 1, 1, 1 };
 // #define MultiU16X8toH16(intRes, charIn1, intIn2)   intRes = ((charIn1) * (intIn2)) >> 16
 // #define MultiU24X24toH16(intRes, longIn1, longIn2) intRes = ((uint64_t)(longIn1) * (longIn2)) >> 24
 
-uint32_t multiU32xU32toH32(uint64_t longIn1, uint32_t longIn2) {
+FORCE_INLINE uint32_t multiU32xU32toH32(uint64_t longIn1, uint32_t longIn2) {
 	return ((longIn1 * longIn2 + 0x80000000) >> 32);
 }
 
