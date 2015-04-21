@@ -284,11 +284,11 @@
    * MAX_STEP_FREQUENCY differs for TOSHIBA
    */
   #ifdef CONFIG_STEPPERS_TOSHIBA
-    #define MAX_STEP_FREQUENCY 10000 // Max step frequency for Toshiba Stepper Controllers
-    #define DOUBLE_STEP_FREQUENCY 10000
+    #define MAX_STEP_FREQUENCY 120000 // Max step frequency for Toshiba Stepper Controllers
+    #define DOUBLE_STEP_FREQUENCY MAX_STEP_FREQUENCY
   #else
-    #define MAX_STEP_FREQUENCY 320000    // Max step frequency for Ultimaker (5000 pps / half step)
-    #define DOUBLE_STEP_FREQUENCY 90000  //96kHz is close to maximum for an Arduino Due
+    #define MAX_STEP_FREQUENCY 480000    // Max step frequency for Ultimaker (5000 pps / half step)
+    #define DOUBLE_STEP_FREQUENCY 120000  //96kHz is close to maximum for an Arduino Due
   #endif
 
   // MS1 MS2 Stepper Driver Microstepping mode table
