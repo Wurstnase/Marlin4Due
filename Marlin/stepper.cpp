@@ -180,10 +180,12 @@ volatile signed char count_direction[NUM_AXIS] = { 1, 1, 1, 1 };
 // intRes = intIn1 * intIn2 >> 16
 // intRes = longIn1 * longIn2 >> 24
 
-#define MultiU16X8toH16(intRes, charIn1, intIn2)   intRes = ((charIn1) * (intIn2)) >> 16
-#define MultiU24X24toH16(intRes, longIn1, longIn2) intRes = ((uint64_t)(longIn1) * (longIn2)) >> 24
-// Some useful constants
+// #define MultiU16X8toH16(intRes, charIn1, intIn2)   intRes = ((charIn1) * (intIn2)) >> 16
+// #define MultiU24X24toH16(intRes, longIn1, longIn2) intRes = ((uint64_t)(longIn1) * (longIn2)) >> 24
 
+uint32_t multiU32xU32toH32(uint64_t longIn1, uint32_t longIn2) {
+	return ((longIn1 * longIn2 + 0x80000000) >> 32);
+}
 
 void endstops_hit_on_purpose() {
   endstop_x_hit = endstop_y_hit = endstop_z_hit = endstop_z_probe_hit = false; // #ifdef endstop_z_probe_hit = to save space if needed.
@@ -276,7 +278,8 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
     unsigned long table_address = (unsigned long)&speed_lookuptable_fast[(unsigned int)(step_rate>>8)][0];
     unsigned long tmp_step_rate = (step_rate & 0x00ff);
     unsigned long gain = (unsigned long)pgm_read_dword_near(table_address+4);
-    MultiU16X8toH16(timer, tmp_step_rate, gain);
+    // MultiU16X8toH16(timer, tmp_step_rate, gain);
+	timer = (tmp_step_rate * gain) >> 16;
     timer = (unsigned long)pgm_read_dword_near(table_address) - timer;
   }
   else { // lower step rates
@@ -646,7 +649,7 @@ HAL_STEP_TIMER_ISR {
     unsigned long step_rate;
     if (step_events_completed <= (unsigned long)current_block->accelerate_until) {
 
-      MultiU24X24toH16(acc_step_rate, acceleration_time, current_block->acceleration_rate);
+      acc_step_rate = multiU32xU32toH32(acceleration_time, current_block->acceleration_rate);
       acc_step_rate += current_block->initial_rate;
 
       // upper limit
@@ -669,7 +672,7 @@ HAL_STEP_TIMER_ISR {
       #endif
     }
     else if (step_events_completed > (unsigned long)current_block->decelerate_after) {
-      MultiU24X24toH16(step_rate, deceleration_time, current_block->acceleration_rate);
+      step_rate = multiU32xU32toH32(deceleration_time, current_block->acceleration_rate);
 
       if (step_rate > acc_step_rate) { // Check step_rate stays positive
         step_rate = current_block->final_rate;
