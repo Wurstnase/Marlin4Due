@@ -357,6 +357,12 @@ const unsigned int dropsegments=5; //everything with less than this number of st
 // for smoother temperature
 #define MEDIAN_COUNT 10
 
+// @section more
+
+// Some stepper needs a delay between setting the dir-signal and the step-signal
+// 0 deactivate it.
+#define STEPPER_DIR_DELAY 0
+
 //===========================================================================
 //=============================Buffers           ============================
 //===========================================================================
