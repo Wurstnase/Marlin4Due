@@ -77,6 +77,8 @@ static volatile bool endstop_y_hit = false;
 static volatile bool endstop_z_hit = false;
 static volatile bool endstop_z_probe_hit = false; // Leaving this in even if Z_PROBE_ENDSTOP isn't defined, keeps code below cleaner. #ifdef it and usage below to save space.
 
+static volatile short last_direction_bits = 0;
+
 #ifdef ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED
   bool abort_on_endstop_hit = false;
 #endif
@@ -321,6 +323,8 @@ HAL_STEP_TIMER_ISR {
   
   // If there is no current block, attempt to pop one from the buffer
   if (!current_block) {
+    // reset last_direction_bits
+    last_direction_bits = 0;
     // Anything in the buffer?
     current_block = plan_get_current_block();
     if (current_block) {
@@ -559,7 +563,12 @@ HAL_STEP_TIMER_ISR {
         count_direction[E_AXIS] = 1;
       }
     #endif //!ADVANCE
-
+    
+    #if STEPPER_DIR_DELAY
+      if (direction_bits != last_direction_bits)
+        _delay_us(STEPPER_DIR_DELAY);
+    #endif
+    
     // Take multiple steps per interrupt (For high speed moves)
     for (int8_t i = 0; i < step_loops; i++) {
 
@@ -624,6 +633,8 @@ HAL_STEP_TIMER_ISR {
       step_events_completed++;
       if (step_events_completed >= current_block->step_event_count) break;
     }
+    
+    last_direction_bits = direction_bits;
     // Calculate new timer value
     unsigned long timer;
     unsigned long step_rate;
