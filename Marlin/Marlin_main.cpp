@@ -1961,7 +1961,7 @@ inline void gcode_G28() {
     }
 
     // Set the Y position, if included
-    if (code_seen(axis_codes[Y_AXIS]) && code_has_value())
+    if (code_seen(axis_codes[Y_AXIS]) && code_has_value()) {
       if (code_value_long() != 0) // filter 0
         current_position[Y_AXIS] = code_value();
     }
@@ -2050,7 +2050,7 @@ inline void gcode_G28() {
     #endif // Z_HOME_DIR < 0
 
     // Set the Z position, if included
-    if (code_seen(axis_codes[Z_AXIS]) && code_has_value())
+    if (code_seen(axis_codes[Z_AXIS]) && code_has_value()) {
       if (code_value_long() != 0) // filter 0
         current_position[Z_AXIS] = code_value();
     }
