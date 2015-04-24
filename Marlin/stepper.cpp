@@ -53,7 +53,7 @@ static unsigned int cleaning_buffer_counter;
               locked_z2_motor = false;
 #endif
 
-// Counter variables for the bresenham line tracer
+// Counter variables for the Bresenham line tracer
 static long counter_x, counter_y, counter_z, counter_e;
 volatile static unsigned long step_events_completed; // The number of step events executed in the current block
 
@@ -243,7 +243,7 @@ void enable_endstops(bool check) { check_endstops = check; }
 //  The trapezoid is the shape the speed curve over time. It starts at block->initial_rate, accelerates
 //  first block->accelerate_until step_events_completed, then keeps going at constant speed until
 //  step_events_completed reaches block->decelerate_after after which it decelerates until the trapezoid generator is reset.
-//  The slope of acceleration is calculated with the leib ramp alghorithm.
+//  The slope of acceleration is calculated using v = u + at where t is the accumulated timer values of the steps so far.
 
 void st_wake_up() {
   //  TCNT1 = 0;
@@ -387,7 +387,7 @@ HAL_STEP_TIMER_ISR {
         if ((current_block->steps[A_AXIS] != current_block->steps[B_AXIS]) || (TEST(out_bits, A_AXIS) == TEST(out_bits, B_AXIS))) {
           if (TEST(out_bits, X_HEAD))
       #else
-          if (TEST(out_bits, X_AXIS))   // stepping along -X axis (regular cartesians bot)
+          if (TEST(out_bits, X_AXIS))   // stepping along -X axis (regular Cartesian bot)
       #endif
           { // -direction
             #ifdef DUAL_X_CARRIAGE

@@ -54,6 +54,11 @@ The current Marlin4Due dev team consists of:
 
 If you find our work usefull please consider donating. Donations will be used to pay for our website http://www.marlinfirmware.org/ and to pay some food or rent money for the very active Collaborators
 
+More features have been added by:
+  - Lampmaker,
+  - Bradley Feldman,
+  - and others...
+
 ## License
 
 Marlin is published under the [GPL license](/Documentation/COPYING.md) because We believe in open development.
