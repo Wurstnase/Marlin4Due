@@ -260,10 +260,11 @@ void HAL_timer_set_count (Tc* tc, uint32_t channel, uint32_t count) {
 	// const tTimerConfig *pConfig = &TimerConfig [timer_num];
 	// pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_RC = count;
 	//TC_SetRC (pConfig->pTimerRegs, pConfig->channel, count);
-  __DSB();
+  if(count < 210) count = 210;
+  
 	tc->TC_CHANNEL[channel].TC_RC = count;
-  __DSB();
-	if(tc->TC_CHANNEL[channel].TC_RC > count) {
+
+	if(tc->TC_CHANNEL[channel].TC_CV > count) {
     // debug_counter = count;
 		tc->TC_CHANNEL[channel].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
     // TC_Start(pConfig->pTimerRegs, pConfig->channel);

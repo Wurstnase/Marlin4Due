@@ -287,7 +287,7 @@
     #define MAX_STEP_FREQUENCY 120000 // Max step frequency for Toshiba Stepper Controllers
     #define DOUBLE_STEP_FREQUENCY MAX_STEP_FREQUENCY
   #else
-    #define MAX_STEP_FREQUENCY 1000000    // Max step frequency for the Due is approx. 330kHz
+    #define MAX_STEP_FREQUENCY 500000    // Max step frequency for the Due is approx. 330kHz
     #define DOUBLE_STEP_FREQUENCY 120000  //96kHz is close to maximum for an Arduino Due
   #endif
 
