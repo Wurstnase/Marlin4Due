@@ -4869,7 +4869,20 @@ void process_commands() {
     case 92: // G92
       gcode_G92();
       break;
+    
+    case 1000:
+      SERIAL_ECHO("set_counter: "); SERIAL_ECHOLN(debug_counter);
+      SERIAL_ECHO("TC_RC: "); SERIAL_ECHOLN(HAL_timer_get_count(STEP_TIMER_NUM));
+      SERIAL_ECHO("TC_VC: "); SERIAL_ECHOLN(HAL_timer_get_real_count(STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL));
+      break;
+      
+    case 1001:
+      SERIAL_ECHOLN("clear");
+      HAL_timer_clear (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL);
+      break;
+    
     }
+    
   }
 
   else if (code_seen('M')) {

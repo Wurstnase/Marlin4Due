@@ -289,7 +289,7 @@ FORCE_INLINE void trapezoid_generator_reset() {
   step_loops_nominal = step_loops;
   acc_step_rate = current_block->initial_rate;
   acceleration_time = calc_timer(acc_step_rate);
-  HAL_timer_set_count (STEP_TIMER_NUM, acceleration_time);
+  HAL_timer_set_count (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL, acceleration_time);
 
   // SERIAL_ECHO_START;
   // SERIAL_ECHOPGM("advance :");
@@ -305,7 +305,7 @@ FORCE_INLINE void trapezoid_generator_reset() {
 // "The Stepper Driver Interrupt" - This timer interrupt is the workhorse.
 // It pops blocks from the block_buffer and executes them by pulsing the stepper pins appropriately.
 HAL_STEP_TIMER_ISR {
-  HAL_timer_isr_status (STEP_TIMER_NUM);
+  HAL_timer_isr_status (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL);
 
   if(cleaning_buffer_counter)
   {
@@ -315,7 +315,7 @@ HAL_STEP_TIMER_ISR {
       if ((cleaning_buffer_counter == 1) && (SD_FINISHED_STEPPERRELEASE)) enqueuecommands_P(PSTR(SD_FINISHED_RELEASECOMMAND));
     #endif
     cleaning_buffer_counter--;
-    HAL_timer_set_count (STEP_TIMER_NUM, HAL_TIMER_RATE / 200); //5ms wait
+    HAL_timer_set_count (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL, HAL_TIMER_RATE / 200); //5ms wait
     return;
   }
   
@@ -333,7 +333,7 @@ HAL_STEP_TIMER_ISR {
       #ifdef Z_LATE_ENABLE
         if (current_block->steps[Z_AXIS] > 0) {
           enable_z();
-          HAL_timer_set_count (STEP_TIMER_NUM, HAL_TIMER_RATE / 1000); //1ms wait
+          HAL_timer_set_count (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL, HAL_TIMER_RATE / 1000); //1ms wait
           return;
         }
       #endif
@@ -343,7 +343,7 @@ HAL_STEP_TIMER_ISR {
       // #endif
     }
     else {
-        HAL_timer_set_count (STEP_TIMER_NUM, HAL_TIMER_RATE / 1000); // 1kHz
+        HAL_timer_set_count (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL, HAL_TIMER_RATE / 1000); // 1kHz
     }
   }
 
@@ -638,7 +638,7 @@ HAL_STEP_TIMER_ISR {
 
       // step_rate to timer interval
       timer = calc_timer(acc_step_rate);
-      HAL_timer_set_count (STEP_TIMER_NUM, timer);
+      HAL_timer_set_count (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL, timer);
       acceleration_time += timer;
       #ifdef ADVANCE
         for(int8_t i=0; i < step_loops; i++) {
@@ -668,7 +668,7 @@ HAL_STEP_TIMER_ISR {
 
       // step_rate to timer interval
       timer = calc_timer(step_rate);
-      HAL_timer_set_count (STEP_TIMER_NUM, timer);
+      HAL_timer_set_count (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL, timer);
       deceleration_time += timer;
       #ifdef ADVANCE
         for(int8_t i=0; i < step_loops; i++) {
@@ -681,7 +681,7 @@ HAL_STEP_TIMER_ISR {
       #endif //ADVANCE
     }
     else {
-      HAL_timer_set_count (STEP_TIMER_NUM, OCR1A_nominal);
+      HAL_timer_set_count (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL, OCR1A_nominal);
       // ensure we're running at the correct step rate, even if we just came off an acceleration
       step_loops = step_loops_nominal;
     }
