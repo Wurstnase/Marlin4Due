@@ -45,7 +45,7 @@ block_t *current_block;  // A pointer to the block currently being traced
 
 // Variables used by The Stepper Driver Interrupt
 static unsigned char out_bits;        // The next stepping-bits to be output
-static unsigned int cleaning_buffer_counter;  
+static unsigned int cleaning_buffer_counter;
 
 #ifdef Z_DUAL_ENDSTOPS
   static bool performing_homing = false, 
@@ -204,8 +204,8 @@ void checkHitEndstops() {
     }
     #ifdef Z_PROBE_ENDSTOP
     if (endstop_z_probe_hit) {
-    	SERIAL_ECHOPAIR(" Z_PROBE:", (float)endstops_trigsteps[Z_AXIS] / axis_steps_per_unit[Z_AXIS]);
-    	LCD_MESSAGEPGM(MSG_ENDSTOPS_HIT "ZP");
+      SERIAL_ECHOPAIR(" Z_PROBE:", (float)endstops_trigsteps[Z_AXIS] / axis_steps_per_unit[Z_AXIS]);
+      LCD_MESSAGEPGM(MSG_ENDSTOPS_HIT "ZP");
     }
     #endif
     SERIAL_EOL;
@@ -318,7 +318,7 @@ HAL_STEP_TIMER_ISR {
     HAL_timer_set_count (STEP_TIMER_NUM, HAL_TIMER_RATE / 200); //5ms wait
     return;
   }
-  
+
   // If there is no current block, attempt to pop one from the buffer
   if (!current_block) {
     // Anything in the buffer?
@@ -370,14 +370,22 @@ HAL_STEP_TIMER_ISR {
       count_direction[Y_AXIS] = 1;
     }
 
+    #define _ENDSTOP(axis, minmax) axis ##_## minmax ##_endstop
+    #define _ENDSTOP_PIN(AXIS, MINMAX) AXIS ##_## MINMAX ##_PIN
+    #define _ENDSTOP_INVERTING(AXIS, MINMAX) AXIS ##_## MINMAX ##_ENDSTOP_INVERTING
+    #define _OLD_ENDSTOP(axis, minmax) old_## axis ##_## minmax ##_endstop
+    #define _AXIS(AXIS) AXIS ##_AXIS
+    #define _ENDSTOP_HIT(axis) endstop_## axis ##_hit
+
     #define UPDATE_ENDSTOP(axis,AXIS,minmax,MINMAX) \
-      bool axis ##_## minmax ##_endstop = (READ(AXIS ##_## MINMAX ##_PIN) != AXIS ##_## MINMAX ##_ENDSTOP_INVERTING); \
-      if (axis ##_## minmax ##_endstop && old_## axis ##_## minmax ##_endstop && (current_block->steps[AXIS ##_AXIS] > 0)) { \
-        endstops_trigsteps[AXIS ##_AXIS] = count_position[AXIS ##_AXIS]; \
-        endstop_## axis ##_hit = true; \
+      bool _ENDSTOP(axis, minmax) = (READ(_ENDSTOP_PIN(AXIS, MINMAX)) != _ENDSTOP_INVERTING(AXIS, MINMAX)); \
+      if (_ENDSTOP(axis, minmax) && _OLD_ENDSTOP(axis, minmax) && (current_block->steps[_AXIS(AXIS)] > 0)) { \
+        endstops_trigsteps[_AXIS(AXIS)] = count_position[_AXIS(AXIS)]; \
+        _ENDSTOP_HIT(axis) = true; \
         step_events_completed = current_block->step_event_count; \
       } \
-      old_## axis ##_## minmax ##_endstop = axis ##_## minmax ##_endstop;
+      _OLD_ENDSTOP(axis, minmax) = _ENDSTOP(axis, minmax);
+
 
     // Check X and Y endstops
     if (check_endstops) {
@@ -393,7 +401,7 @@ HAL_STEP_TIMER_ISR {
             #ifdef DUAL_X_CARRIAGE
               // with 2 x-carriages, endstops are only checked in the homing direction for the active extruder
               if ((current_block->active_extruder == 0 && X_HOME_DIR == -1) || (current_block->active_extruder != 0 && X2_HOME_DIR == -1))
-            #endif          
+            #endif
               {
                 #if HAS_X_MIN
                   UPDATE_ENDSTOP(x, X, min, MIN);
@@ -479,14 +487,14 @@ HAL_STEP_TIMER_ISR {
           z_probe_endstop=(READ(Z_PROBE_PIN) != Z_PROBE_ENDSTOP_INVERTING);
           if(z_probe_endstop && old_z_probe_endstop)
           {
-        	  endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
-        	  endstop_z_probe_hit=true;
+            endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
+            endstop_z_probe_hit=true;
 
-//        	  if (z_probe_endstop && old_z_probe_endstop) SERIAL_ECHOLN("z_probe_endstop = true");
+//            if (z_probe_endstop && old_z_probe_endstop) SERIAL_ECHOLN("z_probe_endstop = true");
           }
           old_z_probe_endstop = z_probe_endstop;
         #endif
-        
+
       } // check_endstops
 
     }
@@ -532,15 +540,15 @@ HAL_STEP_TIMER_ISR {
           #endif // !Z_DUAL_ENDSTOPS
 
         #endif // Z_MAX_PIN
-        
+
         #ifdef Z_PROBE_ENDSTOP
           UPDATE_ENDSTOP(z, Z, probe, PROBE);
           z_probe_endstop=(READ(Z_PROBE_PIN) != Z_PROBE_ENDSTOP_INVERTING);
           if(z_probe_endstop && old_z_probe_endstop)
           {
-        	  endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
-        	  endstop_z_probe_hit=true;
-//        	  if (z_probe_endstop && old_z_probe_endstop) SERIAL_ECHOLN("z_probe_endstop = true");
+            endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
+            endstop_z_probe_hit=true;
+//            if (z_probe_endstop && old_z_probe_endstop) SERIAL_ECHOLN("z_probe_endstop = true");
           }
           old_z_probe_endstop = z_probe_endstop;
         #endif
@@ -571,6 +579,11 @@ HAL_STEP_TIMER_ISR {
         }
       #endif //ADVANCE
 
+      #define _COUNTER(axis) counter_## axis
+      #define _WRITE_STEP(AXIS, HIGHLOW) AXIS ##_STEP_WRITE(HIGHLOW)
+      #define _APPLY_STEP(AXIS) AXIS ##_APPLY_STEP
+      #define _INVERT_STEP_PIN(AXIS) INVERT_## AXIS ##_STEP_PIN
+
       #ifdef CONFIG_STEPPERS_TOSHIBA
         /**
          * The Toshiba stepper controller require much longer pulses.
@@ -579,8 +592,8 @@ HAL_STEP_TIMER_ISR {
          * lag to allow it work with without needing NOPs
          */
         #define STEP_ADD(axis, AXIS) \
-         counter_## axis += current_block->steps[AXIS ##_AXIS]; \
-         if (counter_## axis > 0) { AXIS ##_STEP_WRITE(HIGH); }
+         _COUNTER(axis) += current_block->steps[_AXIS(AXIS)]; \
+         if (_COUNTER(axis) > 0) { _WRITE_STEP(AXIS, HIGH); }
         STEP_ADD(x,X);
         STEP_ADD(y,Y);
         STEP_ADD(z,Z);
@@ -589,10 +602,10 @@ HAL_STEP_TIMER_ISR {
         #endif
 
         #define STEP_IF_COUNTER(axis, AXIS) \
-          if (counter_## axis > 0) { \
-            counter_## axis -= current_block->step_event_count; \
-            count_position[AXIS ##_AXIS] += count_direction[AXIS ##_AXIS]; \
-            AXIS ##_STEP_WRITE(LOW); \
+          if (_COUNTER(axis) > 0) { \
+            _COUNTER(axis) -= current_block->step_event_count; \
+            count_position[_AXIS(AXIS)] += count_direction[_AXIS(AXIS)]; \
+            _WRITE_STEP(AXIS, LOW); \
           }
 
         STEP_IF_COUNTER(x, X);
@@ -605,12 +618,12 @@ HAL_STEP_TIMER_ISR {
       #else // !CONFIG_STEPPERS_TOSHIBA
 
         #define APPLY_MOVEMENT(axis, AXIS) \
-          counter_## axis += current_block->steps[AXIS ##_AXIS]; \
-          if (counter_## axis > 0) { \
-            AXIS ##_APPLY_STEP(!INVERT_## AXIS ##_STEP_PIN,0); \
-            counter_## axis -= current_block->step_event_count; \
-            count_position[AXIS ##_AXIS] += count_direction[AXIS ##_AXIS]; \
-            AXIS ##_APPLY_STEP(INVERT_## AXIS ##_STEP_PIN,0); \
+          _COUNTER(axis) += current_block->steps[_AXIS(AXIS)]; \
+          if (_COUNTER(axis) > 0) { \
+            _APPLY_STEP(AXIS)(!_INVERT_STEP_PIN(AXIS),0); \
+            _COUNTER(axis) -= current_block->step_event_count; \
+            count_position[_AXIS(AXIS)] += count_direction[_AXIS(AXIS)]; \
+            _APPLY_STEP(AXIS)(_INVERT_STEP_PIN(AXIS),0); \
           }
 
         APPLY_MOVEMENT(x, X);
@@ -779,7 +792,7 @@ void st_init() {
   #ifdef HAVE_L6470DRIVER
     L6470_init();
   #endif
-  
+
   // Initialize Dir Pins
   #if HAS_X_DIR
     X_DIR_INIT;
@@ -825,11 +838,11 @@ void st_init() {
   #if HAS_Y_ENABLE
     Y_ENABLE_INIT;
     if (!Y_ENABLE_ON) Y_ENABLE_WRITE(HIGH);
-	
-	#if defined(Y_DUAL_STEPPER_DRIVERS) && HAS_Y2_ENABLE
-	  Y2_ENABLE_INIT;
-	  if (!Y_ENABLE_ON) Y2_ENABLE_WRITE(HIGH);
-	#endif
+
+  #if defined(Y_DUAL_STEPPER_DRIVERS) && HAS_Y2_ENABLE
+    Y2_ENABLE_INIT;
+    if (!Y_ENABLE_ON) Y2_ENABLE_WRITE(HIGH);
+  #endif
   #endif
   #if HAS_Z_ENABLE
     Z_ENABLE_INIT;
@@ -906,8 +919,8 @@ void st_init() {
     #ifdef ENDSTOPPULLUP_ZMAX
       PULLUP(Z2_MAX_PIN,HIGH);
     #endif
-  #endif  
-  
+  #endif
+
 #if (defined(Z_PROBE_PIN) && Z_PROBE_PIN >= 0) && defined(Z_PROBE_ENDSTOP) // Check for Z_PROBE_ENDSTOP so we don't pull a pin high unless it's to be used.
   SET_INPUT(Z_PROBE_PIN);
   #ifdef ENDSTOPPULLUP_ZPROBE
@@ -915,10 +928,13 @@ void st_init() {
   #endif
 #endif
 
+  #define _STEP_INIT(AXIS) AXIS ##_STEP_INIT
+  #define _DISABLE(axis) disable_## axis()
+
   #define AXIS_INIT(axis, AXIS, PIN) \
-    AXIS ##_STEP_INIT; \
-    AXIS ##_STEP_WRITE(INVERT_## PIN ##_STEP_PIN); \
-    disable_## axis()
+    _STEP_INIT(AXIS); \
+    _WRITE_STEP(AXIS, _INVERT_STEP_PIN(PIN)); \
+    _DISABLE(axis)
 
   #define E_AXIS_INIT(NUM) AXIS_INIT(e## NUM, E## NUM, E)
 
@@ -1035,14 +1051,19 @@ void quickStop() {
   // No other ISR should ever interrupt this!
   void babystep(const uint8_t axis, const bool direction) {
 
+    #define _ENABLE(axis) enable_## axis()
+    #define _READ_DIR(AXIS) AXIS ##_DIR_READ
+    #define _INVERT_DIR(AXIS) INVERT_## AXIS ##_DIR
+    #define _APPLY_DIR(AXIS, INVERT) AXIS ##_APPLY_DIR(INVERT, true)
+
     #define BABYSTEP_AXIS(axis, AXIS, INVERT) { \
-        enable_## axis(); \
-        uint8_t old_pin = AXIS ##_DIR_READ; \
-        AXIS ##_APPLY_DIR(INVERT_## AXIS ##_DIR^direction^INVERT, true); \
-        AXIS ##_APPLY_STEP(!INVERT_## AXIS ##_STEP_PIN, true); \
-        _delay_us(1U); \
-        AXIS ##_APPLY_STEP(INVERT_## AXIS ##_STEP_PIN, true); \
-        AXIS ##_APPLY_DIR(old_pin, true); \
+        _ENABLE(axis); \
+        uint8_t old_pin = _READ_DIR(AXIS); \
+        _APPLY_DIR(AXIS, _INVERT_DIR(AXIS)^direction^INVERT); \
+        _APPLY_STEP(AXIS)(!_INVERT_STEP_PIN(AXIS), true); \
+        delayMicroseconds(2); \
+        _APPLY_STEP(AXIS)(_INVERT_STEP_PIN(AXIS), true); \
+        _APPLY_DIR(AXIS, old_pin); \
       }
 
     switch(axis) {
@@ -1054,7 +1075,7 @@ void quickStop() {
       case Y_AXIS:
         BABYSTEP_AXIS(y, Y, false);
         break;
-     
+ 
       case Z_AXIS: {
 
         #ifndef DELTA
@@ -1091,7 +1112,7 @@ void quickStop() {
         #endif
 
       } break;
-     
+ 
       default: break;
     }
   }
@@ -1155,7 +1176,7 @@ void microstep_init() {
 
   #if HAS_MICROSTEPS
     pinMode(X_MS1_PIN,OUTPUT);
-    pinMode(X_MS2_PIN,OUTPUT);  
+    pinMode(X_MS2_PIN,OUTPUT);
     pinMode(Y_MS1_PIN,OUTPUT);
     pinMode(Y_MS2_PIN,OUTPUT);
     pinMode(Z_MS1_PIN,OUTPUT);
