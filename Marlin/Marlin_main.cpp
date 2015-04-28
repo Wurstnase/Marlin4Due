@@ -380,6 +380,7 @@ bool target_direction;
 
 #ifdef FILAMENT_RUNOUT_SENSOR
    static bool filrunoutEnqueued = false;
+   static bool filrunout_active = false;
 #endif
 
 #ifdef SDSUPPORT
@@ -4682,9 +4683,22 @@ inline void gcode_M503() {
 
     #ifdef FILAMENT_RUNOUT_SENSOR
       filrunoutEnqueued = false;
+      filrunout_active = true;
     #endif
     
   }
+  
+  #ifdef FILAMENT_RUNOUT_SENSOR
+  /**
+  * M601 activates the filament-runout-sensor
+  * M601 for active
+  * M601 D to deactivate
+  **/
+    inline void gcode_M601() {
+      if (code_seen('D')) filrunout_active = false;
+      else filrunout_active = true;
+    }
+  #endif
 
 #endif // FILAMENTCHANGEENABLE
 
@@ -5395,6 +5409,12 @@ void process_commands() {
           gcode_M600();
           break;
       #endif // FILAMENTCHANGEENABLE
+      
+      #ifdef FILAMENT_RUNOUT_SENSOR
+        case 601: //Activate filament-runout-sensor; M601 for active, M601 D to deactivate
+          gcode_M601();
+          break;
+      #endif
 
       #ifdef DUAL_X_CARRIAGE
         case 605:
@@ -5987,7 +6007,7 @@ void disable_all_steppers() {
 void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
   
   #if HAS_FILRUNOUT
-    if (card.sdprinting && !(READ(FILRUNOUT_PIN) ^ FIL_RUNOUT_INVERTING))
+    if (filrunout_active && !(READ(FILRUNOUT_PIN) ^ FIL_RUNOUT_INVERTING))
       filrunout();
   #endif
 
@@ -6152,6 +6172,7 @@ void kill()
   void filrunout() {
     if (!filrunoutEnqueued) {
       filrunoutEnqueued = true;
+      filrunout_active = false;
       enqueuecommand("M600");
     }
   }
