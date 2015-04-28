@@ -326,7 +326,46 @@ static inline void digitalFastWrite(int pin, bool v) {
 #define DIO77_PIN 28
 #define DIO77_WPORT PIOA
 
-#define DIO78_PIN 29
-#define DIO78_WPORT PIOA
+#define DIO78_PIN 23
+#define DIO78_WPORT PIOB
+
+#define DIO79_PIN 17
+#define DIO79_WPORT PIOA
+
+#define DIO80_PIN 12
+#define DIO80_WPORT PIOB
+
+#define DIO81_PIN 8
+#define DIO81_WPORT PIOA
+
+#define DIO82_PIN 11
+#define DIO82_WPORT PIOA
+
+#define DIO83_PIN 13
+#define DIO83_WPORT PIOA
+
+#define DIO84_PIN 4
+#define DIO84_WPORT PIOD
+
+#define DIO85_PIN 11
+#define DIO85_WPORT PIOB
+
+#define DIO86_PIN 21
+#define DIO86_WPORT PIOB
+
+#define DIO87_PIN 29
+#define DIO87_WPORT PIOA
+
+#define DIO88_PIN 15
+#define DIO88_WPORT PIOB
+
+#define DIO89_PIN 14
+#define DIO89_WPORT PIOB
+
+#define DIO90_PIN 1
+#define DIO90_WPORT PIOA
+
+#define DIO91_PIN 15
+#define DIO91_WPORT PIOB
 
 #endif	/* _FASTIO_H */
