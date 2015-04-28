@@ -160,6 +160,13 @@
       #endif
     #endif
   #endif
+  
+  #ifdef DAVINCI_PANEL
+    #define LCD_WIDTH 16
+    #define LCD_HEIGHT 4
+    //#define SDSUPPORT
+    #define ULTRA_LCD
+  #endif
 
   #ifdef DOGLCD
     /* Custom characters defined in font font_6x10_marlin_symbols */

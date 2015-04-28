@@ -386,8 +386,16 @@ static void lcd_implementation_init(
       // required for RAMPS-FD, but does no harm for other targets
       SET_OUTPUT(LCD_PINS_RS);
       SET_OUTPUT(LCD_PINS_ENABLE);
+      #ifdef LCD_PIN_RW //if RW is defined it is better to give a state
+		SET_OUTPUT(LCD_PIN_RW);
+		WRITE(LCD_PIN_RW, LOW);
+	  #endif
 	#endif
     lcd.begin(LCD_WIDTH, LCD_HEIGHT);
+    #ifdef LCD_PIN_BL // Enable LCD backlight
+		pinMode(LCD_PIN_BL, OUTPUT);
+		digitalWrite(LCD_PIN_BL, HIGH);
+  #endif
 #endif
 
     lcd_set_custom_characters(
