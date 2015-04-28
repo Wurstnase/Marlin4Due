@@ -4693,9 +4693,20 @@ inline void gcode_M503() {
   * M601 activates the filament-runout-sensor
   * M601 for active
   * M601 D to deactivate
+  * M601 T to test the sensor
   **/
     inline void gcode_M601() {
-      if (code_seen('D')) filrunout_active = false;
+      if (code_seen('D')) { 
+        filrunout_active = false; 
+      }
+      else if (code_seen('T')) { 
+        SERIAL_ECHOPGM("Filamentsensor: "); 
+        if (!(READ(FILRUNOUT_PIN) ^ FIL_RUNOUT_INVERTING)) {
+          SERIAL_ECHOLNPGM(MSG_ENDSTOP_HIT);
+        }
+        else {
+          SERIAL_ECHOLNPGM(MSG_ENDSTOP_OPEN);
+        }
       else filrunout_active = true;
     }
   #endif
