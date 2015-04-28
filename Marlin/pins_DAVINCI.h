@@ -6,9 +6,12 @@
 //TODO Need to add conditions and pins for DAVINCI 1.0/2.0 SF/DF 1.0A/2.0A
 //TODO Need to add SDCARD PINS and Support
 //TODO Need to add Sensor PINS
+//TODO Need to add Light support
 //TODO Need to add DAVINCI Keypad Support
 //TODO Need to add DAVINCI thermistor tables for Extruder 1.0/2.0 for Extruder 1.0A/2.0A and Bed
 //TODO Need Define the Serial Output properly
+//TODO Need to add virtual EEPROM support
+//TODO Need add watchdog support
 
 #define X_STEP_PIN 			15
 #define X_DIR_PIN			14
