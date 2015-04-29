@@ -20,8 +20,8 @@
 #define Y_DIR_PIN		  	12
 #define Y_ENABLE_PIN	  	69
 
-#define Z_STEP_PIN         118
-#define Z_DIR_PIN          119
+#define Z_STEP_PIN         119
+#define Z_DIR_PIN          118
 #define Z_ENABLE_PIN       120
 
 #define X_MIN_PIN          11
