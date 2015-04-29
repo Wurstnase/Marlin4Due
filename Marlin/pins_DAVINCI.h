@@ -9,9 +9,8 @@
 //TODO Need to add Light support
 //TODO Need to add DAVINCI Keypad Support
 //TODO Need to add DAVINCI thermistor tables for Extruder 1.0/2.0 for Extruder 1.0A/2.0A and Bed
-//TODO Need Define the Serial Output properly
-//TODO Need to add virtual EEPROM support
-//TODO Need add watchdog support
+
+
 
 #define X_STEP_PIN 			15
 #define X_DIR_PIN			14
@@ -65,15 +64,15 @@
   #define FILRUNOUT_PIN        -1
 #endif
 
-#define HEATER_BED_PIN     17    // BED
-#define HEATER_0_PIN       16
-#define HEATER_1_PIN       -1  // 12
+#define HEATER_BED_PIN     -1//17    // BED
+#define HEATER_0_PIN       20
+#define HEATER_1_PIN       -1//16  // 12
 #define HEATER_2_PIN       -1  // 11
 #define HEATER_3_PIN       -1
 
-#define TEMP_BED_PIN       14   // ANALOG NUMBERING
-#define TEMP_0_PIN         13   // ANALOG NUMBERING
-#define TEMP_1_PIN          9  // 1   // ANALOG NUMBERING
+#define TEMP_BED_PIN       -1 //14 ANALOG NUMBERING
+#define TEMP_0_PIN         9   // ANALOG NUMBERING
+#define TEMP_1_PIN         -1  // 13  // ANALOG NUMBERING
 #define TEMP_2_PIN         -1  // 2   // ANALOG NUMBERING
 #define TEMP_3_PIN         -1  // 3   // ANALOG NUMBERING
 
@@ -89,4 +88,4 @@
 
 #define SDCARDDETECT 		-1 //currently disabled until SDSUPPORT implemented
 
-
+#define MYSERIAL SerialUSB
