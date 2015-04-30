@@ -64,14 +64,14 @@
   #define FILRUNOUT_PIN        -1
 #endif
 
-#define HEATER_BED_PIN     -1//17    // BED
+#define HEATER_BED_PIN     17    // BED
 #define HEATER_0_PIN       20
 #define HEATER_1_PIN       -1//16  // 12
 #define HEATER_2_PIN       -1  // 11
 #define HEATER_3_PIN       -1
 
-#define TEMP_BED_PIN       -1 //14 ANALOG NUMBERING
-#define TEMP_0_PIN         9   // ANALOG NUMBERING
+#define TEMP_BED_PIN       126 //14 ANALOG NUMBERING
+#define TEMP_0_PIN         65//13//9   // ANALOG NUMBERING
 #define TEMP_1_PIN         -1  // 13  // ANALOG NUMBERING
 #define TEMP_2_PIN         -1  // 2   // ANALOG NUMBERING
 #define TEMP_3_PIN         -1  // 3   // ANALOG NUMBERING
