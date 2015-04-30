@@ -1,4 +1,6 @@
 # Marlin4Due 3D Printer Firmware - DaVinci Version     
+
+[![Join the chat at https://gitter.im/luc-github/Marlin4Due](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/luc-github/Marlin4Due?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Davinci is a DUE based printer with a complete different pinout and several proprietary item     
 The goal is after https://github.com/luc-github/Repetier-Firmware-0.92, to offer another alternative firmware     
 
