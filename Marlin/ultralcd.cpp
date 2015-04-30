@@ -1582,6 +1582,26 @@ bool lcd_clicked() { return LCD_CLICKED; }
 
 #endif //ULTIPANEL
 
+#ifdef DAVINCI_PANEL
+void lcd_buzz(long duration, uint16_t freq) {
+  if (freq > 0) {
+    #if BEEPER > 0
+      SET_OUTPUT(BEEPER);
+      tone(BEEPER, freq);
+      delay(duration);
+      noTone(BEEPER);
+    #elif defined(LCD_USE_I2C_BUZZER)
+      lcd.buzz(duration,freq);
+    #else
+      delay(duration);
+    #endif
+  }
+  else {
+    delay(duration);
+  }
+}
+#endif
+
 /*********************************/
 /** Number to string conversion **/
 /*********************************/
