@@ -86,6 +86,27 @@
 #define LCD_PIN_RW			45
 #define LCD_PIN_BL			78
 
+//76,UI_ACTION_OK); // push button, connects gnd to pin
+//10,UI_ACTION_NEXT); // push button, connects gnd to pin
+//44,UI_ACTION_PREVIOUS); // push button, connects gnd to pin
+//75,UI_ACTION_BACK); // push button, connects gnd to pin
+//72,UI_ACTION_RIGHT_KEY); // push button, connects gnd to pin
+//77,UI_ACTION_TOP_MENU
+
+//Previous
+#define BTN_EN1 10
+//Next
+#define BTN_EN2 44
+//OK
+#define BTN_ENC 76 
+//back			
+#define BTN_BACK 75
+
+#define SS            55
+#define MOSI      43
+#define MISO       73
+#define SCK         42
+
 #define SDCARDDETECT 		-1 //currently disabled until SDSUPPORT implemented
 
 #define MYSERIAL SerialUSB

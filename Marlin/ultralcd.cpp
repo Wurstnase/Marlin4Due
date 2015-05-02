@@ -376,6 +376,7 @@ static void lcd_status_screen() {
 
 static void lcd_return_to_status() { lcd_goto_menu(lcd_status_screen); }
 
+#if SDSUPPORT
 static void lcd_sdcard_pause() { card.pauseSDPrint(); }
 
 static void lcd_sdcard_resume() { card.startFileprint(); }
@@ -388,6 +389,7 @@ static void lcd_sdcard_stop() {
   cancel_heatup = true;
   lcd_setstatus(MSG_PRINT_ABORTED, true);
 }
+#endif
 
 /* Menu implementation */
 static void lcd_main_menu() {
@@ -1005,6 +1007,7 @@ static void lcd_control_volumetric_menu() {
   }
 #endif // FWRETRACT
 
+#if SDSUPPORT
 #if SDCARDDETECT == -1
   static void lcd_sd_refresh() {
     card.initsd();
@@ -1051,6 +1054,7 @@ void lcd_sdcard_menu() {
   }
   END_MENU();
 }
+#endif
 
 #define menu_edit_type(_type, _name, _strFunc, scale) \
   bool _menu_edit_ ## _name () { \
@@ -1178,10 +1182,12 @@ static void menu_action_sdfile(const char* filename, char* longFilename) {
   enqueuecommands_P(PSTR("M24"));
   lcd_return_to_status();
 }
+#if SDSUPPORT
 static void menu_action_sddirectory(const char* filename, char* longFilename) {
   card.chdir(filename);
   encoderPosition = 0;
 }
+#endif
 static void menu_action_setting_edit_bool(const char* pstr, bool* ptr) { *ptr = !(*ptr); }
 static void menu_action_setting_edit_callback_bool(const char* pstr, bool* ptr, menuFunc_t callback) {
   menu_action_setting_edit_bool(pstr, ptr);
@@ -1485,8 +1491,30 @@ void lcd_reset_alert_level() { lcd_status_message_level = 0; }
 void lcd_buttons_update() {
   #ifdef NEWPANEL
     uint8_t newbutton = 0;
-    if (READ(BTN_EN1) == 0) newbutton |= EN_A;
-    if (READ(BTN_EN2) == 0) newbutton |= EN_B;
+    #ifdef DAVINCI_PANEL
+    //just the change to simulate a click
+    //need to memorize the previous state
+    static uint8_t previousA = 2;
+    static uint8_t previousB = 2;
+    //read current
+    uint8_t currentA = READ(BTN_EN1);
+    uint8_t currentB = READ(BTN_EN2);
+    //check Encoder A
+    if ((previousA!=currentA) && (currentA==0)) {
+			newbutton |= EN_A;
+			encoderDiff++;//simulate a pulse to right
+	}
+	previousA=currentA;
+	//check Encoder A
+	if ((previousB!=currentB) && (currentB==0)) {
+		newbutton |= EN_B;
+		encoderDiff--; //simulate a pulse to left
+	}
+	previousB=currentB;
+	#else //normal ULTIPANEL
+		if (READ(BTN_EN1) == 0) newbutton |= EN_A;
+		if (READ(BTN_EN2) == 0) newbutton |= EN_B;
+    #endif
     #if BTN_ENC > 0
       millis_t ms = millis();
       if (ms > next_button_update_ms && READ(BTN_ENC) == 0) newbutton |= EN_C;
@@ -1524,7 +1552,7 @@ void lcd_buttons_update() {
     }
     buttons = ~newbutton; //invert it, because a pressed switch produces a logical 0
   #endif //!NEWPANEL
-
+  #ifndef DAVINCI_PANEL
   //manage encoder rotation
   uint8_t enc=0;
   if (buttons & EN_A) enc |= B01;
@@ -1550,6 +1578,7 @@ void lcd_buttons_update() {
     }
   }
   lastEncoderBits = enc;
+  #endif
 }
 
 bool lcd_detected(void) {
@@ -1582,25 +1611,6 @@ bool lcd_clicked() { return LCD_CLICKED; }
 
 #endif //ULTIPANEL
 
-#ifdef DAVINCI_PANEL
-void lcd_buzz(long duration, uint16_t freq) {
-  if (freq > 0) {
-    #if BEEPER > 0
-      SET_OUTPUT(BEEPER);
-      tone(BEEPER, freq);
-      delay(duration);
-      noTone(BEEPER);
-    #elif defined(LCD_USE_I2C_BUZZER)
-      lcd.buzz(duration,freq);
-    #else
-      delay(duration);
-    #endif
-  }
-  else {
-    delay(duration);
-  }
-}
-#endif
 
 /*********************************/
 /** Number to string conversion **/

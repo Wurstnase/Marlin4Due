@@ -166,6 +166,10 @@
     #define LCD_HEIGHT 4
     //#define SDSUPPORT
     #define ULTRA_LCD
+    #define ULTIPANEL
+    #define NEWPANEL
+    #define ENCODER_PULSES_PER_STEP 1
+    #define ENCODER_STEPS_PER_MENU_ITEM 1
   #endif
 
   #ifdef DOGLCD
