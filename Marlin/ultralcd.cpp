@@ -388,6 +388,7 @@ static void lcd_status_screen() {
 
 static void lcd_return_to_status() { lcd_goto_menu(lcd_status_screen); }
 
+#ifdef SDSUPPORT
 static void lcd_sdcard_pause() { card.pauseSDPrint(); }
 
 static void lcd_sdcard_resume() { card.startFileprint(); }
@@ -400,6 +401,7 @@ static void lcd_sdcard_stop() {
   cancel_heatup = true;
   lcd_setstatus(MSG_PRINT_ABORTED, true);
 }
+#endif
 
 /**
  *
@@ -1145,6 +1147,7 @@ static void lcd_control_volumetric_menu() {
   }
 #endif // FWRETRACT
 
+#ifdef SDSUPPORT
 #if SDCARDDETECT == -1
   static void lcd_sd_refresh() {
     card.initsd();
@@ -1197,6 +1200,7 @@ void lcd_sdcard_menu() {
   }
   END_MENU();
 }
+#endif
 
 /**
  *
@@ -1333,6 +1337,7 @@ static void menu_action_back(menuFunc_t func) { lcd_goto_menu(func); }
 static void menu_action_submenu(menuFunc_t func) { lcd_goto_menu(func); }
 static void menu_action_gcode(const char* pgcode) { enqueuecommands_P(pgcode); }
 static void menu_action_function(menuFunc_t func) { (*func)(); }
+#ifdef SDSUPPORT
 static void menu_action_sdfile(const char* filename, char* longFilename) {
   char cmd[30];
   char* c;
@@ -1346,6 +1351,7 @@ static void menu_action_sddirectory(const char* filename, char* longFilename) {
   card.chdir(filename);
   encoderPosition = 0;
 }
+#endif
 static void menu_action_setting_edit_bool(const char* pstr, bool* ptr) { *ptr = !(*ptr); }
 static void menu_action_setting_edit_callback_bool(const char* pstr, bool* ptr, menuFunc_t callback) {
   menu_action_setting_edit_bool(pstr, ptr);
