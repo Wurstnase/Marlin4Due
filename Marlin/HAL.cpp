@@ -227,7 +227,7 @@ void HAL_temp_timer_start (uint8_t timer_num) {
 	TC_Configure (tc, channel, TC_CMR_CPCTRG | TC_CMR_TCCLKS_TIMER_CLOCK4);
   tc->TC_CHANNEL[channel].TC_IER |= TC_IER_CPCS; //enable interrupt on timer match with register C
 
-	tc->TC_CHANNEL[channel].TC_RC   = (VARIANT_MCK >> 7) / 2000;
+	tc->TC_CHANNEL[channel].TC_RC   = (VARIANT_MCK >> 7) / TEMP_FREQUENCY;
 	TC_Start(tc, channel);
 
 	//enable interrupt on RC compare

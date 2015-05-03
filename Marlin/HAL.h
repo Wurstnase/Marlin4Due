@@ -96,7 +96,10 @@ unsigned char eeprom_read_byte(unsigned char *pos);
 
 // timers
 #define STEP_TIMER_NUM 2
+
 #define TEMP_TIMER_NUM 3
+#define TEMP_FREQUENCY 2000
+
 #define BEEPER_TIMER_NUM 4
 
 #define HAL_TIMER_RATE 		     (F_CPU/2)
