@@ -1253,6 +1253,11 @@ menu_edit_type(float, float51, ftostr51, 10)
 menu_edit_type(float, float52, ftostr52, 100)
 menu_edit_type(unsigned long, long5, ftostr5, 0.01)
 
+/**
+ *
+ * Handlers for RepRap World Keypad input
+ *
+ */
 #ifdef REPRAPWORLD_KEYPAD
   static void reprapworld_keypad_move_z_up() {
     encoderPosition = 1;
