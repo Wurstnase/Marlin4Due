@@ -1337,6 +1337,7 @@ static void menu_action_back(menuFunc_t func) { lcd_goto_menu(func); }
 static void menu_action_submenu(menuFunc_t func) { lcd_goto_menu(func); }
 static void menu_action_gcode(const char* pgcode) { enqueuecommands_P(pgcode); }
 static void menu_action_function(menuFunc_t func) { (*func)(); }
+#ifdef SDSUPPORT
 static void menu_action_sdfile(const char* filename, char* longFilename) {
   char cmd[30];
   char* c;
@@ -1346,7 +1347,6 @@ static void menu_action_sdfile(const char* filename, char* longFilename) {
   enqueuecommands_P(PSTR("M24"));
   lcd_return_to_status();
 }
-#ifdef SDSUPPORT
 static void menu_action_sddirectory(const char* filename, char* longFilename) {
   card.chdir(filename);
   encoderPosition = 0;
