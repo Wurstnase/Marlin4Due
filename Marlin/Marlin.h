@@ -57,7 +57,9 @@ typedef unsigned long millis_t;
     #define MYSERIAL Serial
   #endif // BTENABLED
 #else
+  #ifndef MYSERIAL
   #define MYSERIAL Serial
+  #endif
 #endif
 
 #define SERIAL_CHAR(x) MYSERIAL.write(x)
