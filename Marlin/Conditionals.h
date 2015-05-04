@@ -170,6 +170,7 @@
     #define NEWPANEL
     #define ENCODER_PULSES_PER_STEP 1
     #define ENCODER_STEPS_PER_MENU_ITEM 1
+    #define ENCODER_FEEDRATE_DEADZONE 0
   #endif
 
   #ifdef DOGLCD
