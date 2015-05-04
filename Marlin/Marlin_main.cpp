@@ -4131,6 +4131,7 @@ inline void gcode_M226() {
       if (code_seen('P')) PID_PARAM(Kp, e) = code_value();
       if (code_seen('I')) PID_PARAM(Ki, e) = scalePID_i(code_value());
       if (code_seen('D')) PID_PARAM(Kd, e) = scalePID_d(code_value());
+      if (code_seen('H')) PID_PARAM(Km, e) = code_value_short();
       #ifdef PID_ADD_EXTRUSION_RATE
         if (code_seen('C')) PID_PARAM(Kc, e) = code_value();
       #endif      
@@ -4147,6 +4148,8 @@ inline void gcode_M226() {
       SERIAL_PROTOCOL(unscalePID_i(PID_PARAM(Ki, e)));
       SERIAL_PROTOCOL(" d:");
       SERIAL_PROTOCOL(unscalePID_d(PID_PARAM(Kd, e)));
+      SERIAL_PROTOCOL(" PID_Max:");
+      SERIAL_PROTOCOL(PID_PARAM(Km, e));
       #ifdef PID_ADD_EXTRUSION_RATE
         SERIAL_PROTOCOL(" c:");
         //Kc does not have scaling applied above, or in resetting defaults
