@@ -35,7 +35,7 @@
 #endif
 
 #if defined(PIDTEMPBED) || defined(PIDTEMP)
-  #define PID_dT (((OVERSAMPLENR + 2) * 12.0)/(F_CPU / 128.0 / TEMP_FREQUENCY))
+  #define PID_dT (((OVERSAMPLENR + 2) * 12.0)/ TEMP_FREQUENCY)
   #define RECI_PID_dT ( 1 / PID_dT )
 #endif
 
@@ -489,7 +489,7 @@ float get_pid_output(int e) {
   float pid_output;
   #ifdef PIDTEMP
     #if defined(PID_OPENLOOP)
-      pid_output = constrain(target_temperature[e], 0, PID_MAX);
+      pid_output = constrain(target_temperature[e], 0, PID_PARAM(Km,extruder));
     #elif defined(DEAD_TIME)
       float m_1;
       pid_error[e] = target_temperature[e] - current_temperature[e];
@@ -527,9 +527,9 @@ float get_pid_output(int e) {
 
         dTerm[e] = K2 * PID_PARAM(Kd,e) * (current_temperature[e] - temp_dState[e]) + K1 * dTerm[e];
         pid_output = pTerm[e] + iTerm[e] - dTerm[e];
-        if (pid_output > PID_MAX) {
+        if (pid_output > PID_PARAM(Km,extruder)) {
           if (pid_error[e] > 0) temp_iState[e] -= pid_error[e]; // conditional un-integration
-          pid_output = PID_MAX;
+          pid_output = PID_PARAM(Km,extruder);
         }
         else if (pid_output < 0) {
           if (pid_error[e] < 0) temp_iState[e] -= pid_error[e]; // conditional un-integration
@@ -572,7 +572,7 @@ float get_pid_output(int e) {
     #endif //DEADTIME_DEBUG
 
   #else /* PID off */
-    pid_output = (current_temperature[e] < target_temperature[e]) ? PID_MAX : 0;
+    pid_output = (current_temperature[e] < target_temperature[e]) ? PID_PARAM(Km,extruder) : 0;
   #endif
 
   return pid_output;
