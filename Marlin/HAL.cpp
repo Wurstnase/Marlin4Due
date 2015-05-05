@@ -183,34 +183,32 @@ static const tTimerConfig TimerConfig [NUM_HARDWARE_TIMERS] =
 // thanks for that work
 // http://forum.arduino.cc/index.php?topic=297397.0
 
+TcChannel *stepperChannel = (STEP_TIMER_COUNTER->TC_CHANNEL + STEP_TIMER_CHANNEL);
+
 void HAL_step_timer_start() {
   pmc_set_writeprotect(false); //remove write protection on registers
   // NVIC_SetPriorityGrouping(4);
   
   // Timer for stepper
   // Timer 3 HAL.h STEP_TIMER_NUM
-  // uint8_t timer_num = STEP_TIMER_NUM;
   
-  // Get the ISR from table
-  Tc *tc = STEP_TIMER_COUNTER;
   IRQn_Type irq = STEP_TIMER_IRQN;
-  uint32_t channel = STEP_TIMER_CHANNEL;
   
   pmc_enable_periph_clk((uint32_t)irq); //we need a clock?
   // NVIC_SetPriority(irq, NVIC_EncodePriority(4, 4, 0));
   
-  tc->TC_CHANNEL[channel].TC_CCR = TC_CCR_CLKDIS;
+  stepperChannel.TC_CCR = TC_CCR_CLKDIS;
   
   // TC_Configure(tc, channel, TC_CMR_TCCLKS_TIMER_CLOCK1 | TC_CMR_CPCTRG); //set clock rate (CLOCK1 is MCK/2) and reset counter register C on match
-  tc->TC_CHANNEL[channel].TC_SR; // clear status register
-  tc->TC_CHANNEL[channel].TC_CMR =  TC_CMR_WAVSEL_UP_RC | TC_CMR_WAVE | TC_CMR_TCCLKS_TIMER_CLOCK1;
+  stepperChannel.TC_SR; // clear status register
+  stepperChannel.TC_CMR =  TC_CMR_WAVSEL_UP_RC | TC_CMR_WAVE | TC_CMR_TCCLKS_TIMER_CLOCK1;
 
-  tc->TC_CHANNEL[channel].TC_IER /*|*/= TC_IER_CPCS; //enable interrupt on timer match with register C
-  tc->TC_CHANNEL[channel].TC_IDR = ~TC_IER_CPCS;
-  tc->TC_CHANNEL[channel].TC_RC   = (VARIANT_MCK >> 1) / 1000; // start with 1kHz as frequency; //interrupt occurs every x interations of the timer counter
+  stepperChannel.TC_IER /*|*/= TC_IER_CPCS; //enable interrupt on timer match with register C
+  stepperChannel.TC_IDR = ~TC_IER_CPCS;
+  stepperChannel.TC_RC   = (VARIANT_MCK >> 1) / 1000; // start with 1kHz as frequency; //interrupt occurs every x interations of the timer counter
   
   // TC_Start(tc, channel); //start timer counter
-  tc->TC_CHANNEL[channel].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
+  stepperChannel.TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
     
   //tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS;
   //tc->TC_CHANNEL[channel].TC_IDR =~ TC_IER_CPCS;
@@ -255,19 +253,28 @@ void HAL_timer_disable_interrupt (uint8_t timer_num) {
 	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IDR = TC_IER_CPCS; //disable interrupt
 }
 
-void HAL_timer_set_count (Tc* tc, uint32_t channel, uint32_t count) {
+void HAL_timer_set_count (uint32_t count) {
   // if(count < 210) count = 210;
 	// const tTimerConfig *pConfig = &TimerConfig [timer_num];
 	// pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_RC = count;
 	//TC_SetRC (pConfig->pTimerRegs, pConfig->channel, count);
   if(count < 210) count = 210;
   
-	tc->TC_CHANNEL[channel].TC_RC = count;
+	stepperChannel.TC_RC = count;
 
-	if(tc->TC_CHANNEL[channel].TC_CV > count) {
+	if(stepperChannel.TC_CV > count) {
     // debug_counter = count;
-		tc->TC_CHANNEL[channel].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
+		stepperChannel.TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
     // TC_Start(pConfig->pTimerRegs, pConfig->channel);
+  }
+}
+
+inline void HAL_timer_next_block (bool next) {
+  if (next) {
+    stepperChannel.TC_RA = TICKS_PER_100NANOSEC * STEP_DIR_DELAY;
+  }
+  else {
+    stepperChannel.TC_RA = 0;
   }
 }
 

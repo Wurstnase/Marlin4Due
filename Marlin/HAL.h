@@ -116,11 +116,15 @@ unsigned char eeprom_read_byte(unsigned char *pos);
 #define BEEPER_TIMER_IRQN TC4_IRQn
 #define HAL_BEEPER_TIMER_ISR  void TC4_Handler()
 
-#define HAL_TIMER_RATE 		     (F_CPU/2)
-#define TICKS_PER_NANOSECOND   (HAL_TIMER_RATE)/1000
+#define HAL_TIMER_RATE 		      (F_CPU/2)
+#define TICKS_PER_USEC          (HAL_TIMER_RATE / 1000000)
+#define TICKS_PER_MSEC          (HAL_TIMER_RATE)/1000
+#define TICKS_PER_100NANOSEC    (TICKS_PER_USEC / 10.0)
 
 #define ENABLE_STEPPER_DRIVER_INTERRUPT()	HAL_timer_enable_interrupt (STEP_TIMER_NUM)
 #define DISABLE_STEPPER_DRIVER_INTERRUPT()	HAL_timer_disable_interrupt (STEP_TIMER_NUM)
+
+#define STEP_DIR_DELAY 15
 
 //
 
