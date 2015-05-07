@@ -307,6 +307,17 @@ FORCE_INLINE void trapezoid_generator_reset() {
     Z_APPLY_DIR(!INVERT_Z_DIR,0);
     count_direction[Z_AXIS] = 1;
   }
+  
+  #ifndef ADVANCE
+    if (TEST(out_bits, E_AXIS)) {
+      REV_E_DIR();
+      count_direction[E_AXIS] = -1;
+    }
+    else {
+      NORM_E_DIR();
+      count_direction[E_AXIS] = 1;
+    }
+  #endif
 
   #ifdef ADVANCE
     advance = current_block->initial_advance;
@@ -538,16 +549,7 @@ HAL_STEP_TIMER_ISR {
 
     }
 
-    #ifndef ADVANCE
-      if (TEST(out_bits, E_AXIS)) {  // -direction
-        REV_E_DIR();
-        count_direction[E_AXIS] = -1;
-      }
-      else { // +direction
-        NORM_E_DIR();
-        count_direction[E_AXIS] = 1;
-      }
-    #endif //!ADVANCE
+
 
     // Take multiple steps per interrupt (For high speed moves)
     for (int8_t i = 0; i < step_loops; i++) {
@@ -565,56 +567,30 @@ HAL_STEP_TIMER_ISR {
       #define _APPLY_STEP(AXIS) AXIS ##_APPLY_STEP
       #define _INVERT_STEP_PIN(AXIS) INVERT_## AXIS ##_STEP_PIN
 
-      #ifdef CONFIG_STEPPERS_TOSHIBA
-        /**
-         * The Toshiba stepper controller require much longer pulses.
-         * So we 'stage' decompose the pulses between high and low
-         * instead of doing each in turn. The extra tests add enough
-         * lag to allow it work with without needing NOPs
-         */
-        #define STEP_ADD(axis, AXIS) \
-         _COUNTER(axis) += current_block->steps[_AXIS(AXIS)]; \
-         if (_COUNTER(axis) > 0) { _WRITE_STEP(AXIS, HIGH); }
-        STEP_ADD(x,X);
-        STEP_ADD(y,Y);
-        STEP_ADD(z,Z);
-        #ifndef ADVANCE
-          STEP_ADD(e,E);
-        #endif
+      #define STEP_ADD(axis, AXIS) \
+       _COUNTER(axis) += current_block->steps[_AXIS(AXIS)]; \
+       if (_COUNTER(axis) > 0) { _WRITE_STEP(AXIS, HIGH); }
+      STEP_ADD(x,X);
+      STEP_ADD(y,Y);
+      STEP_ADD(z,Z);
+      #ifndef ADVANCE
+        STEP_ADD(e,E);
+      #endif
 
-        #define STEP_IF_COUNTER(axis, AXIS) \
-          if (_COUNTER(axis) > 0) { \
-            _COUNTER(axis) -= current_block->step_event_count; \
-            count_position[_AXIS(AXIS)] += count_direction[_AXIS(AXIS)]; \
-            _WRITE_STEP(AXIS, LOW); \
-          }
+      #define STEP_IF_COUNTER(axis, AXIS) \
+        if (_COUNTER(axis) > 0) { \
+          _COUNTER(axis) -= current_block->step_event_count; \
+          count_position[_AXIS(AXIS)] += count_direction[_AXIS(AXIS)]; \
+          _WRITE_STEP(AXIS, LOW); \
+        }
 
-        STEP_IF_COUNTER(x, X);
-        STEP_IF_COUNTER(y, Y);
-        STEP_IF_COUNTER(z, Z);
-        #ifndef ADVANCE
-          STEP_IF_COUNTER(e, E);
-        #endif
+      STEP_IF_COUNTER(x, X);
+      STEP_IF_COUNTER(y, Y);
+      STEP_IF_COUNTER(z, Z);
+      #ifndef ADVANCE
+        STEP_IF_COUNTER(e, E);
+      #endif
 
-      #else // !CONFIG_STEPPERS_TOSHIBA
-
-        #define APPLY_MOVEMENT(axis, AXIS) \
-          _COUNTER(axis) += current_block->steps[_AXIS(AXIS)]; \
-          if (_COUNTER(axis) > 0) { \
-            _APPLY_STEP(AXIS)(!_INVERT_STEP_PIN(AXIS),0); \
-            _COUNTER(axis) -= current_block->step_event_count; \
-            count_position[_AXIS(AXIS)] += count_direction[_AXIS(AXIS)]; \
-            _APPLY_STEP(AXIS)(_INVERT_STEP_PIN(AXIS),0); \
-          }
-
-        APPLY_MOVEMENT(x, X);
-        APPLY_MOVEMENT(y, Y);
-        APPLY_MOVEMENT(z, Z);
-        #ifndef ADVANCE
-          APPLY_MOVEMENT(e, E);
-        #endif
-
-      #endif // CONFIG_STEPPERS_TOSHIBA
       step_events_completed++;
       if (step_events_completed >= current_block->step_event_count) break;
     }
