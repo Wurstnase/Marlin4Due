@@ -46,7 +46,6 @@ block_t *current_block;  // A pointer to the block currently being traced
 // Variables used by The Stepper Driver Interrupt
 static unsigned char out_bits;        // The next stepping-bits to be output
 static unsigned int cleaning_buffer_counter;
-static long current_step_event_count;
 
 #ifdef Z_DUAL_ENDSTOPS
   static bool performing_homing = false, 
@@ -277,47 +276,49 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
 // block begins.
 FORCE_INLINE void trapezoid_generator_reset() {
 
- // Set directions TO DO This should be done once during init of trapezoid. Endstops -> interrupt
-  out_bits = current_block->direction_bits;
+  if (out_bits != current_block->direction_bits) {
+    // Set directions TO DO This should be done once during init of trapezoid. Endstops -> interrupt
+    out_bits = current_block->direction_bits;
 
-  // Set the direction bits (X_AXIS=A_AXIS and Y_AXIS=B_AXIS for COREXY)
-  if (TEST(out_bits, X_AXIS)) {
-    X_APPLY_DIR(INVERT_X_DIR,0);
-    count_direction[X_AXIS] = -1;
-  }
-  else {
-    X_APPLY_DIR(!INVERT_X_DIR,0);
-    count_direction[X_AXIS] = 1;
-  }
-
-  if (TEST(out_bits, Y_AXIS)) {
-    Y_APPLY_DIR(INVERT_Y_DIR,0);
-    count_direction[Y_AXIS] = -1;
-  }
-  else {
-    Y_APPLY_DIR(!INVERT_Y_DIR,0);
-    count_direction[Y_AXIS] = 1;
-  }
-  
-  if (TEST(out_bits, Z_AXIS)) {
-    Z_APPLY_DIR(INVERT_Z_DIR,0);
-    count_direction[Z_AXIS] = -1;
-  }
-  else {
-    Z_APPLY_DIR(!INVERT_Z_DIR,0);
-    count_direction[Z_AXIS] = 1;
-  }
-  
-  #ifndef ADVANCE
-    if (TEST(out_bits, E_AXIS)) {
-      REV_E_DIR();
-      count_direction[E_AXIS] = -1;
+    // Set the direction bits (X_AXIS=A_AXIS and Y_AXIS=B_AXIS for COREXY)
+    if (TEST(out_bits, X_AXIS)) {
+      X_APPLY_DIR(INVERT_X_DIR,0);
+      count_direction[X_AXIS] = -1;
     }
     else {
-      NORM_E_DIR();
-      count_direction[E_AXIS] = 1;
+      X_APPLY_DIR(!INVERT_X_DIR,0);
+      count_direction[X_AXIS] = 1;
     }
-  #endif
+
+    if (TEST(out_bits, Y_AXIS)) {
+      Y_APPLY_DIR(INVERT_Y_DIR,0);
+      count_direction[Y_AXIS] = -1;
+    }
+    else {
+      Y_APPLY_DIR(!INVERT_Y_DIR,0);
+      count_direction[Y_AXIS] = 1;
+    }
+    
+    if (TEST(out_bits, Z_AXIS)) {
+      Z_APPLY_DIR(INVERT_Z_DIR,0);
+      count_direction[Z_AXIS] = -1;
+    }
+    else {
+      Z_APPLY_DIR(!INVERT_Z_DIR,0);
+      count_direction[Z_AXIS] = 1;
+    }
+    
+    #ifndef ADVANCE
+      if (TEST(out_bits, E_AXIS)) {
+        REV_E_DIR();
+        count_direction[E_AXIS] = -1;
+      }
+      else {
+        NORM_E_DIR();
+        count_direction[E_AXIS] = 1;
+      }
+    #endif
+  }
 
   #ifdef ADVANCE
     advance = current_block->initial_advance;
@@ -563,32 +564,30 @@ HAL_STEP_TIMER_ISR {
       #endif //ADVANCE
 
       #define _COUNTER(axis) counter_## axis
-      #define _WRITE_STEP(AXIS, HIGHLOW) AXIS ##_STEP_WRITE(HIGHLOW)
       #define _APPLY_STEP(AXIS) AXIS ##_APPLY_STEP
       #define _INVERT_STEP_PIN(AXIS) INVERT_## AXIS ##_STEP_PIN
 
-      #define STEP_ADD(axis, AXIS) \
-       _COUNTER(axis) += current_block->steps[_AXIS(AXIS)]; \
-       if (_COUNTER(axis) > 0) { _WRITE_STEP(AXIS, HIGH); }
-      STEP_ADD(x,X);
-      STEP_ADD(y,Y);
-      STEP_ADD(z,Z);
+      #define STEP_START(axis, AXIS) \
+        _COUNTER(axis) += current_block->steps[_AXIS(AXIS)]; \
+        if (_COUNTER(axis) > 0) { \
+          _APPLY_STEP(AXIS)(!_INVERT_STEP_PIN(AXIS),0); \
+          _COUNTER(axis) -= current_block->step_event_count; \
+          count_position[_AXIS(AXIS)] += count_direction[_AXIS(AXIS)]; }
+          
+      STEP_START(x,X);
+      STEP_START(y,Y);
+      STEP_START(z,Z);
       #ifndef ADVANCE
-        STEP_ADD(e,E);
+        STEP_START(e,E);
       #endif
 
-      #define STEP_IF_COUNTER(axis, AXIS) \
-        if (_COUNTER(axis) > 0) { \
-          _COUNTER(axis) -= current_block->step_event_count; \
-          count_position[_AXIS(AXIS)] += count_direction[_AXIS(AXIS)]; \
-          _WRITE_STEP(AXIS, LOW); \
-        }
+      #define STEP_END(axis, AXIS) _APPLY_STEP(AXIS)(_INVERT_STEP_PIN(AXIS),0)
 
-      STEP_IF_COUNTER(x, X);
-      STEP_IF_COUNTER(y, Y);
-      STEP_IF_COUNTER(z, Z);
+      STEP_END(x, X);
+      STEP_END(y, Y);
+      STEP_END(z, Z);
       #ifndef ADVANCE
-        STEP_IF_COUNTER(e, E);
+        STEP_END(e, E);
       #endif
 
       step_events_completed++;
@@ -886,7 +885,8 @@ void st_init() {
 #endif
 
   #define _STEP_INIT(AXIS) AXIS ##_STEP_INIT
-  #define _DISABLE(axis) disable_## axis()
+  #define _WRITE_STEP(AXIS, HIGHLOW) AXIS ##_STEP_WRITE(HIGHLOW)
+  #define _DISABLE(axis) disable_## axis()  
 
   #define AXIS_INIT(axis, AXIS, PIN) \
     _STEP_INIT(AXIS); \
