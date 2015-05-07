@@ -284,7 +284,9 @@ int HAL_timer_get_count (uint8_t timer_num) {
 	return tc->TC_CHANNEL[channel].TC_RC;
 }
 
-int HAL_timer_get_real_count (Tc* tc, uint32_t channel) {
+uint32_t HAL_timer_get_count_value () {
+  Tc *tc = STEP_TIMER_COUNTER;
+  uint32_t channel = STEP_TIMER_CHANNEL;
   return tc->TC_CHANNEL[channel].TC_CV;
 }
 

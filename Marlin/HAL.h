@@ -133,7 +133,7 @@ void HAL_timer_disable_interrupt (uint8_t timer_num);
 
 void HAL_timer_isr_status (Tc *tc, uint32_t channel);
 int HAL_timer_get_count (uint8_t timer_num);
-int HAL_timer_get_real_count (Tc* tc, uint32_t channel);
+uint32_t HAL_timer_get_count_value ();
 void HAL_timer_clear (Tc* tc, uint32_t channel);
 //
 
