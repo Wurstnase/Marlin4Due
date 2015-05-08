@@ -5533,7 +5533,12 @@ void ClearToSend() {
   #ifdef SDSUPPORT
     if (fromsd[cmd_queue_index_r]) return;
   #endif
-  SERIAL_PROTOCOLLNPGM(MSG_OK);
+  SERIAL_PROTOCOLPGM(MSG_OK);
+  #ifdef ADVANCED_OK
+    SERIAL_PROTOCOLPGM(" N"); SERIAL_PROTOCOL(gcode_LastN);
+    SERIAL_PROTOCOLPGM(" P"); SERIAL_PROTOCOL(BUFSIZE - commands_in_queue);
+  #endif
+  SERIAL_PROTOCOLLNPGM("");  
 }
 
 void get_coordinates() {
