@@ -106,5 +106,23 @@ void microstep_readings();
 #ifdef BABYSTEPPING
   void babystep(const uint8_t axis,const bool direction); // perform a short step with a single stepper motor, outside of any convention
 #endif
+
+typedef struct {
+  int pin;
+  bool inverting;
+} tEndstopConfig;
+
+static const tEndstopConfig EndstopConfig[9] =
+{
+  { X_MIN_PIN, X_MIN_ENDSTOP_INVERTING },
+  { Y_MIN_PIN, Y_MIN_ENDSTOP_INVERTING },
+  { Z_MIN_PIN, Z_MIN_ENDSTOP_INVERTING },
+  { Z_PROBE_PIN, Z_PROBE_ENDSTOP_INVERTING },
+  { X_MAX_PIN, X_MAX_ENDSTOP_INVERTING },
+  { Y_MAX_PIN, Y_MAX_ENDSTOP_INVERTING },
+  { Z_MAX_PIN, Z_MAX_ENDSTOP_INVERTING },
+  { Z2_MIN_PIN, Z2_MIN_ENDSTOP_INVERTING },
+  { Z2_MAX_PIN, Z2_MAX_ENDSTOP_INVERTING },
+};
      
 #endif

@@ -50,9 +50,9 @@ static inline void digitalFastWrite(int pin, bool v) {
   else g_APinDescription[pin].pPort->PIO_CODR = g_APinDescription[pin].ulPin;
 }
 
-// static inline bool digitalFastRead(int pin) {
-  // return PIO_Get(g_APinDescription[pin].pPort, PIO_INPUT, g_APinDescription[pin].ulPin);
-// }
+static inline bool digitalFastRead(int pin) {
+  return PIO_Get(g_APinDescription[pin].pPort, PIO_INPUT, g_APinDescription[pin].ulPin);
+}
 
 #define _FASTREAD(IO) ((bool)(DIO ## IO ## _WPORT -> PIO_PDSR & (MASK(DIO ## IO ## _PIN))))
 
@@ -60,7 +60,7 @@ static inline void digitalFastWrite(int pin, bool v) {
                                 else {DIO ##  IO ## _WPORT -> PIO_CODR = MASK(DIO ## IO ## _PIN); }; \
                           } while (0)
 
-// #define READ(pin) digitalFastRead(pin)
+#define READ_VAR(pin) digitalFastRead(pin)
 #define READ(pin) _FASTREAD(pin)
 #define WRITE_VAR(pin, v) digitalFastWrite(pin, v)
 #define WRITE(pin, v) _FASTWRITE(pin, v)

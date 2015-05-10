@@ -19,6 +19,8 @@
 #define DIGIPOTSS_PIN -1
 #define HEATER_3_PIN -1
 #define TEMP_3_PIN -1
+#define Z2_MIN_PIN -1
+#define Z2_MAX_PIN -1
 
 #if MB(RADDS)
   #include "pins_RADDS.h"
@@ -133,7 +135,7 @@
 #define SENSITIVE_PINS { 0, 1, \
                         X_STEP_PIN, X_DIR_PIN, X_ENABLE_PIN, X_MIN_PIN, X_MAX_PIN, \
                         Y_STEP_PIN, Y_DIR_PIN, Y_ENABLE_PIN, Y_MIN_PIN, Y_MAX_PIN, \
-                        Z_STEP_PIN, Z_DIR_PIN, Z_ENABLE_PIN, Z_MIN_PIN, Z_MAX_PIN, Z_PROBE_PIN, \
+                        Z_STEP_PIN, Z_DIR_PIN, Z_ENABLE_PIN, Z_MIN_PIN, Z_MAX_PIN, Z_PROBE_PIN, Z2_MIN_PIN, Z2_MAX_PIN, \
                         PS_ON_PIN, HEATER_BED_PIN, FAN_PIN, \
                         _E0_PINS _E1_PINS _E2_PINS _E3_PINS \
                         analogInputToDigitalPin(TEMP_BED_PIN) \

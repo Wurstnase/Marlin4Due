@@ -72,11 +72,8 @@ static unsigned short step_loops_nominal;
 
 volatile long endstops_trigsteps[3] = { 0 };
 volatile long endstops_stepsTotal, endstops_stepsDone;
-static volatile char endstop_hit_bits = 0;
-static volatile bool endstop_x_hit = false;
-static volatile bool endstop_y_hit = false;
-static volatile bool endstop_z_hit = false;
-static volatile bool endstop_z_probe_hit = false; // Leaving this in even if Z_PROBE_ENDSTOP isn't defined, keeps code below cleaner. #ifdef it and usage below to save space.
+static volatile int endstop_hit_bits = 0;
+static volatile int old_endstop_bits = 0;
 
 #ifdef ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED
   bool abort_on_endstop_hit = false;
@@ -184,23 +181,22 @@ volatile signed char count_direction[NUM_AXIS] = { 1, 1, 1, 1 };
 #define MultiU32X32toH32(intRes, longIn1, longIn2) intRes = ((uint64_t)longIn1 * longIn2 + 0x80000000) >> 32
 
 void endstops_hit_on_purpose() {
-  endstop_hit_bits = 0;
-  // endstop_x_hit = endstop_y_hit = endstop_z_hit = endstop_z_probe_hit = false; // #ifdef endstop_z_probe_hit = to save space if needed.
+  endstop_hit_bits = 0; // remove any endstop hit
 }
 
 void checkHitEndstops() {
-  if (endstop_hit_bits) { // #ifdef || endstop_z_probe_hit to save space if needed.
+  if (endstop_hit_bits) {
     SERIAL_ECHO_START;
     SERIAL_ECHOPGM(MSG_ENDSTOPS_HIT);
-    if (endstop_hit_bits & BIT(X_MIN)) {
+    if (TEST(endstop_hit_bits, X_MIN) || TEST(endstop_hit_bits, X_MAX)) {
       SERIAL_ECHOPAIR(" X:", (float)endstops_trigsteps[X_AXIS] / axis_steps_per_unit[X_AXIS]);
       LCD_MESSAGEPGM(MSG_ENDSTOPS_HIT "X");
     }
-    if (endstop_hit_bits & BIT(Y_MIN)) {
+    if (TEST(endstop_hit_bits, Y_MIN) || TEST(endstop_hit_bits, Y_MAX)) {
       SERIAL_ECHOPAIR(" Y:", (float)endstops_trigsteps[Y_AXIS] / axis_steps_per_unit[Y_AXIS]);
       LCD_MESSAGEPGM(MSG_ENDSTOPS_HIT "Y");
     }
-    if (endstop_hit_bits & BIT(Z_MIN)) {
+    if (TEST(endstop_hit_bits, Z_MIN) || TEST(endstop_hit_bits, Z_MAX)) {
       SERIAL_ECHOPAIR(" Z:", (float)endstops_trigsteps[Z_AXIS] / axis_steps_per_unit[Z_AXIS]);
       LCD_MESSAGEPGM(MSG_ENDSTOPS_HIT "Z");
     }
@@ -275,6 +271,7 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
 }
 
 // set the stepper direction of each axis
+FORCE_INLINE
 void set_stepper_direction() {
   
     // Set the direction bits (X_AXIS=A_AXIS and Y_AXIS=B_AXIS for COREXY)
@@ -319,7 +316,8 @@ void set_stepper_direction() {
 
 // Initializes the trapezoid generator from the current block. Called whenever a new
 // block begins.
-FORCE_INLINE void trapezoid_generator_reset() {
+FORCE_INLINE
+void trapezoid_generator_reset() {
 
   // Set directions TO DO This should be done once during init of trapezoid. Endstops -> interrupt
   out_bits = current_block->direction_bits;
@@ -351,6 +349,19 @@ FORCE_INLINE void trapezoid_generator_reset() {
   // SERIAL_ECHOPGM("final advance :");
   // SERIAL_ECHOLN(current_block->final_advance/256.0);
 
+}
+
+FORCE_INLINE
+void update_endstop( EndstopEnum endstop, AxisEnum axis ) {
+  // read the endstop current status
+  bool endstop_hit = (READ_VAR(EndstopConfig[endstop].pin) != EndstopConfig[endstop].inverting);
+  
+  if (endstop_hit && TEST(old_endstop_bits, endstop) && (current_block->steps[axis] > 0)) {
+    endstops_trigsteps[axis] = count_position[axis];
+    endstop_hit_bits |= BIT(endstop);
+    step_events_completed = current_block->step_event_count;
+    SERIAL_ECHO("hit "); SERIAL_ECHO(endstop); SERIAL_ECHO(" : "); SERIAL_ECHOLN(axis);
+  }
 }
 
 // "The Stepper Driver Interrupt" - This timer interrupt is the workhorse.
@@ -408,14 +419,14 @@ HAL_STEP_TIMER_ISR {
       #define _ENDSTOP_INVERTING(AXIS, MINMAX) AXIS ##_## MINMAX ##_ENDSTOP_INVERTING
       #define _OLD_ENDSTOP(axis, minmax) old_## axis ##_## minmax ##_endstop
       #define _AXIS(AXIS) AXIS ##_AXIS
-      #define _HIT_BIT(AXIS) AXIS ##_MIN
-      #define _ENDSTOP_HIT(AXIS) endstop_hit_bits |= BIT(_HIT_BIT(AXIS))
+      #define _HIT_BIT(AXIS, MINMAX) AXIS ##_## MINMAX
+      #define _ENDSTOP_HIT(AXIS, MINMAX) endstop_hit_bits |= BIT(_HIT_BIT(AXIS, MINMAX))
 
       #define UPDATE_ENDSTOP(axis,AXIS,minmax,MINMAX) \
         bool _ENDSTOP(axis, minmax) = (READ(_ENDSTOP_PIN(AXIS, MINMAX)) != _ENDSTOP_INVERTING(AXIS, MINMAX)); \
         if (_ENDSTOP(axis, minmax) && _OLD_ENDSTOP(axis, minmax) && (current_block->steps[_AXIS(AXIS)] > 0)) { \
           endstops_trigsteps[_AXIS(AXIS)] = count_position[_AXIS(AXIS)]; \
-          _ENDSTOP_HIT(AXIS); \
+          _ENDSTOP_HIT(AXIS, MINMAX); \
           step_events_completed = current_block->step_event_count; \
         } \
         _OLD_ENDSTOP(axis, minmax) = _ENDSTOP(axis, minmax);
@@ -446,7 +457,8 @@ HAL_STEP_TIMER_ISR {
             #endif
               {
                 #if HAS_X_MAX
-                  UPDATE_ENDSTOP(x, X, max, MAX);
+                  update_endstop(X_MAX, X_AXIS);
+                  //UPDATE_ENDSTOP(x, X, max, MAX);
                 #endif
               }
           }
@@ -553,7 +565,7 @@ HAL_STEP_TIMER_ISR {
         }
         old_z_probe_endstop = z_probe_endstop;
       #endif
-
+      old_endstop_bits = endstop_hit_bits;
     }
 
 
