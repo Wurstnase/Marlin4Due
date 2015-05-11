@@ -35,7 +35,8 @@
 #endif
 
 #if defined(PIDTEMPBED) || defined(PIDTEMP)
-  #define PID_dT ((OVERSAMPLENR * 12.0)/(F_CPU / 64.0 / 256.0))
+  #define PID_dT (((OVERSAMPLENR + 2) * 12.0)/ TEMP_FREQUENCY)
+  #define RECI_PID_dT ( 1 / PID_dT )
 #endif
 
 //===========================================================================
@@ -106,6 +107,11 @@ static volatile bool temp_meas_ready = false;
   static float temp_iState_min[EXTRUDERS];
   static float temp_iState_max[EXTRUDERS];
   static bool pid_reset[EXTRUDERS];
+  #ifdef DEAD_TIME
+    static millis_t previous_millis_heater[EXTRUDERS];
+    static float temp_m1[EXTRUDERS] = { 0 };
+    static float m_4[EXTRUDERS];
+  #endif
 #endif //PIDTEMP
 #ifdef PIDTEMPBED
   //static cannot be external:
@@ -135,6 +141,7 @@ static volatile bool temp_meas_ready = false;
     float Kp[EXTRUDERS] = ARRAY_BY_EXTRUDERS(DEFAULT_Kp, DEFAULT_Kp, DEFAULT_Kp, DEFAULT_Kp);
     float Ki[EXTRUDERS] = ARRAY_BY_EXTRUDERS(DEFAULT_Ki*PID_dT, DEFAULT_Ki*PID_dT, DEFAULT_Ki*PID_dT, DEFAULT_Ki*PID_dT);
     float Kd[EXTRUDERS] = ARRAY_BY_EXTRUDERS(DEFAULT_Kd / PID_dT, DEFAULT_Kd / PID_dT, DEFAULT_Kd / PID_dT, DEFAULT_Kd / PID_dT);
+    short Km[EXTRUDERS] = ARRAY_BY_EXTRUDERS(PID_MAX, PID_MAX, PID_MAX, PID_MAX);
     #ifdef PID_ADD_EXTRUSION_RATE
       float Kc[EXTRUDERS] = ARRAY_BY_EXTRUDERS(DEFAULT_Kc, DEFAULT_Kc, DEFAULT_Kc, DEFAULT_Kc);
     #endif // PID_ADD_EXTRUSION_RATE
@@ -142,6 +149,7 @@ static volatile bool temp_meas_ready = false;
     float Kp = DEFAULT_Kp;
     float Ki = DEFAULT_Ki * PID_dT;
     float Kd = DEFAULT_Kd / PID_dT;
+    short Km = PID_MAX;
     #ifdef PID_ADD_EXTRUSION_RATE
       float Kc = DEFAULT_Kc;
     #endif // PID_ADD_EXTRUSION_RATE
@@ -225,7 +233,7 @@ void PID_autotune(float temp, int extruder, int ncycles)
   if (extruder < 0)
     soft_pwm_bed = bias = d = MAX_BED_POWER / 2;
   else
-    soft_pwm[extruder] = bias = d = PID_MAX / 2;
+    soft_pwm[extruder] = bias = d = PID_PARAM(Km,extruder) / 2;
 
   // PID Tuning loop
   for (;;) {
@@ -480,7 +488,24 @@ void bed_max_temp_error(void) {
 float get_pid_output(int e) {
   float pid_output;
   #ifdef PIDTEMP
-    #ifndef PID_OPENLOOP
+    #if defined(PID_OPENLOOP)
+      pid_output = constrain(target_temperature[e], 0, PID_PARAM(Km,extruder));
+    #elif defined(DEAD_TIME)
+      float m_1;
+      pid_error[e] = target_temperature[e] - current_temperature[e];
+      if (pid_error[e] > PID_FUNCTIONAL_RANGE) {
+        pid_output = BANG_MAX;
+      }
+      else if (pid_error[e] < -PID_FUNCTIONAL_RANGE || target_temperature[e] == 0) {
+        pid_output = 0;
+      }
+      else {
+        m_1 = (current_temperature[e] - temp_m1[e]) * RECI_PID_dT;
+        temp_iState[e] = 1 / PID_PARAM(Kd,e) * ( (PID_PARAM(Kd,e) - 1) * temp_iState[e] + m_1);
+        temp_m1[e] = current_temperature[e];
+        pid_output = (((current_temperature[e] + temp_iState[e] * PID_PARAM(Kp,e)) < target_temperature[e]) ? PID_PARAM(Km,e) : 0);
+      }
+    #else
       pid_error[e] = target_temperature[e] - current_temperature[e];
       if (pid_error[e] > PID_FUNCTIONAL_RANGE) {
         pid_output = BANG_MAX;
@@ -502,9 +527,9 @@ float get_pid_output(int e) {
 
         dTerm[e] = K2 * PID_PARAM(Kd,e) * (current_temperature[e] - temp_dState[e]) + K1 * dTerm[e];
         pid_output = pTerm[e] + iTerm[e] - dTerm[e];
-        if (pid_output > PID_MAX) {
+        if (pid_output > PID_PARAM(Km,extruder)) {
           if (pid_error[e] > 0) temp_iState[e] -= pid_error[e]; // conditional un-integration
-          pid_output = PID_MAX;
+          pid_output = PID_PARAM(Km,extruder);
         }
         else if (pid_output < 0) {
           if (pid_error[e] < 0) temp_iState[e] -= pid_error[e]; // conditional un-integration
@@ -512,8 +537,6 @@ float get_pid_output(int e) {
         }
       }
       temp_dState[e] = current_temperature[e];
-    #else
-      pid_output = constrain(target_temperature[e], 0, PID_MAX);
     #endif //PID_OPENLOOP
 
     #ifdef PID_DEBUG
@@ -531,9 +554,25 @@ float get_pid_output(int e) {
       SERIAL_ECHO(MSG_PID_DEBUG_DTERM);
       SERIAL_ECHOLN(dTerm[e]);
     #endif //PID_DEBUG
+    //#define DEADTIME_DEBUG
+    #ifdef DEADTIME_DEBUG
+      SERIAL_ECHO_START;
+      SERIAL_ECHO(MSG_PID_DEBUG);
+      SERIAL_ECHO(e);
+      SERIAL_ECHO("m1 ");
+      SERIAL_ECHOLN(m_1);
+      SERIAL_ECHO("tmp_i ");
+      SERIAL_ECHOLN(temp_iState[e]);
+      SERIAL_ECHO("pid_output = ");
+      SERIAL_ECHO(pid_output);
+      SERIAL_ECHO("current_temp ");
+      SERIAL_ECHO(current_temperature[e]);
+      SERIAL_ECHO(" * tmp_i * Kp ");
+      SERIAL_ECHOLN(temp_iState[e] * PID_PARAM(Kp,e));
+    #endif //DEADTIME_DEBUG
 
   #else /* PID off */
-    pid_output = (current_temperature[e] < target_temperature[e]) ? PID_MAX : 0;
+    pid_output = (current_temperature[e] < target_temperature[e]) ? PID_PARAM(Km,extruder) : 0;
   #endif
 
   return pid_output;
@@ -1224,7 +1263,7 @@ HAL_TEMP_TIMER_ISR {
     SERIAL_ECHOLN("First start for temperature finished.");
   }
   
-  HAL_timer_isr_status (TEMP_TIMER_NUM);
+  HAL_timer_isr_status (TEMP_TIMER_COUNTER, TEMP_TIMER_CHANNEL);
   #ifndef SLOW_PWM_HEATERS
     /**
      * standard PWM modulation

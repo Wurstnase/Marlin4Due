@@ -64,6 +64,7 @@
 // reset reason set by bootloader
 extern uint8_t MCUSR;
 static uint32_t tone_pin;
+volatile static uint32_t debug_counter;
 
 // --------------------------------------------------------------------------
 // Public functions
@@ -96,8 +97,24 @@ unsigned char eeprom_read_byte(unsigned char *pos);
 
 // timers
 #define STEP_TIMER_NUM 2
+#define STEP_TIMER_COUNTER TC0
+#define STEP_TIMER_CHANNEL 2
+#define STEP_TIMER_IRQN TC2_IRQn
+#define HAL_STEP_TIMER_ISR 	void TC2_Handler()
+
 #define TEMP_TIMER_NUM 3
+#define TEMP_TIMER_COUNTER TC1
+#define TEMP_TIMER_CHANNEL 0
+#define TEMP_FREQUENCY 2000
+
+#define TEMP_TIMER_IRQN TC3_IRQn
+#define HAL_TEMP_TIMER_ISR 	void TC3_Handler()
+
 #define BEEPER_TIMER_NUM 4
+#define BEEPER_TIMER_COUNTER TC1
+#define BEEPER_TIMER_CHANNEL 1
+#define BEEPER_TIMER_IRQN TC4_IRQn
+#define HAL_BEEPER_TIMER_ISR  void TC4_Handler()
 
 #define HAL_TIMER_RATE 		     (F_CPU/2)
 #define TICKS_PER_NANOSECOND   (HAL_TIMER_RATE)/1000
@@ -106,23 +123,23 @@ unsigned char eeprom_read_byte(unsigned char *pos);
 #define DISABLE_STEPPER_DRIVER_INTERRUPT()	HAL_timer_disable_interrupt (STEP_TIMER_NUM)
 
 //
-#define HAL_STEP_TIMER_ISR 	void TC2_Handler()
-#define HAL_TEMP_TIMER_ISR 	void TC3_Handler()
-#define HAL_BEEPER_TIMER_ISR  void TC4_Handler()
 
 void HAL_step_timer_start(void);
 void HAL_temp_timer_start (uint8_t timer_num);
-void HAL_timer_set_count (uint8_t timer_num, uint32_t count);
+void HAL_timer_set_count (Tc *tc, uint32_t channel, uint32_t count);
 
 void HAL_timer_enable_interrupt (uint8_t timer_num);
 void HAL_timer_disable_interrupt (uint8_t timer_num);
 
-void HAL_timer_isr_status (uint8_t timer_num);
+void HAL_timer_isr_status (Tc *tc, uint32_t channel);
 int HAL_timer_get_count (uint8_t timer_num);
+uint32_t HAL_timer_get_count_value ();
+void HAL_timer_clear (Tc* tc, uint32_t channel);
 //
 
 void tone(uint8_t pin, int frequency);
 void noTone(uint8_t pin);
+//void tone(uint8_t pin, int frequency, long duration);
 
 // --------------------------------------------------------------------------
 //
