@@ -256,17 +256,14 @@ void HAL_timer_disable_interrupt (uint8_t timer_num) {
 }
 
 void HAL_timer_set_count (Tc* tc, uint32_t channel, uint32_t count) {
-  // if(count < 210) count = 210;
-	// const tTimerConfig *pConfig = &TimerConfig [timer_num];
-	// pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_RC = count;
-	//TC_SetRC (pConfig->pTimerRegs, pConfig->channel, count);
-  if(count < 210) count = 210;
+  if(count < 130) count = 130;
   
 	tc->TC_CHANNEL[channel].TC_RC = count;
 
-	if(tc->TC_CHANNEL[channel].TC_CV > count) {
+	if(tc->TC_CHANNEL[channel].TC_CV + 20 > count) {
     // debug_counter = count;
-		tc->TC_CHANNEL[channel].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
+		//tc->TC_CHANNEL[channel].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
+    tc->TC_CHANNEL[channel].TC_RC = tc->TC_CHANNEL[channel].TC_CV + 20;
     // TC_Start(pConfig->pTimerRegs, pConfig->channel);
   }
 }

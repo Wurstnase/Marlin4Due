@@ -106,5 +106,66 @@ void microstep_readings();
 #ifdef BABYSTEPPING
   void babystep(const uint8_t axis,const bool direction); // perform a short step with a single stepper motor, outside of any convention
 #endif
+
+#ifdef DUAL_X_CARRIAGE
+  #define X_APPLY_DIR(v,ALWAYS) \
+    if (extruder_duplication_enabled || ALWAYS) { \
+      X_DIR_WRITE(v); \
+      X2_DIR_WRITE(v); \
+    } \
+    else { \
+      if (current_block->active_extruder) X2_DIR_WRITE(v); else X_DIR_WRITE(v); \
+    }
+  #define X_APPLY_STEP(v,ALWAYS) \
+    if (extruder_duplication_enabled || ALWAYS) { \
+      X_STEP_WRITE(v); \
+      X2_STEP_WRITE(v); \
+    } \
+    else { \
+      if (current_block->active_extruder != 0) X2_STEP_WRITE(v); else X_STEP_WRITE(v); \
+    }
+#else
+  #define X_APPLY_DIR(v,Q) X_DIR_WRITE(v)
+  #define X_APPLY_STEP(v,Q) X_STEP_WRITE(v)
+#endif
+
+#ifdef Y_DUAL_STEPPER_DRIVERS
+  #define Y_APPLY_DIR(v,Q) { Y_DIR_WRITE(v); Y2_DIR_WRITE((v) != INVERT_Y2_VS_Y_DIR); }
+  #define Y_APPLY_STEP(v,Q) { Y_STEP_WRITE(v); Y2_STEP_WRITE(v); }
+#else
+  #define Y_APPLY_DIR(v,Q) Y_DIR_WRITE(v)
+  #define Y_APPLY_STEP(v,Q) Y_STEP_WRITE(v)
+#endif
+
+#ifdef Z_DUAL_STEPPER_DRIVERS
+  #define Z_APPLY_DIR(v,Q) { Z_DIR_WRITE(v); Z2_DIR_WRITE(v); }
+  #ifdef Z_DUAL_ENDSTOPS
+    #define Z_APPLY_STEP(v,Q) \
+    if (performing_homing) { \
+      if (Z_HOME_DIR > 0) {\
+        if (!(old_z_max_endstop && (count_direction[Z_AXIS] > 0)) && !locked_z_motor) Z_STEP_WRITE(v); \
+        if (!(old_z2_max_endstop && (count_direction[Z_AXIS] > 0)) && !locked_z2_motor) Z2_STEP_WRITE(v); \
+      } else {\
+        if (!(old_z_min_endstop && (count_direction[Z_AXIS] < 0)) && !locked_z_motor) Z_STEP_WRITE(v); \
+        if (!(old_z2_min_endstop && (count_direction[Z_AXIS] < 0)) && !locked_z2_motor) Z2_STEP_WRITE(v); \
+      } \
+    } else { \
+      Z_STEP_WRITE(v); \
+      Z2_STEP_WRITE(v); \
+    }
+  #else
+    #define Z_APPLY_STEP(v,Q) { Z_STEP_WRITE(v); Z2_STEP_WRITE(v); }
+  #endif
+#else
+  #define Z_APPLY_DIR(v,Q) Z_DIR_WRITE(v)
+  #define Z_APPLY_STEP(v,Q) Z_STEP_WRITE(v)
+#endif
+
+#define E_APPLY_STEP(v,Q) E_STEP_WRITE(v)
+
+inline
+void step( AxisEnum axis ) {
+  
+}
      
 #endif

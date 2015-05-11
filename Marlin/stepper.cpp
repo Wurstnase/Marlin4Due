@@ -54,7 +54,8 @@ static unsigned int cleaning_buffer_counter;
 #endif
 
 // Counter variables for the Bresenham line tracer
-static long counter_x, counter_y, counter_z, counter_e;
+//static long counter_x, counter_y, counter_z, counter_e;
+static long step_counter[NUM_AXIS];
 volatile static unsigned long step_events_completed; // The number of step events executed in the current block
 
 #ifdef ADVANCE
@@ -73,10 +74,6 @@ static unsigned short step_loops_nominal;
 volatile long endstops_trigsteps[3] = { 0 };
 volatile long endstops_stepsTotal, endstops_stepsDone;
 static volatile char endstop_hit_bits = 0;
-static volatile bool endstop_x_hit = false;
-static volatile bool endstop_y_hit = false;
-static volatile bool endstop_z_hit = false;
-static volatile bool endstop_z_probe_hit = false; // Leaving this in even if Z_PROBE_ENDSTOP isn't defined, keeps code below cleaner. #ifdef it and usage below to save space.
 
 #ifdef ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED
   bool abort_on_endstop_hit = false;
@@ -120,62 +117,6 @@ volatile signed char count_direction[NUM_AXIS] = { 1, 1, 1, 1 };
 //===========================================================================
 //================================ functions ================================
 //===========================================================================
-
-#ifdef DUAL_X_CARRIAGE
-  #define X_APPLY_DIR(v,ALWAYS) \
-    if (extruder_duplication_enabled || ALWAYS) { \
-      X_DIR_WRITE(v); \
-      X2_DIR_WRITE(v); \
-    } \
-    else { \
-      if (current_block->active_extruder) X2_DIR_WRITE(v); else X_DIR_WRITE(v); \
-    }
-  #define X_APPLY_STEP(v,ALWAYS) \
-    if (extruder_duplication_enabled || ALWAYS) { \
-      X_STEP_WRITE(v); \
-      X2_STEP_WRITE(v); \
-    } \
-    else { \
-      if (current_block->active_extruder != 0) X2_STEP_WRITE(v); else X_STEP_WRITE(v); \
-    }
-#else
-  #define X_APPLY_DIR(v,Q) X_DIR_WRITE(v)
-  #define X_APPLY_STEP(v,Q) X_STEP_WRITE(v)
-#endif
-
-#ifdef Y_DUAL_STEPPER_DRIVERS
-  #define Y_APPLY_DIR(v,Q) { Y_DIR_WRITE(v); Y2_DIR_WRITE((v) != INVERT_Y2_VS_Y_DIR); }
-  #define Y_APPLY_STEP(v,Q) { Y_STEP_WRITE(v); Y2_STEP_WRITE(v); }
-#else
-  #define Y_APPLY_DIR(v,Q) Y_DIR_WRITE(v)
-  #define Y_APPLY_STEP(v,Q) Y_STEP_WRITE(v)
-#endif
-
-#ifdef Z_DUAL_STEPPER_DRIVERS
-  #define Z_APPLY_DIR(v,Q) { Z_DIR_WRITE(v); Z2_DIR_WRITE(v); }
-  #ifdef Z_DUAL_ENDSTOPS
-    #define Z_APPLY_STEP(v,Q) \
-    if (performing_homing) { \
-      if (Z_HOME_DIR > 0) {\
-        if (!(old_z_max_endstop && (count_direction[Z_AXIS] > 0)) && !locked_z_motor) Z_STEP_WRITE(v); \
-        if (!(old_z2_max_endstop && (count_direction[Z_AXIS] > 0)) && !locked_z2_motor) Z2_STEP_WRITE(v); \
-      } else {\
-        if (!(old_z_min_endstop && (count_direction[Z_AXIS] < 0)) && !locked_z_motor) Z_STEP_WRITE(v); \
-        if (!(old_z2_min_endstop && (count_direction[Z_AXIS] < 0)) && !locked_z2_motor) Z2_STEP_WRITE(v); \
-      } \
-    } else { \
-      Z_STEP_WRITE(v); \
-      Z2_STEP_WRITE(v); \
-    }
-  #else
-    #define Z_APPLY_STEP(v,Q) { Z_STEP_WRITE(v); Z2_STEP_WRITE(v); }
-  #endif
-#else
-  #define Z_APPLY_DIR(v,Q) Z_DIR_WRITE(v)
-  #define Z_APPLY_STEP(v,Q) Z_STEP_WRITE(v)
-#endif
-
-#define E_APPLY_STEP(v,Q) E_STEP_WRITE(v)
 
 // intRes = intIn1 * intIn2 >> 16
 #define MultiU16X8toH16(intRes, charIn1, intIn2)   intRes = ((charIn1) * (intIn2)) >> 16
@@ -377,8 +318,8 @@ HAL_STEP_TIMER_ISR {
     if (current_block) {
       current_block->busy = true;
       trapezoid_generator_reset();
-      counter_x = -(current_block->step_event_count >> 1);
-      counter_y = counter_z = counter_e = counter_x;
+      step_counter[X_AXIS] = -(current_block->step_event_count >> 1);
+      step_counter[Y_AXIS] = step_counter[Z_AXIS] = step_counter[E_AXIS] = step_counter[X_AXIS];
       step_events_completed = 0;
 
       #ifdef Z_LATE_ENABLE
@@ -562,22 +503,22 @@ HAL_STEP_TIMER_ISR {
     for (int8_t i = 0; i < step_loops; i++) {
 
       #ifdef ADVANCE
-        counter_e += current_block->steps[E_AXIS];
-        if (counter_e > 0) {
-          counter_e -= current_block->step_event_count;
+        step_counter[E_AXIS] += current_block->steps[E_AXIS];
+        if (step_counter[E_AXIS] > 0) {
+          step_counter[E_AXIS] -= current_block->step_event_count;
           e_steps[current_block->active_extruder] += TEST(out_bits, E_AXIS) ? -1 : 1;
         }
       #endif //ADVANCE
 
-      #define _COUNTER(axis) counter_## axis
+      #define _COUNTER(AXIS) step_counter[_AXIS(AXIS)]
       #define _APPLY_STEP(AXIS) AXIS ##_APPLY_STEP
       #define _INVERT_STEP_PIN(AXIS) INVERT_## AXIS ##_STEP_PIN
 
       #define STEP_START(axis, AXIS) \
-        _COUNTER(axis) += current_block->steps[_AXIS(AXIS)]; \
-        if (_COUNTER(axis) > 0) { \
+        _COUNTER(AXIS) += current_block->steps[_AXIS(AXIS)]; \
+        if (_COUNTER(AXIS) > 0) { \
           _APPLY_STEP(AXIS)(!_INVERT_STEP_PIN(AXIS),0); \
-          _COUNTER(axis) -= current_block->step_event_count; \
+          _COUNTER(AXIS) -= current_block->step_event_count; \
           count_position[_AXIS(AXIS)] += count_direction[_AXIS(AXIS)]; }
           
       STEP_START(x,X);
