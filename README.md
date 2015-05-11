@@ -6,17 +6,19 @@ Some time ago bobc started with this port. After some time sadly he stopped with
 
 Also a big thanks to all Marlin8bit-developers. Keep on working.
 
-Last but not least, many thanks to Repetier. ~~His ARM-port gives me a lot of inspiration.~~
-It's not just inspiration anymore. I think this ports goes now more to a mix of the ARM-part (Timer, ADC...) of Repetier and the rest (stepper control, temperature control...) with Marlin.
+A big thanks to Repetier! We've talked a lot in the last weeks.
 
 *Wurstnase*
 
+### This is an experimental repository! You should never leave your printer alone.
+
 ### New features are:
-* Steprates up to 320.000 steps/s (top for 1/128 stepper driver)
-* smoother temperature (median of last 5 values)
+* Steprates up to 400kHz
+* First try of Deadtime-Control for heater
  
 ### known issues:
-  * watchdog doesn't work, don't activate it
+* watchdog doesn't work
+* advanced extruder not implemented
 
 ---
 # Marlin 3D Printer Firmware
