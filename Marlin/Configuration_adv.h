@@ -378,7 +378,7 @@ const unsigned int dropsegments=5; //everything with less than this number of st
 //The ASCII buffer for receiving from the serial:
 #define MAX_CMD_SIZE 96
 #define BUFSIZE 4
-
+#define ADVANCED_OK // new advanced ok with last line number and remaining buffer for serial 'ok Nxxx Py'
 // @section fwretract
 
 // Firmware based and LCD controlled retract
