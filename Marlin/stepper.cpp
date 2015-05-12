@@ -73,10 +73,6 @@ static unsigned short step_loops_nominal;
 volatile long endstops_trigsteps[3] = { 0 };
 volatile long endstops_stepsTotal, endstops_stepsDone;
 static volatile char endstop_hit_bits = 0;
-static volatile bool endstop_x_hit = false;
-static volatile bool endstop_y_hit = false;
-static volatile bool endstop_z_hit = false;
-static volatile bool endstop_z_probe_hit = false; // Leaving this in even if Z_PROBE_ENDSTOP isn't defined, keeps code below cleaner. #ifdef it and usage below to save space.
 
 #ifdef ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED
   bool abort_on_endstop_hit = false;
@@ -490,7 +486,7 @@ HAL_STEP_TIMER_ISR {
               z2_min_both = z2_min_endstop && old_z2_min_endstop;
           if ((z_min_both || z2_min_both) && current_block->steps[Z_AXIS] > 0) {
             endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
-            endstop_z_hit = true;
+            endstop_hit_bits = BIT(Z_MIN);
             if (!performing_homing || (performing_homing && z_min_both && z2_min_both)) //if not performing home or if both endstops were trigged during homing...
               step_events_completed = current_block->step_event_count;
           }
@@ -522,7 +518,7 @@ HAL_STEP_TIMER_ISR {
               z2_max_both = z2_max_endstop && old_z2_max_endstop;
           if ((z_max_both || z2_max_both) && current_block->steps[Z_AXIS] > 0) {
             endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
-            endstop_z_hit = true;
+            endstop_hit_bits = BIT(Z_MIN);
 
            // if (z_max_both) SERIAL_ECHOLN("z_max_endstop = true");
            // if (z2_max_both) SERIAL_ECHOLN("z2_max_endstop = true");
@@ -547,7 +543,7 @@ HAL_STEP_TIMER_ISR {
         if(z_probe_endstop && old_z_probe_endstop)
         {
           endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
-          endstop_z_probe_hit=true;
+          endstop_hit_bits = BIT(Z_PROBE);
 
 //            if (z_probe_endstop && old_z_probe_endstop) SERIAL_ECHOLN("z_probe_endstop = true");
         }
