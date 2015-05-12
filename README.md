@@ -19,6 +19,7 @@ A big thanks to Repetier! We've talked a lot in the last weeks.
 ### known issues:
 * watchdog doesn't work
 * advanced extruder not implemented
+* some drivers are too slow, i'm working on a solution
 
 ---
 # Marlin 3D Printer Firmware
