@@ -730,6 +730,9 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
   #define ULTIPANEL
 #endif
 
+// Tiny SSD1306 OLED I2C 128x64 FULL GRAPHICS CONTROLLER
+//#define SSD1306_OLED_I2C_CONTROLLER
+
 // Shift register panels
 // ---------------------
 // 2 wire Non-latching LCD SR from:

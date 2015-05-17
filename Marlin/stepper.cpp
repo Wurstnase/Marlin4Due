@@ -1,22 +1,23 @@
-/*
-  stepper.c - stepper motor driver: executes motion plans using stepper motors
-  Part of Grbl
-
-  Copyright (c) 2009-2011 Simen Svale Skogsrud
-
-  Grbl is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  Grbl is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with Grbl.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/**
+ * stepper.cpp - stepper motor driver: executes motion plans using stepper motors
+ * Marlin Firmware
+ *
+ * Derived from Grbl
+ * Copyright (c) 2009-2011 Simen Svale Skogsrud
+ *
+ * Grbl is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Grbl is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Grbl.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /* The timer calculations of this module informed by the 'RepRap cartesian firmware' by Zack Smith
    and Philipp Tiefenbacher. */
@@ -44,7 +45,7 @@ block_t *current_block;  // A pointer to the block currently being traced
 //static makes it impossible to be called from outside of this file by extern.!
 
 // Variables used by The Stepper Driver Interrupt
-static unsigned char out_bits;        // The next stepping-bits to be output
+static unsigned char out_bits = 0;        // The next stepping-bits to be output
 static unsigned int cleaning_buffer_counter;
 
 #ifdef Z_DUAL_ENDSTOPS
@@ -316,9 +317,10 @@ void set_stepper_direction() {
 // block begins.
 FORCE_INLINE void trapezoid_generator_reset() {
 
-  // Set directions TO DO This should be done once during init of trapezoid. Endstops -> interrupt
-  out_bits = current_block->direction_bits;
-  set_stepper_direction();
+  if (current_block->direction_bits != out_bits) {
+    out_bits = current_block->direction_bits;
+    set_stepper_direction();
+  }
   
   #ifdef ADVANCE
     advance = current_block->initial_advance;
@@ -466,86 +468,100 @@ HAL_STEP_TIMER_ISR {
       #ifdef COREXY
         }
       #endif
-      
-      #if HAS_Z_MIN
+      if (TEST(out_bits, Z_AXIS)) { // z -direction
+        #if HAS_Z_MIN
 
-        #ifdef Z_DUAL_ENDSTOPS
+          #ifdef Z_DUAL_ENDSTOPS
 
-          bool z_min_endstop = READ(Z_MIN_PIN) != Z_MIN_ENDSTOP_INVERTING,
-              z2_min_endstop =
-                #if HAS_Z2_MIN
-                  READ(Z2_MIN_PIN) != Z2_MIN_ENDSTOP_INVERTING
-                #else
-                  z_min_endstop
-                #endif
-              ;
+            bool z_min_endstop = READ(Z_MIN_PIN) != Z_MIN_ENDSTOP_INVERTING,
+                z2_min_endstop =
+                  #if HAS_Z2_MIN
+                    READ(Z2_MIN_PIN) != Z2_MIN_ENDSTOP_INVERTING
+                  #else
+                    z_min_endstop
+                  #endif
+                ;
 
-          bool z_min_both = z_min_endstop && old_z_min_endstop,
-              z2_min_both = z2_min_endstop && old_z2_min_endstop;
-          if ((z_min_both || z2_min_both) && current_block->steps[Z_AXIS] > 0) {
-            endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
+            bool z_min_both = z_min_endstop && old_z_min_endstop,
+                z2_min_both = z2_min_endstop && old_z2_min_endstop;
+            if ((z_min_both || z2_min_both) && current_block->steps[Z_AXIS] > 0) {
+              endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
               endstop_hit_bits |= BIT(Z_MIN);
-            if (!performing_homing || (performing_homing && z_min_both && z2_min_both)) //if not performing home or if both endstops were trigged during homing...
-              step_events_completed = current_block->step_event_count;
-          }
-          old_z_min_endstop = z_min_endstop;
-          old_z2_min_endstop = z2_min_endstop;
+              if (!performing_homing || (performing_homing && z_min_both && z2_min_both)) //if not performing home or if both endstops were trigged during homing...
+                step_events_completed = current_block->step_event_count;
+            }
+            old_z_min_endstop = z_min_endstop;
+            old_z2_min_endstop = z2_min_endstop;
 
-        #else // !Z_DUAL_ENDSTOPS
+          #else // !Z_DUAL_ENDSTOPS
 
-          UPDATE_ENDSTOP(z, Z, min, MIN);
+            UPDATE_ENDSTOP(z, Z, min, MIN);
 
-        #endif // !Z_DUAL_ENDSTOPS
+          #endif // !Z_DUAL_ENDSTOPS
 
-      #endif // Z_MIN_PIN
+        #endif // Z_MIN_PIN
 
-      #if HAS_Z_MAX
-
-        #ifdef Z_DUAL_ENDSTOPS
-
-          bool z_max_endstop = READ(Z_MAX_PIN) != Z_MAX_ENDSTOP_INVERTING,
-              z2_max_endstop =
-                #if HAS_Z2_MAX
-                  READ(Z2_MAX_PIN) != Z2_MAX_ENDSTOP_INVERTING
-                #else
-                  z_max_endstop
-                #endif
-              ;
-
-          bool z_max_both = z_max_endstop && old_z_max_endstop,
-              z2_max_both = z2_max_endstop && old_z2_max_endstop;
-          if ((z_max_both || z2_max_both) && current_block->steps[Z_AXIS] > 0) {
+        #ifdef Z_PROBE_ENDSTOP
+          UPDATE_ENDSTOP(z, Z, probe, PROBE);
+          z_probe_endstop=(READ(Z_PROBE_PIN) != Z_PROBE_ENDSTOP_INVERTING);
+          if(z_probe_endstop && old_z_probe_endstop)
+          {
             endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
-              endstop_hit_bits |= BIT(Z_MIN);
-
-           // if (z_max_both) SERIAL_ECHOLN("z_max_endstop = true");
-           // if (z2_max_both) SERIAL_ECHOLN("z2_max_endstop = true");
-
-            if (!performing_homing || (performing_homing && z_max_both && z2_max_both)) //if not performing home or if both endstops were trigged during homing...
-              step_events_completed = current_block->step_event_count;
-          }
-          old_z_max_endstop = z_max_endstop;
-          old_z2_max_endstop = z2_max_endstop;
-
-        #else // !Z_DUAL_ENDSTOPS
-
-          UPDATE_ENDSTOP(z, Z, max, MAX);
-
-        #endif // !Z_DUAL_ENDSTOPS
-
-      #endif // Z_MAX_PIN
-      
-      #ifdef Z_PROBE_ENDSTOP
-        UPDATE_ENDSTOP(z, Z, probe, PROBE);
-        z_probe_endstop=(READ(Z_PROBE_PIN) != Z_PROBE_ENDSTOP_INVERTING);
-        if(z_probe_endstop && old_z_probe_endstop)
-        {
-          endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
             endstop_hit_bits |= BIT(Z_PROBE);
-//            if (z_probe_endstop && old_z_probe_endstop) SERIAL_ECHOLN("z_probe_endstop = true");
-        }
-        old_z_probe_endstop = z_probe_endstop;
-      #endif
+  //        if (z_probe_endstop && old_z_probe_endstop) SERIAL_ECHOLN("z_probe_endstop = true");
+          }
+          old_z_probe_endstop = z_probe_endstop;
+        #endif
+      }
+      else { // z +direction
+        #if HAS_Z_MAX
+
+          #ifdef Z_DUAL_ENDSTOPS
+
+            bool z_max_endstop = READ(Z_MAX_PIN) != Z_MAX_ENDSTOP_INVERTING,
+                z2_max_endstop =
+                  #if HAS_Z2_MAX
+                    READ(Z2_MAX_PIN) != Z2_MAX_ENDSTOP_INVERTING
+                  #else
+                    z_max_endstop
+                  #endif
+                ;
+
+            bool z_max_both = z_max_endstop && old_z_max_endstop,
+                z2_max_both = z2_max_endstop && old_z2_max_endstop;
+            if ((z_max_both || z2_max_both) && current_block->steps[Z_AXIS] > 0) {
+              endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
+              endstop_hit_bits |= BIT(Z_MIN);
+
+             // if (z_max_both) SERIAL_ECHOLN("z_max_endstop = true");
+             // if (z2_max_both) SERIAL_ECHOLN("z2_max_endstop = true");
+
+              if (!performing_homing || (performing_homing && z_max_both && z2_max_both)) //if not performing home or if both endstops were trigged during homing...
+                step_events_completed = current_block->step_event_count;
+            }
+            old_z_max_endstop = z_max_endstop;
+            old_z2_max_endstop = z2_max_endstop;
+
+          #else // !Z_DUAL_ENDSTOPS
+
+            UPDATE_ENDSTOP(z, Z, max, MAX);
+
+          #endif // !Z_DUAL_ENDSTOPS
+
+        #endif // Z_MAX_PIN
+        
+        #ifdef Z_PROBE_ENDSTOP
+          UPDATE_ENDSTOP(z, Z, probe, PROBE);
+          z_probe_endstop=(READ(Z_PROBE_PIN) != Z_PROBE_ENDSTOP_INVERTING);
+          if(z_probe_endstop && old_z_probe_endstop)
+          {
+            endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
+            endstop_hit_bits |= BIT(Z_PROBE);
+//          if (z_probe_endstop && old_z_probe_endstop) SERIAL_ECHOLN("z_probe_endstop = true");
+          }
+          old_z_probe_endstop = z_probe_endstop;
+        #endif
+      }
 
     }
 
@@ -876,12 +892,12 @@ void st_init() {
     #endif
   #endif
 
-#if (defined(Z_PROBE_PIN) && Z_PROBE_PIN >= 0) && defined(Z_PROBE_ENDSTOP) // Check for Z_PROBE_ENDSTOP so we don't pull a pin high unless it's to be used.
-  SET_INPUT(Z_PROBE_PIN);
-  #ifdef ENDSTOPPULLUP_ZPROBE
+  #if (defined(Z_PROBE_PIN) && Z_PROBE_PIN >= 0) && defined(Z_PROBE_ENDSTOP) // Check for Z_PROBE_ENDSTOP so we don't pull a pin high unless it's to be used.
+    SET_INPUT(Z_PROBE_PIN);
+    #ifdef ENDSTOPPULLUP_ZPROBE
     PULLUP(Z_PROBE_PIN,HIGH);
+    #endif
   #endif
-#endif
 
   #define _STEP_INIT(AXIS) AXIS ##_STEP_INIT
   #define _WRITE_STEP(AXIS, HIGHLOW) AXIS ##_STEP_WRITE(HIGHLOW)
@@ -944,6 +960,8 @@ void st_init() {
 
   enable_endstops(true); // Start with endstops active. After homing they can be disabled
   sei();
+  
+  set_stepper_direction(); // Init directions to out_bits = 0
 }
 
 
@@ -981,9 +999,8 @@ long st_get_position(uint8_t axis) {
 
 #ifdef ENABLE_AUTO_BED_LEVELING
 
-  float st_get_position_mm(uint8_t axis) {
-    float steper_position_in_steps = st_get_position(axis);
-    return steper_position_in_steps / axis_steps_per_unit[axis];
+  float st_get_position_mm(AxisEnum axis) {
+    return st_get_position(axis) / axis_steps_per_unit[axis];
   }
 
 #endif  // ENABLE_AUTO_BED_LEVELING
