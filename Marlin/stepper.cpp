@@ -72,7 +72,7 @@ static unsigned short step_loops_nominal;
 
 volatile long endstops_trigsteps[3] = { 0 };
 volatile long endstops_stepsTotal, endstops_stepsDone;
-static volatile char endstop_hit_bits = 0;
+static volatile char endstop_hit_bits = 0; // use X_MIN, Y_MIN, Z_MIN and Z_PROBE as BIT value
 
 #ifdef ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED
   bool abort_on_endstop_hit = false;
@@ -181,7 +181,6 @@ volatile signed char count_direction[NUM_AXIS] = { 1, 1, 1, 1 };
 
 void endstops_hit_on_purpose() {
   endstop_hit_bits = 0;
-  // endstop_x_hit = endstop_y_hit = endstop_z_hit = endstop_z_probe_hit = false; // #ifdef endstop_z_probe_hit = to save space if needed.
 }
 
 void checkHitEndstops() {
@@ -346,7 +345,6 @@ FORCE_INLINE void trapezoid_generator_reset() {
   // SERIAL_ECHO(current_block->initial_advance/256.0);
   // SERIAL_ECHOPGM("final advance :");
   // SERIAL_ECHOLN(current_block->final_advance/256.0);
-
 }
 
 // "The Stepper Driver Interrupt" - This timer interrupt is the workhorse.
@@ -486,7 +484,7 @@ HAL_STEP_TIMER_ISR {
               z2_min_both = z2_min_endstop && old_z2_min_endstop;
           if ((z_min_both || z2_min_both) && current_block->steps[Z_AXIS] > 0) {
             endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
-            endstop_hit_bits = BIT(Z_MIN);
+              endstop_hit_bits |= BIT(Z_MIN);
             if (!performing_homing || (performing_homing && z_min_both && z2_min_both)) //if not performing home or if both endstops were trigged during homing...
               step_events_completed = current_block->step_event_count;
           }
@@ -518,7 +516,7 @@ HAL_STEP_TIMER_ISR {
               z2_max_both = z2_max_endstop && old_z2_max_endstop;
           if ((z_max_both || z2_max_both) && current_block->steps[Z_AXIS] > 0) {
             endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
-            endstop_hit_bits = BIT(Z_MIN);
+              endstop_hit_bits |= BIT(Z_MIN);
 
            // if (z_max_both) SERIAL_ECHOLN("z_max_endstop = true");
            // if (z2_max_both) SERIAL_ECHOLN("z2_max_endstop = true");
@@ -543,8 +541,7 @@ HAL_STEP_TIMER_ISR {
         if(z_probe_endstop && old_z_probe_endstop)
         {
           endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
-          endstop_hit_bits = BIT(Z_PROBE);
-
+            endstop_hit_bits |= BIT(Z_PROBE);
 //            if (z_probe_endstop && old_z_probe_endstop) SERIAL_ECHOLN("z_probe_endstop = true");
         }
         old_z_probe_endstop = z_probe_endstop;
@@ -575,7 +572,7 @@ HAL_STEP_TIMER_ISR {
           _APPLY_STEP(AXIS)(!_INVERT_STEP_PIN(AXIS),0); \
           _COUNTER(axis) -= current_block->step_event_count; \
           count_position[_AXIS(AXIS)] += count_direction[_AXIS(AXIS)]; }
-          
+
       STEP_START(x,X);
       STEP_START(y,Y);
       STEP_START(z,Z);
@@ -888,7 +885,7 @@ void st_init() {
 
   #define _STEP_INIT(AXIS) AXIS ##_STEP_INIT
   #define _WRITE_STEP(AXIS, HIGHLOW) AXIS ##_STEP_WRITE(HIGHLOW)
-  #define _DISABLE(axis) disable_## axis()  
+  #define _DISABLE(axis) disable_## axis()
 
   #define AXIS_INIT(axis, AXIS, PIN) \
     _STEP_INIT(AXIS); \

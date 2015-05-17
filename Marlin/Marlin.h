@@ -17,6 +17,10 @@
 #include "fastio.h"
 #include "Configuration.h"
 
+#ifndef SANITYCHECK_H
+  #error Your Configuration.h and Configuration_adv.h files are outdated!
+#endif
+
 #if (ARDUINO >= 100)
   #include "Arduino.h"
 #else
@@ -105,7 +109,6 @@ FORCE_INLINE void serialprintPGM(const char *str) {
 }
 
 void get_command();
-void process_commands();
 
 void manage_inactivity(bool ignore_stepper_queue=false);
 
@@ -197,9 +200,8 @@ void enable_all_steppers();
 void disable_all_steppers();
 
 void FlushSerialRequestResend();
-void ClearToSend();
+void ok_to_send();
 
-void get_coordinates();
 #ifdef DELTA
   void calculate_delta(float cartesian[3]);
   #ifdef ENABLE_AUTO_BED_LEVELING
