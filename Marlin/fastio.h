@@ -1,6 +1,6 @@
 /*
  Contributors:
-    Copyright (c) 2014 Bob Cousins bobcousins42@googlemail.com
+    Copyright (c) 2015 Nico Tonnhofer wurstnase.reprap@gmail.com
 */
 /* **************************************************************************
  This program is free software: you can redistribute it and/or modify
