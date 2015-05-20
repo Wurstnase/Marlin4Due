@@ -1436,14 +1436,12 @@ static void setup_for_endstop_move() {
     run_z_probe();
     float measured_z = current_position[Z_AXIS];
 
-	#if 0
     #if Z_RAISE_BETWEEN_PROBINGS > 0
       if (probe_action == ProbeStay) {
         do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS); // this also updates current_position
         st_synchronize();
       }
     #endif
-	#endif
 
     #if !defined(Z_PROBE_SLED) && !defined(Z_PROBE_ALLEN_KEY)
       if (probe_action & ProbeStow) stow_z_probe();
@@ -2831,7 +2829,13 @@ inline void gcode_G92() {
         didXYZ = true;
     }
   }
-  if (didXYZ) sync_plan_position();
+  if (didXYZ) {
+    #if defined(DELTA) || defined(SCARA)
+      sync_plan_position_delta();
+    #else
+      sync_plan_position();
+    #endif
+  }
 }
 
 #ifdef ULTIPANEL
