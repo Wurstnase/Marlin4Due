@@ -35,15 +35,11 @@
 #include "ultralcd_st7920_u8glib_rrd.h"
 #include "Configuration.h"
 
-// save 3120 bytes of PROGMEM by commenting out #define USE_BIG_EDIT_FONT
-// we don't have a big font for Cyrillic, Kana
-#if defined(MAPPER_C2C3) || defined(MAPPER_NON)
-  //#define USE_BIG_EDIT_FONT
+#if !defined(MAPPER_C2C3) && !defined(MAPPER_NON) && defined(USE_BIG_EDIT_FONT)
+   #undef USE_BIG_EDIT_FONT
 #endif
 
-// If you have spare 2300Byte of progmem and want to use a 
-// smaller font on the Info-screen uncomment the next line.
-//#define USE_SMALL_INFOFONT
+
 #ifdef USE_SMALL_INFOFONT
   #include "dogm_font_data_6x9_marlin.h"
   #define FONT_STATUSMENU_NAME u8g_font_6x9
@@ -126,6 +122,9 @@
 #elif defined(VIKI2) || defined(miniVIKI)
   // Mini Viki and Viki 2.0 LCD, ST7565 controller as well
   U8GLIB_NHD_C12864 u8g(DOGLCD_CS, DOGLCD_A0);
+#elif defined(U8GLIB_LM6059_AF)
+  // Based on the Adafruit ST7565 (http://www.adafruit.com/products/250)
+  U8GLIB_LM6059 u8g(DOGLCD_CS, DOGLCD_A0);
 #else
   // for regular DOGM128 display with HW-SPI
   U8GLIB_DOGM128 u8g(DOGLCD_CS, DOGLCD_A0);  // HW-SPI Com: CS, A0
@@ -192,23 +191,23 @@ static void lcd_implementation_init() {
 
   #ifdef LCD_PIN_BL // Enable LCD backlight
     pinMode(LCD_PIN_BL, OUTPUT);
-	  digitalWrite(LCD_PIN_BL, HIGH);
+    digitalWrite(LCD_PIN_BL, HIGH);
   #endif
 
-  u8g.setContrast(lcd_contrast);	
-	// FIXME: remove this workaround
+  u8g.setContrast(lcd_contrast);  
+  // FIXME: remove this workaround
   // Uncomment this if you have the first generation (V1.10) of STBs board
-  // pinMode(17, OUTPUT);	// Enable LCD backlight
+  // pinMode(17, OUTPUT); // Enable LCD backlight
   // digitalWrite(17, HIGH);
 
   #ifdef LCD_SCREEN_ROT_90
     u8g.setRot90();   // Rotate screen by 90°
   #elif defined(LCD_SCREEN_ROT_180)
-    u8g.setRot180();	// Rotate screen by 180°
+    u8g.setRot180();  // Rotate screen by 180°
   #elif defined(LCD_SCREEN_ROT_270)
-    u8g.setRot270();	// Rotate screen by 270°
+    u8g.setRot270();  // Rotate screen by 270°
   #endif
-	
+  
   // Show splashscreen
   int offx = (u8g.getWidth() - START_BMPWIDTH) / 2;
   #ifdef START_BMPHIGH
@@ -219,7 +218,7 @@ static void lcd_implementation_init() {
 
   int txt1X = (u8g.getWidth() - (sizeof(STRING_SPLASH_LINE1) - 1)*DOG_CHAR_WIDTH) / 2;
 
-	u8g.firstPage();
+  u8g.firstPage();
   do {
     if (show_splashscreen) {
       u8g.drawBitmapP(offx, offy, START_BMPBYTEWIDTH, START_BMPHEIGHT, start_bmp);
