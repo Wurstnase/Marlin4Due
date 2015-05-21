@@ -273,44 +273,44 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
 // set the stepper direction of each axis
 void set_stepper_direction() {
   
-    // Set the direction bits (X_AXIS=A_AXIS and Y_AXIS=B_AXIS for COREXY)
-    if (TEST(out_bits, X_AXIS)) {
-      X_APPLY_DIR(INVERT_X_DIR,0);
-      count_direction[X_AXIS] = -1;
-    }
-    else {
-      X_APPLY_DIR(!INVERT_X_DIR,0);
-      count_direction[X_AXIS] = 1;
-    }
+  // Set the direction bits (X_AXIS=A_AXIS and Y_AXIS=B_AXIS for COREXY)
+  if (TEST(out_bits, X_AXIS)) {
+    X_APPLY_DIR(INVERT_X_DIR,0);
+    count_direction[X_AXIS] = -1;
+  }
+  else {
+    X_APPLY_DIR(!INVERT_X_DIR,0);
+    count_direction[X_AXIS] = 1;
+  }
 
-    if (TEST(out_bits, Y_AXIS)) {
-      Y_APPLY_DIR(INVERT_Y_DIR,0);
-      count_direction[Y_AXIS] = -1;
+  if (TEST(out_bits, Y_AXIS)) {
+    Y_APPLY_DIR(INVERT_Y_DIR,0);
+    count_direction[Y_AXIS] = -1;
+  }
+  else {
+    Y_APPLY_DIR(!INVERT_Y_DIR,0);
+    count_direction[Y_AXIS] = 1;
+  }
+  
+  if (TEST(out_bits, Z_AXIS)) {
+    Z_APPLY_DIR(INVERT_Z_DIR,0);
+    count_direction[Z_AXIS] = -1;
+  }
+  else {
+    Z_APPLY_DIR(!INVERT_Z_DIR,0);
+    count_direction[Z_AXIS] = 1;
+  }
+  
+  #ifndef ADVANCE
+    if (TEST(out_bits, E_AXIS)) {
+      REV_E_DIR();
+      count_direction[E_AXIS] = -1;
     }
     else {
-      Y_APPLY_DIR(!INVERT_Y_DIR,0);
-      count_direction[Y_AXIS] = 1;
+      NORM_E_DIR();
+      count_direction[E_AXIS] = 1;
     }
-    
-    if (TEST(out_bits, Z_AXIS)) {
-      Z_APPLY_DIR(INVERT_Z_DIR,0);
-      count_direction[Z_AXIS] = -1;
-    }
-    else {
-      Z_APPLY_DIR(!INVERT_Z_DIR,0);
-      count_direction[Z_AXIS] = 1;
-    }
-    
-    #ifndef ADVANCE
-      if (TEST(out_bits, E_AXIS)) {
-        REV_E_DIR();
-        count_direction[E_AXIS] = -1;
-      }
-      else {
-        NORM_E_DIR();
-        count_direction[E_AXIS] = 1;
-      }
-    #endif
+  #endif //!ADVANCE
 }
 
 // Initializes the trapezoid generator from the current block. Called whenever a new

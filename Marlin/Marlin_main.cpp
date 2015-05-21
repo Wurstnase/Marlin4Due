@@ -840,7 +840,7 @@ void get_command() {
       }
 
       // If command was e-stop process now
-      if (strcmp(command, "M112") == 0) kill();
+      if (strcmp(command, "M112") == 0) kill(PSTR(MSG_KILLED));
 
       cmd_queue_index_w = (cmd_queue_index_w + 1) % BUFSIZE;
       commands_in_queue += 1;
@@ -1436,14 +1436,14 @@ static void setup_for_endstop_move() {
     run_z_probe();
     float measured_z = current_position[Z_AXIS];
 
-	#if 0
+  #if 0
     #if Z_RAISE_BETWEEN_PROBINGS > 0
       if (probe_action == ProbeStay) {
         do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS); // this also updates current_position
         st_synchronize();
       }
     #endif
-	#endif
+  #endif
 
     #if !defined(Z_PROBE_SLED) && !defined(Z_PROBE_ALLEN_KEY)
       if (probe_action & ProbeStow) stow_z_probe();
@@ -2831,7 +2831,13 @@ inline void gcode_G92() {
         didXYZ = true;
     }
   }
-  if (didXYZ) sync_plan_position();
+  if (didXYZ) {
+    #if defined(DELTA) || defined(SCARA)
+      sync_plan_position_delta();
+    #else
+      sync_plan_position();
+    #endif
+  }
 }
 
 #ifdef ULTIPANEL
@@ -3591,7 +3597,7 @@ inline void gcode_M111() {
 /**
  * M112: Emergency Stop
  */
-inline void gcode_M112() { kill(); }
+inline void gcode_M112() { kill(PSTR(MSG_KILLED)); }
 
 #ifdef BARICUDA
 
@@ -6245,7 +6251,7 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
 
   millis_t ms = millis();
 
-  if (max_inactive_time && ms > previous_cmd_ms + max_inactive_time) kill();
+  if (max_inactive_time && ms > previous_cmd_ms + max_inactive_time) kill(PSTR(MSG_KILLED));
 
   if (stepper_inactive_time && ms > previous_cmd_ms + stepper_inactive_time
       && !ignore_stepper_queue && !blocks_queued())
@@ -6273,7 +6279,7 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
     // Exceeded threshold and we can confirm that it was not accidental
     // KILL the machine
     // ----------------------------------------------------------------
-    if (killCount >= KILL_DELAY) kill();
+    if (killCount >= KILL_DELAY) kill(PSTR(MSG_KILLED));
   #endif
 
   #if HAS_HOME
@@ -6374,11 +6380,13 @@ void manage_inactivity(bool ignore_stepper_queue/*=false*/) {
   check_axes_activity();
 }
 
-void kill()
-{
+void kill(const char *lcd_msg) {
+  #ifdef ULTRA_LCD
+    lcd_setalertstatuspgm(lcd_msg);
+  #endif
+
   cli(); // Stop interrupts
   disable_all_heaters();
-
   disable_all_steppers();
 
   #if HAS_POWER_SWITCH
@@ -6387,7 +6395,6 @@ void kill()
 
   SERIAL_ERROR_START;
   SERIAL_ERRORLNPGM(MSG_ERR_KILLED);
-  LCD_ALERTMESSAGEPGM(MSG_KILLED);
   
   // FMC small patch to update the LCD before ending
   sei();   // enable interrupts

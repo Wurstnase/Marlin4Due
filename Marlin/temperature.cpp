@@ -320,7 +320,8 @@ void PID_autotune(float temp, int extruder, int ncycles)
         }
       } 
     }
-    if (input > temp + 20) {
+    #define MAX_OVERSHOOT_PID_AUTOTUNE 20
+    if (input > temp + MAX_OVERSHOOT_PID_AUTOTUNE) {
       SERIAL_PROTOCOLLNPGM(MSG_PID_TEMP_TOO_HIGH);
       return;
     }
@@ -457,31 +458,28 @@ void checkExtruderAutoFans()
 inline void _temp_error(int e, const char *serial_msg, const char *lcd_msg) {
   if (IsRunning()) {
     SERIAL_ERROR_START;
-    if (e >= 0) SERIAL_ERRORLN((int)e);
     serialprintPGM(serial_msg);
-    MYSERIAL.write('\n');
-    #ifdef ULTRA_LCD
-      lcd_setalertstatuspgm(lcd_msg);
-    #endif
+    SERIAL_ERRORPGM(MSG_STOPPED_HEATER);
+    if (e >= 0) SERIAL_ERRORLN((int)e); else SERIAL_ERRORLNPGM(MSG_HEATER_BED);
   }
   #ifndef BOGUS_TEMPERATURE_FAILSAFE_OVERRIDE
-    Stop();
+    kill(lcd_msg);
   #endif
 }
 
 void max_temp_error(uint8_t e) {
   disable_all_heaters();
-  _temp_error(e, PSTR(MSG_MAXTEMP_EXTRUDER_OFF), PSTR(MSG_ERR_MAXTEMP));
+  _temp_error(e, PSTR(MSG_T_MAXTEMP), PSTR(MSG_ERR_MAXTEMP));
 }
 void min_temp_error(uint8_t e) {
   disable_all_heaters();
-  _temp_error(e, PSTR(MSG_MINTEMP_EXTRUDER_OFF), PSTR(MSG_ERR_MINTEMP));
+  _temp_error(e, PSTR(MSG_T_MINTEMP), PSTR(MSG_ERR_MINTEMP));
 }
 void bed_max_temp_error(void) {
   #if HAS_HEATER_BED
     WRITE_HEATER_BED(0);
   #endif
-  _temp_error(-1, PSTR(MSG_MAXTEMP_BED_OFF), PSTR(MSG_ERR_MAXTEMP_BED));
+  _temp_error(-1, PSTR(MSG_T_MAXTEMP), PSTR(MSG_ERR_MAXTEMP_BED));
 }
 
 float get_pid_output(int e) {
@@ -666,8 +664,7 @@ void manage_heater() {
         // Has it failed to increase enough?
         if (degHotend(e) < watch_target_temp[e]) {
           // Stop!
-          disable_all_heaters();
-          _temp_error(e, PSTR(MSG_HEATING_FAILED), PSTR(MSG_HEATING_FAILED_LCD));
+          _temp_error(e, PSTR(MSG_T_HEATING_FAILED), PSTR(MSG_HEATING_FAILED_LCD));
         }
         else {
           // Start again if the target is still far off
@@ -762,7 +759,7 @@ static float analog2temp(int raw, uint8_t e) {
       SERIAL_ERROR_START;
       SERIAL_ERROR((int)e);
       SERIAL_ERRORLNPGM(MSG_INVALID_EXTRUDER_NUM);
-      kill();
+      kill(PSTR(MSG_KILLED));
       return 0.0;
     } 
 
@@ -1083,16 +1080,7 @@ void tp_init() {
           *state = TRRunaway;
         break;
       case TRRunaway:
-        SERIAL_ERROR_START;
-        SERIAL_ERRORLNPGM(MSG_THERMAL_RUNAWAY_STOP);
-        if (heater_id < 0) SERIAL_ERRORLNPGM("bed"); else SERIAL_ERRORLN(heater_id);
-        LCD_ALERTMESSAGEPGM(MSG_THERMAL_RUNAWAY);
-        disable_all_heaters();
-        disable_all_steppers();
-        for (;;) {
-          manage_heater();
-          lcd_update();
-        }
+        _temp_error(heater_id, PSTR(MSG_T_THERMAL_RUNAWAY), PSTR(MSG_THERMAL_RUNAWAY));
     }
   }
 
