@@ -41,8 +41,8 @@
 #define X_MAX_PIN          34  // 34   //Max endstops default to disabled "-1", set to commented value to enable.
 #define Y_MIN_PIN          30
 #define Y_MAX_PIN          36  // 36
-#define Z_MIN_PIN          -1  // 32
-#define Z_MAX_PIN          32  // 38
+#define Z_MIN_PIN          32  // 32
+#define Z_MAX_PIN          38  // 38
 
 #define E0_STEP_PIN        61
 #define E0_DIR_PIN         60
