@@ -197,11 +197,7 @@ void checkHitEndstops() {
         card.sdprinting = false;
         card.closefile();
         quickStop();
-        setTargetHotend0(0);
-        setTargetHotend1(0);
-        setTargetHotend2(0);
-        setTargetHotend3(0);
-        setTargetBed(0);
+        disable_all_heaters(); // switch off all heaters.
       }
     #endif
   }
@@ -336,7 +332,7 @@ FORCE_INLINE void trapezoid_generator_reset() {
 HAL_STEP_TIMER_ISR {
   HAL_timer_isr_status (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL);
 
-  if(cleaning_buffer_counter)
+  if (cleaning_buffer_counter)
   {
     current_block = NULL;
     plan_discard_current_block();
