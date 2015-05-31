@@ -29,8 +29,9 @@
 
 #define BIT(b) (1<<(b))
 #define TEST(n,b) (((n)&BIT(b))!=0)
+#define SET_BIT(n,b,value) (n) ^= ((-value)^(n)) & (BIT(b))
 #define RADIANS(d) ((d)*M_PI/180.0)
-#define DEGREES(r) ((d)*180.0/M_PI)
+#define DEGREES(r) ((r)*180.0/M_PI)
 #define NOLESS(v,n) do{ if (v < n) v = n; }while(0)
 #define NOMORE(v,n) do{ if (v > n) v = n; }while(0)
 
@@ -109,6 +110,8 @@ FORCE_INLINE void serialprintPGM(const char *str) {
 }
 
 void get_command();
+
+void idle(); // the standard idle routine calls manage_inactivity(false)
 
 void manage_inactivity(bool ignore_stepper_queue=false);
 
@@ -194,7 +197,7 @@ void manage_inactivity(bool ignore_stepper_queue=false);
  */
 enum AxisEnum {X_AXIS=0, Y_AXIS=1, A_AXIS=0, B_AXIS=1, Z_AXIS=2, E_AXIS=3, X_HEAD=4, Y_HEAD=5};
 
-enum EndstopEnum {X_MIN=0, Y_MIN=1, Z_MIN=2, Z_PROBE=3, X_MAX=4, Y_MAX=5, Z_MAX=6};
+enum EndstopEnum {X_MIN=0, Y_MIN=1, Z_MIN=2, Z_PROBE=3, X_MAX=4, Y_MAX=5, Z_MAX=6, Z2_MIN=7, Z2_MAX=8};
 
 void enable_all_steppers();
 void disable_all_steppers();

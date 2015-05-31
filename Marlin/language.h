@@ -20,6 +20,7 @@
 // de       German
 // es       Spanish
 // ru       Russian
+// bg       Bulgarian
 // it       Italian
 // pt       Portuguese
 // pt-br    Portuguese (Brazil)
@@ -59,21 +60,8 @@
 #elif MB(SAV_MKI)
   #define MACHINE_NAME "SAV MkI"
   #define FIRMWARE_URL "https://github.com/fmalpartida/Marlin/tree/SAV-MkI-config"
-#elif MB(WITBOX)
-  #define MACHINE_NAME "WITBOX"
-  #define FIRMWARE_URL "http://www.bq.com/gb/downloads-witbox.html"
-#elif MB(HEPHESTOS)
-  #define MACHINE_NAME "HEPHESTOS"
-  #define FIRMWARE_URL "http://www.bq.com/gb/downloads-prusa-i3-hephestos.html"
-#elif MB(BRAINWAVE_PRO)
-  #define MACHINE_NAME "Kossel Pro"
-  #ifndef FIRMWARE_URL
-    #define FIRMWARE_URL "https://github.com/OpenBeamUSA/Marlin/"
-  #endif
-#else
-  #ifndef MACHINE_NAME
-    #define MACHINE_NAME "3D Printer"
-  #endif
+#elif !defined(MACHINE_NAME)
+  #define MACHINE_NAME "3D Printer"
 #endif
 
 #ifdef CUSTOM_MENDEL_NAME
@@ -134,12 +122,6 @@
 #define MSG_END_FILE_LIST                   "End file list"
 #define MSG_INVALID_EXTRUDER                "Invalid extruder"
 #define MSG_INVALID_SOLENOID                "Invalid solenoid"
-#define MSG_M104_INVALID_EXTRUDER           "M104 " MSG_INVALID_EXTRUDER " "
-#define MSG_M105_INVALID_EXTRUDER           "M105 " MSG_INVALID_EXTRUDER " "
-#define MSG_M109_INVALID_EXTRUDER           "M109 " MSG_INVALID_EXTRUDER " "
-#define MSG_M200_INVALID_EXTRUDER           "M200 " MSG_INVALID_EXTRUDER " "
-#define MSG_M218_INVALID_EXTRUDER           "M218 " MSG_INVALID_EXTRUDER " "
-#define MSG_M221_INVALID_EXTRUDER           "M221 " MSG_INVALID_EXTRUDER " "
 #define MSG_ERR_NO_THERMISTORS              "No thermistors - no temperature"
 #define MSG_HEATING                         "Heating..."
 #define MSG_HEATING_COMPLETE                "Heating done."
