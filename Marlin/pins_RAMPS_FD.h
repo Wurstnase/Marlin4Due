@@ -6,7 +6,7 @@
 
 //
 #ifdef MB(RAMPS_FD_V1)
-  #define INVERTED_HEATER_PINS
+  //#define INVERTED_HEATER_PINS
   // No EEPROM
   // Use 4k7 thermistor tables
 #else
@@ -18,20 +18,20 @@
 #define X_STEP_PIN         63
 #define X_DIR_PIN          62
 #define X_ENABLE_PIN       48
-#define X_MIN_PIN          22
-#define X_MAX_PIN          2
+#define X_MIN_PIN          -1 //22
+#define X_MAX_PIN          30
 
 #define Y_STEP_PIN         65
 #define Y_DIR_PIN          64
 #define Y_ENABLE_PIN       46
-#define Y_MIN_PIN          24
-#define Y_MAX_PIN          15
+#define Y_MIN_PIN          -1 //24
+#define Y_MAX_PIN          38
 
 #define Z_STEP_PIN         67
 #define Z_DIR_PIN          66
 #define Z_ENABLE_PIN       44
 #define Z_MIN_PIN          26
-#define Z_MAX_PIN          -1
+#define Z_MAX_PIN          34
 
 #define E0_STEP_PIN        36
 #define E0_DIR_PIN         28
@@ -51,17 +51,17 @@
 
 #define BEEPER             -1
 
-#define FAN_PIN            -1
+#define FAN_PIN            10 //fet3
 
 #define PS_ON_PIN          -1
 
 #define KILL_PIN           -1
 
 
-#define HEATER_BED_PIN     8    // BED
+#define HEATER_BED_PIN     9    // BED
 
-#define HEATER_0_PIN       9
-#define HEATER_1_PIN       10
+#define HEATER_0_PIN       8
+#define HEATER_1_PIN       -1
 #define HEATER_2_PIN       11
 
 #define TEMP_BED_PIN       0   // ANALOG NUMBERING
@@ -91,7 +91,6 @@
     #endif
   #endif
 
-
   #ifdef ULTRA_LCD
 
     #ifdef NEWPANEL
@@ -111,7 +110,16 @@
         #define BTN_ENC 35
 
         #define SDCARDDETECT 49
-        #endif
+     
+      #elif defined(SSD1306_OLED_I2C_CONTROLLER)
+        #define BTN_EN1 31
+        #define BTN_EN2 33
+        #define BTN_ENC 35
+        #define BEEPER -1
+        #define LCD_SDSS 49
+        #define SDCARDDETECT 37
+        #define KILL_PIN 39
+      #endif
 
       #endif
 

@@ -149,7 +149,17 @@
       #define BTN_ENC 35
 
       #define SDCARDDETECT 49
-    #elif defined(LCD_I2C_PANELOLU2)
+          
+      #elif defined(SSD1306_OLED_I2C_CONTROLLER)
+        #define BTN_EN1 31
+        #define BTN_EN2 33
+        #define BTN_ENC 35
+        #define BEEPER -1
+        #define LCD_SDSS 49
+        #define SDCARDDETECT 37
+        #define KILL_PIN 39
+      
+     #elif defined(LCD_I2C_PANELOLU2)
       #define BTN_EN1 47  // reverse if the encoder turns the wrong way.
       #define BTN_EN2 43
       #define BTN_ENC 32
