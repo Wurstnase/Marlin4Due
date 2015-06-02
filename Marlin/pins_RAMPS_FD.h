@@ -19,13 +19,13 @@
 #define X_STEP_PIN         63
 #define X_DIR_PIN          62
 #define X_ENABLE_PIN       48
-#define X_MIN_PIN          -1 //22
+#define X_MIN_PIN          22
 #define X_MAX_PIN          30
 
 #define Y_STEP_PIN         65
 #define Y_DIR_PIN          64
 #define Y_ENABLE_PIN       46
-#define Y_MIN_PIN          -1 //24
+#define Y_MIN_PIN          24
 #define Y_MAX_PIN          38
 
 #define Z_STEP_PIN         67
