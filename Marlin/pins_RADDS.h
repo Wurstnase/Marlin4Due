@@ -128,8 +128,18 @@
 			#undef SDSS
 			#define SDSS  10
 			#define SDCARDDETECT 14
-	  #endif
-	#endif
+          
+         #elif defined(SSD1306_OLED_I2C_CONTROLLER)
+                        #define BTN_EN1 50
+                        #define BTN_EN2 52
+                        #define BTN_ENC 48
+                        #define BEEPER 41
+                        #define LCD_SDSS 10
+                        #define SDCARDDETECT 14
+                        #define KILL_PIN -1
+      
+           #endif
+       #endif
 
 #endif //ULTRA_LCD
 

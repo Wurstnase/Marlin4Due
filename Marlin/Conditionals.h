@@ -1,4 +1,4 @@
-/**
+  /**
  * Conditionals.h
  * Defines that depend on configuration but are not editable.
  */
@@ -47,6 +47,14 @@
     #define U8GLIB_ST7920
     #define REPRAP_DISCOUNT_SMART_CONTROLLER
   #endif
+  
+  #ifdef SSD1306_OLED_I2C_CONTROLLER
+    #define DOGLCD
+    #define U8GLIB_SSD1306
+    #define ULTIPANEL
+    #define NEWPANEL
+  #endif
+
 
   #if defined(ULTIMAKERCONTROLLER) || defined(REPRAP_DISCOUNT_SMART_CONTROLLER) || defined(G3D_PANEL)
     #define ULTIPANEL
@@ -200,6 +208,9 @@
   #ifdef DOGLCD
     #define HAS_LCD_CONTRAST
     #ifdef U8GLIB_ST7920
+      #undef HAS_LCD_CONTRAST
+    #endif  
+    #ifdef SSD1306_OLED_I2C_CONTROLLER
       #undef HAS_LCD_CONTRAST
     #endif
   #endif
