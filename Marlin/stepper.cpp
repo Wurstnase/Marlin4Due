@@ -465,7 +465,7 @@ HAL_STEP_TIMER_ISR {
               #if HAS_Z2_MIN
                 SET_ENDSTOP_BIT(Z2, MIN);
               #else
-                COPY_BIT(current_endstop_bits, Z_MIN, Z2_MIN)
+                COPY_BIT(current_endstop_bits, Z_MIN, Z2_MIN);
               #endif
 
             byte z_test = TEST_ENDSTOP(Z_MIN) << 0 + TEST_ENDSTOP(Z2_MIN) << 1; // bit 0 for Z, bit 1 for Z2
@@ -473,8 +473,8 @@ HAL_STEP_TIMER_ISR {
             if (z_test && current_block->steps[Z_AXIS] > 0) { // z_test = Z_MIN || Z2_MIN
               endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
               endstop_hit_bits |= BIT(Z_MIN);
-              if (!performing_homing || (performing_homing && !((~z_test) & 0x3)))  //if not performing home or if both endstops were trigged during homing...
-                step_events_completed = current_block->step_event_count;            //!((~z_test) & 0x3) = Z_MIN && Z2_MIN
+              if (!performing_homing || (z_test == 0x3))  //if not performing home or if both endstops were trigged during homing...
+                step_events_completed = current_block->step_event_count;
             }
           #else // !Z_DUAL_ENDSTOPS
 
@@ -484,7 +484,6 @@ HAL_STEP_TIMER_ISR {
 
         #ifdef Z_PROBE_ENDSTOP
           UPDATE_ENDSTOP(Z, PROBE);
-          SET_ENDSTOP_BIT(Z, PROBE);
 
           if (TEST_ENDSTOP(Z_PROBE))
           {
@@ -510,8 +509,8 @@ HAL_STEP_TIMER_ISR {
             if (z_test && current_block->steps[Z_AXIS] > 0) {  // t_test = Z_MAX || Z2_MAX
               endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
               endstop_hit_bits |= BIT(Z_MIN);
-              if (!performing_homing || (performing_homing && !((~z_test) & 0x3)))  //if not performing home or if both endstops were trigged during homing...
-                step_events_completed = current_block->step_event_count;            //!((~z_test) & 0x3) = Z_MAX && Z2_MAX
+              if (!performing_homing || (z_test == 0x3))  //if not performing home or if both endstops were trigged during homing...
+                step_events_completed = current_block->step_event_count;
             }
 
           #else // !Z_DUAL_ENDSTOPS
@@ -523,7 +522,7 @@ HAL_STEP_TIMER_ISR {
         
         #ifdef Z_PROBE_ENDSTOP
           UPDATE_ENDSTOP(Z, PROBE);
-          SET_ENDSTOP_BIT(Z, PROBE);
+          
           if (TEST_ENDSTOP(Z_PROBE))
           {
             endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];

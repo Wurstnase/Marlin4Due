@@ -207,6 +207,9 @@
     #ifdef U8GLIB_ST7920
       #undef HAS_LCD_CONTRAST
     #endif
+    #ifdef U8GLIB_SSD1306
+      #undef HAS_LCD_CONTRAST
+    #endif  
   #endif
 
 #else // CONFIGURATION_LCD

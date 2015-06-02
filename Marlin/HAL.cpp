@@ -351,6 +351,29 @@ HAL_BEEPER_TIMER_ISR {
 //
 // --------------------------------------------------------------------------
 
+uint16_t getAdcReading(adc_channel_num_t chan)
+{
+  uint16_t rslt = (uint16_t) adc_get_channel_value(ADC, chan);
+  adc_disable_channel(ADC, chan);
+  return rslt;
+}
+
+void startAdcConversion(adc_channel_num_t chan)
+{
+  adc_enable_channel(ADC, chan);
+  adc_start(ADC );
+}
+
+// Convert an Arduino Due pin number to the corresponding ADC channel number
+adc_channel_num_t pinToAdcChannel(int pin)
+{
+  if (pin < A0)
+  {
+    pin += A0;
+  }
+  return (adc_channel_num_t) (int) g_APinDescription[pin].ulADCChannelNumber;
+}
+
 // --------------------------------------------------------------------------
 //! @brief
 //! @param[in]

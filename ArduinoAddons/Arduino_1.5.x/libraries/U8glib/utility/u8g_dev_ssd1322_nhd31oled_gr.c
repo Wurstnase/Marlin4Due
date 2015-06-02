@@ -199,7 +199,7 @@ static const uint8_t u8g_dev_ssd13xx_sleep_on[] PROGMEM = {
   U8G_ESC_ADR(0),           /* instruction mode */
   U8G_ESC_CS(1),             /* enable chip */
   0x0ae,		/* display off */      
-  U8G_ESC_CS(1),             /* disable chip */
+  U8G_ESC_CS(0),             /* disable chip, bugfix 12 nov 2014 */
   U8G_ESC_END                /* end of sequence */
 };
 
@@ -208,7 +208,7 @@ static const uint8_t u8g_dev_ssd13xx_sleep_off[] PROGMEM = {
   U8G_ESC_CS(1),             /* enable chip */
   0x0af,		/* display on */      
   U8G_ESC_DLY(50),       /* delay 50 ms */
-  U8G_ESC_CS(1),             /* disable chip */
+  U8G_ESC_CS(0),             /* disable chip, bugfix 12 nov 2014 */
   U8G_ESC_END                /* end of sequence */
 };
 
@@ -243,6 +243,7 @@ uint8_t u8g_dev_ssd1322_nhd31oled_gr_fn(u8g_t *u8g, u8g_dev_t *dev, uint8_t msg,
 	  u8g_WriteByte(u8g, dev, 0x00);
 	  u8g_WriteByte(u8g, dev, 0x00);
 #endif
+	  u8g_MicroDelay();	// for DUE?
 	  u8g_SetChipSelect(u8g, dev, 0);        
 	  p+=cnt;
 	}
@@ -254,6 +255,7 @@ uint8_t u8g_dev_ssd1322_nhd31oled_gr_fn(u8g_t *u8g, u8g_dev_t *dev, uint8_t msg,
       u8g_WriteByte(u8g, dev, 0x081);
       u8g_SetAddress(u8g, dev, 1);          /* data mode */
       u8g_WriteByte(u8g, dev, (*(uint8_t *)arg) >> 1);
+      u8g_MicroDelay();	// for DUE?
       u8g_SetChipSelect(u8g, dev, 0);      
       break;
     case U8G_DEV_MSG_SLEEP_ON:
@@ -298,6 +300,7 @@ uint8_t u8g_dev_ssd1322_nhd31oled_2x_gr_fn(u8g_t *u8g, u8g_dev_t *dev, uint8_t m
 	  u8g_WriteByte(u8g, dev, 0x00);
 	  u8g_WriteByte(u8g, dev, 0x00);
 #endif
+	  u8g_MicroDelay();	// for DUE?
 	  u8g_SetChipSelect(u8g, dev, 0);        
 	  p+=cnt;
 	}

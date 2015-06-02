@@ -251,7 +251,7 @@ float homing_feedrate[] = HOMING_FEEDRATE;
 bool axis_relative_modes[] = AXIS_RELATIVE_MODES;
 int feedrate_multiplier = 100; //100->1 200->2
 int saved_feedrate_multiplier;
-int extruder_multiply[EXTRUDERS] = ARRAY_BY_EXTRUDERS(100, 100, 100, 100);
+int extruder_multiplier[EXTRUDERS] = ARRAY_BY_EXTRUDERS(100, 100, 100, 100);
 bool volumetric_enabled = false;
 float filament_size[EXTRUDERS] = ARRAY_BY_EXTRUDERS(DEFAULT_NOMINAL_FILAMENT_DIA, DEFAULT_NOMINAL_FILAMENT_DIA, DEFAULT_NOMINAL_FILAMENT_DIA, DEFAULT_NOMINAL_FILAMENT_DIA);
 float volumetric_multiplier[EXTRUDERS] = ARRAY_BY_EXTRUDERS(1.0, 1.0, 1.0, 1.0);
@@ -616,19 +616,19 @@ void setup() {
   MCUSR = 0;
 
   SERIAL_ECHOPGM(MSG_MARLIN);
-  SERIAL_ECHOLNPGM(" " STRING_VERSION);
+  SERIAL_ECHOLNPGM(" " BUILD_VERSION);
 
-  #ifdef STRING_VERSION_CONFIG_H
+  #ifdef STRING_DISTRIBUTION_DATE
     #ifdef STRING_CONFIG_H_AUTHOR
       SERIAL_ECHO_START;
       SERIAL_ECHOPGM(MSG_CONFIGURATION_VER);
-      SERIAL_ECHOPGM(STRING_VERSION_CONFIG_H);
+      SERIAL_ECHOPGM(STRING_DISTRIBUTION_DATE);
       SERIAL_ECHOPGM(MSG_AUTHOR);
       SERIAL_ECHOLNPGM(STRING_CONFIG_H_AUTHOR);
       SERIAL_ECHOPGM("Compiled: ");
       SERIAL_ECHOLNPGM(__DATE__);
     #endif // STRING_CONFIG_H_AUTHOR
-  #endif // STRING_VERSION_CONFIG_H
+  #endif // STRING_DISTRIBUTION_DATE
 
   SERIAL_ECHO_START;
   SERIAL_ECHOPGM(MSG_FREE_MEMORY);
@@ -4191,10 +4191,10 @@ inline void gcode_M221() {
     int sval = code_value();
     if (code_seen('T')) {
       if (setTargetedHotend(221)) return;
-      extruder_multiply[target_extruder] = sval;
+      extruder_multiplier[target_extruder] = sval;
     }
     else {
-      extruder_multiply[active_extruder] = sval;
+      extruder_multiplier[active_extruder] = sval;
     }
   }
 }
@@ -4641,7 +4641,7 @@ inline void gcode_M400() { st_synchronize(); }
     //SERIAL_PROTOCOLPGM("Filament dia (measured mm):");
     //SERIAL_PROTOCOL(filament_width_meas);
     //SERIAL_PROTOCOLPGM("Extrusion ratio(%):");
-    //SERIAL_PROTOCOL(extruder_multiply[active_extruder]);
+    //SERIAL_PROTOCOL(extruder_multiplier[active_extruder]);
   }
 
   /**
@@ -5174,7 +5174,7 @@ void process_next_command() {
   //  - Overwrite * with nul to mark the end
   while (*current_command == ' ') ++current_command;
   if (*current_command == 'N' && current_command[1] >= '0' && current_command[1] <= '9') {
-    while (*current_command != ' ') ++current_command;
+    while (*current_command != ' ' && *current_command != 'G' && *current_command != 'M' && *current_command != 'T') ++current_command;
     while (*current_command == ' ') ++current_command;
   }
   char *starpos = strchr(current_command, '*');  // * should always be the last parameter

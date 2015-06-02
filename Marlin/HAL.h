@@ -138,6 +138,10 @@ void tone(uint8_t pin, int frequency);
 void noTone(uint8_t pin);
 //void tone(uint8_t pin, int frequency, long duration);
 
+uint16_t getAdcReading(adc_channel_num_t chan);
+void startAdcConversion(adc_channel_num_t chan);
+adc_channel_num_t pinToAdcChannel(int pin);
+
 // --------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------
