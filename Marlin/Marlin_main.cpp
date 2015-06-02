@@ -643,15 +643,15 @@ void setup() {
   // loads data from EEPROM if available else uses defaults (and resets step acceleration rate)
   Config_RetrieveSettings();
 
+  lcd_init();
+  _delay_ms(1000);  // wait 1sec to display the splash screen
+
   tp_init();    // Initialize temperature loop
   plan_init();  // Initialize planner;
   watchdog_init();
   st_init();    // Initialize stepper, this enables interrupts!
   setup_photpin();
   servo_init();
-
-  lcd_init();
-  _delay_ms(1000);  // wait 1sec to display the splash screen
 
   #if HAS_CONTROLLERFAN
     SET_OUTPUT(CONTROLLERFAN_PIN); //Set pin used for driver cooling fan
@@ -728,11 +728,8 @@ void loop() {
     commands_in_queue--;
     cmd_queue_index_r = (cmd_queue_index_r + 1) % BUFSIZE;
   }
-  // Check heater every n milliseconds
-  manage_heater();
-  manage_inactivity();
   checkHitEndstops();
-  lcd_update();
+  idle();
 }
 
 void gcode_line_error(const char *err, bool doFlush=true) {
@@ -2002,11 +1999,7 @@ inline void gcode_G4() {
 
   if (!lcd_hasstatus()) LCD_MESSAGEPGM(MSG_DWELL);
 
-  while (millis() < codenum) {
-    manage_heater();
-    manage_inactivity();
-    lcd_update();
-  }
+  while (millis() < codenum) idle();
 }
 
 #ifdef FWRETRACT
@@ -2448,6 +2441,12 @@ inline void gcode_G28() {
 
 #elif defined(ENABLE_AUTO_BED_LEVELING)
 
+  void out_of_range_error(const char *edge) {
+    char msg[40];
+    sprintf_P(msg, PSTR("?Probe %s position out of range.\n"), edge);
+    SERIAL_PROTOCOL(msg);
+  }
+
   /**
    * G29: Detailed Z-Probe, probes the bed at 3 or more points.
    *      Will fail if the printer has not been homed with G28.
@@ -2543,19 +2542,19 @@ inline void gcode_G28() {
 
       if (left_out || right_out || front_out || back_out) {
         if (left_out) {
-          SERIAL_PROTOCOLPGM("?Probe (L)eft position out of range.\n");
+          out_of_range_error(PSTR("(L)eft"));
           left_probe_bed_position = left_out_l ? MIN_PROBE_X : right_probe_bed_position - MIN_PROBE_EDGE;
         }
         if (right_out) {
-          SERIAL_PROTOCOLPGM("?Probe (R)ight position out of range.\n");
+          out_of_range_error(PSTR("(R)ight"));
           right_probe_bed_position = right_out_r ? MAX_PROBE_X : left_probe_bed_position + MIN_PROBE_EDGE;
         }
         if (front_out) {
-          SERIAL_PROTOCOLPGM("?Probe (F)ront position out of range.\n");
+          out_of_range_error(PSTR("(F)ront"));
           front_probe_bed_position = front_out_f ? MIN_PROBE_Y : back_probe_bed_position - MIN_PROBE_EDGE;
         }
         if (back_out) {
-          SERIAL_PROTOCOLPGM("?Probe (B)ack position out of range.\n");
+          out_of_range_error(PSTR("(B)ack"));
           back_probe_bed_position = back_out_b ? MAX_PROBE_Y : front_probe_bed_position + MIN_PROBE_EDGE;
         }
         return;
@@ -2680,9 +2679,7 @@ inline void gcode_G28() {
 
           probePointCounter++;
 
-          manage_heater();
-          manage_inactivity();
-          lcd_update();
+          idle();
 
         } //xProbe
       } //yProbe
@@ -2883,21 +2880,13 @@ inline void gcode_G92() {
     st_synchronize();
     refresh_cmd_timeout();
     if (codenum > 0) {
-      codenum += previous_cmd_ms;  // keep track of when we started waiting
-      while(millis() < codenum && !lcd_clicked()) {
-        manage_heater();
-        manage_inactivity();
-        lcd_update();
-      }
+      codenum += previous_cmd_ms;  // wait until this time for a click
+      while (millis() < codenum && !lcd_clicked()) idle();
       lcd_ignore_click(false);
     }
     else {
       if (!lcd_detected()) return;
-      while (!lcd_clicked()) {
-        manage_heater();
-        manage_inactivity();
-        lcd_update();
-      }
+      while (!lcd_clicked()) idle();
     }
     if (IS_SD_PRINTING)
       LCD_MESSAGEPGM(MSG_RESUMING);
@@ -3063,10 +3052,7 @@ inline void gcode_M31() {
      *   /Miscellaneous/Armchair/Armchair.gcode
      */
     inline void gcode_M33() {
-      char *args = strchr_pointer + 4;
-      while (*args == ' ') ++args;
-      clear_asterisk(args);
-      card.printLongPath(args);
+      card.printLongPath(current_command_args);
     }
 
   #endif
@@ -3174,7 +3160,7 @@ inline void gcode_M42() {
     if (code_seen('X') || code_seen('x')) {
       X_probe_location = code_value() - X_PROBE_OFFSET_FROM_EXTRUDER;
       if (X_probe_location < X_MIN_POS || X_probe_location > X_MAX_POS) {
-        SERIAL_PROTOCOLPGM("?X position out of range.\n");
+        out_of_range_error(PSTR("X"));
         return;
       }
     }
@@ -3182,7 +3168,7 @@ inline void gcode_M42() {
     if (code_seen('Y') || code_seen('y')) {
       Y_probe_location = code_value() -  Y_PROBE_OFFSET_FROM_EXTRUDER;
       if (Y_probe_location < Y_MIN_POS || Y_probe_location > Y_MAX_POS) {
-        SERIAL_PROTOCOLPGM("?Y position out of range.\n");
+        out_of_range_error(PSTR("Y"));
         return;
       }
     }
@@ -3386,7 +3372,7 @@ inline void gcode_M105() {
 
   #if HAS_TEMP_0 || HAS_TEMP_BED || defined(HEATER_0_USES_MAX6675)
     SERIAL_PROTOCOLPGM(MSG_OK);
-    #if HAS_TEMP_0
+    #if HAS_TEMP_0 || defined(HEATER_0_USES_MAX6675)
       SERIAL_PROTOCOLPGM(" T:");
       SERIAL_PROTOCOL_F(degHotend(target_extruder), 1);
       SERIAL_PROTOCOLPGM(" /");
@@ -3523,9 +3509,9 @@ inline void gcode_M109() {
         #endif
         temp_ms = millis();
       }
-      manage_heater();
-      manage_inactivity();
-      lcd_update();
+
+      idle();
+
       #ifdef TEMP_RESIDENCY_TIME
         // start/restart the TEMP_RESIDENCY_TIME timer whenever we reach target temp for the first time
         // or when current temp falls outside the hysteresis after target temp was reached
@@ -3573,9 +3559,7 @@ inline void gcode_M109() {
         SERIAL_PROTOCOL_F(degBed(), 1);
         SERIAL_EOL;
       }
-      manage_heater();
-      manage_inactivity();
-      lcd_update();
+      idle();
     }
     LCD_MESSAGEPGM(MSG_BED_DONE);
     refresh_cmd_timeout();
@@ -3936,20 +3920,14 @@ inline void gcode_M121() { enable_endstops(false); }
 #endif // BLINKM
 
 /**
- * M200: Set filament diameter and set E axis units to cubic millimeters (use S0 to set back to millimeters).
- *       T<extruder>
- *       D<millimeters>
+ * M200: Set filament diameter and set E axis units to cubic millimeters
+ *
+ *    T<extruder> - Optional extruder number. Current extruder if omitted.
+ *    D<mm> - Diameter of the filament. Use "D0" to set units back to millimeters.
  */
 inline void gcode_M200() {
-  int tmp_extruder = active_extruder;
-  if (code_seen('T')) {
-    tmp_extruder = code_value_short();
-    if (tmp_extruder >= EXTRUDERS) {
-      SERIAL_ECHO_START;
-      SERIAL_ECHO(MSG_M200_INVALID_EXTRUDER);
-      return;
-    }
-  }
+
+  if (setTargetedHotend(200)) return;
 
   if (code_seen('D')) {
     float diameter = code_value();
@@ -3958,7 +3936,7 @@ inline void gcode_M200() {
     // for all extruders
     volumetric_enabled = (diameter != 0.0);
     if (volumetric_enabled) {
-      filament_size[tmp_extruder] = diameter;
+      filament_size[target_extruder] = diameter;
       // make sure all extruders have some sane value for the filament size
       for (int i=0; i<EXTRUDERS; i++)
         if (! filament_size[i]) filament_size[i] = DEFAULT_NOMINAL_FILAMENT_DIA;
@@ -4260,11 +4238,7 @@ inline void gcode_M226() {
             break;
         }
 
-        while(digitalRead(pin_number) != target) {
-          manage_heater();
-          manage_inactivity();
-          lcd_update();
-        }
+        while (digitalRead(pin_number) != target) idle();
 
       } // pin_number > -1
     } // pin_state -1 0 1
@@ -4340,7 +4314,6 @@ inline void gcode_M226() {
       if (code_seen('P')) PID_PARAM(Kp, e) = code_value();
       if (code_seen('I')) PID_PARAM(Ki, e) = scalePID_i(code_value());
       if (code_seen('D')) PID_PARAM(Kd, e) = scalePID_d(code_value());
-      if (code_seen('H')) PID_PARAM(Km, e) = code_value_short();
       #ifdef PID_ADD_EXTRUSION_RATE
         if (code_seen('C')) PID_PARAM(Kc, e) = code_value();
       #endif      
@@ -4357,8 +4330,6 @@ inline void gcode_M226() {
       SERIAL_PROTOCOL(unscalePID_i(PID_PARAM(Ki, e)));
       SERIAL_PROTOCOL(" d:");
       SERIAL_PROTOCOL(unscalePID_d(PID_PARAM(Kd, e)));
-      SERIAL_PROTOCOL(" PID_Max:");
-      SERIAL_PROTOCOL(PID_PARAM(Km, e));
       #ifdef PID_ADD_EXTRUSION_RATE
         SERIAL_PROTOCOL(" c:");
         //Kc does not have scaling applied above, or in resetting defaults
@@ -5301,8 +5272,6 @@ void process_next_command() {
       case 92: // G92
         gcode_G92();
         break;
-
-      default: code_is_good = false;
     }
     break;
 
@@ -5733,14 +5702,14 @@ void process_next_command() {
       case 999: // M999: Restart after being Stopped
         gcode_M999();
         break;
-
-      default: code_is_good = false;
     }
     break;
 
     case 'T':
       gcode_T(codenum);
     break;
+
+    default: code_is_good = false;
   }
 
 ExitUnknownCommand:
@@ -6255,6 +6224,15 @@ void disable_all_steppers() {
 }
 
 /**
+ * Standard idle routine keeps the machine alive
+ */
+void idle() {
+  manage_heater();
+  manage_inactivity();
+  lcd_update();
+}
+
+/**
  * Manage several activities:
  *  - Check for Filament Runout
  *  - Keep the command buffer full
@@ -6523,29 +6501,20 @@ void Stop() {
   }
 }
 
-bool setTargetedHotend(int code){
+/**
+ * Set target_extruder from the T parameter or the active_extruder
+ *
+ * Returns TRUE if the target is invalid
+ */
+bool setTargetedHotend(int code) {
   target_extruder = active_extruder;
   if (code_seen('T')) {
     target_extruder = code_value_short();
     if (target_extruder >= EXTRUDERS) {
       SERIAL_ECHO_START;
-      switch(code){
-        case 104:
-          SERIAL_ECHO(MSG_M104_INVALID_EXTRUDER);
-          break;
-        case 105:
-          SERIAL_ECHO(MSG_M105_INVALID_EXTRUDER);
-          break;
-        case 109:
-          SERIAL_ECHO(MSG_M109_INVALID_EXTRUDER);
-          break;
-        case 218:
-          SERIAL_ECHO(MSG_M218_INVALID_EXTRUDER);
-          break;
-        case 221:
-          SERIAL_ECHO(MSG_M221_INVALID_EXTRUDER);
-          break;
-      }
+      SERIAL_CHAR('M');
+      SERIAL_ECHO(code);
+      SERIAL_ECHOPGM(" " MSG_INVALID_EXTRUDER " ");
       SERIAL_ECHOLN(target_extruder);
       return true;
     }

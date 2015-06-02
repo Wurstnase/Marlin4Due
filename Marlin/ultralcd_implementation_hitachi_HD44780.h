@@ -386,7 +386,7 @@ static void lcd_implementation_init(
       // required for RAMPS-FD, but does no harm for other targets
       SET_OUTPUT(LCD_PINS_RS);
       SET_OUTPUT(LCD_PINS_ENABLE);
-	#endif
+  #endif
     lcd.begin(LCD_WIDTH, LCD_HEIGHT);
   #endif
 
@@ -409,7 +409,7 @@ char lcd_printPGM(const char* str) {
 }
 
 char lcd_print(char* str) {
-  char c, n = 0;;
+  char c, n = 0;
   unsigned char i = 0;
   while ((c = str[i++])) n += charset_mapper(c);
   return n;
@@ -635,8 +635,8 @@ static void lcd_implementation_status_screen() {
       lcd.print(ftostr12ns(filament_width_meas));
       lcd_printPGM(PSTR(" V"));
       lcd.print(itostr3(100.0*volumetric_multiplier[FILAMENT_SENSOR_EXTRUDER_NUM]));
-  	  lcd.print('%');
-  	  return;
+      lcd.print('%');
+      return;
     }
 
   #endif // FILAMENT_LCD_DISPLAY

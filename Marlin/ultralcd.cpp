@@ -509,15 +509,15 @@ static void lcd_tune_menu() {
   #endif
   MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_FAN_SPEED, &fanSpeed, 0, 255);
   MENU_ITEM_EDIT(int3, MSG_FLOW, &extruder_multiply[active_extruder], 10, 999);
-  MENU_ITEM_EDIT(int3, MSG_FLOW MSG_F0, &extruder_multiply[0], 10, 999);
+  MENU_ITEM_EDIT(int3, MSG_FLOW MSG_N0, &extruder_multiply[0], 10, 999);
   #if TEMP_SENSOR_1 != 0
-    MENU_ITEM_EDIT(int3, MSG_FLOW MSG_F1, &extruder_multiply[1], 10, 999);
+    MENU_ITEM_EDIT(int3, MSG_FLOW MSG_N1, &extruder_multiply[1], 10, 999);
   #endif
   #if TEMP_SENSOR_2 != 0
-    MENU_ITEM_EDIT(int3, MSG_FLOW MSG_F2, &extruder_multiply[2], 10, 999);
+    MENU_ITEM_EDIT(int3, MSG_FLOW MSG_N2, &extruder_multiply[2], 10, 999);
   #endif
   #if TEMP_SENSOR_3 != 0
-    MENU_ITEM_EDIT(int3, MSG_FLOW MSG_F3, &extruder_multiply[3], 10, 999);
+    MENU_ITEM_EDIT(int3, MSG_FLOW MSG_N3, &extruder_multiply[3], 10, 999);
   #endif
 
   #ifdef BABYSTEPPING
@@ -1855,18 +1855,18 @@ char *ftostr32(const float &x) {
 
 // Convert float to string with 1.234 format
 char *ftostr43(const float &x) {
-	long xx = x * 1000;
+  long xx = x * 1000;
     if (xx >= 0)
-		conv[0] = (xx / 1000) % 10 + '0';
-	else
-		conv[0] = '-';
-	xx = abs(xx);
-	conv[1] = '.';
-	conv[2] = (xx / 100) % 10 + '0';
-	conv[3] = (xx / 10) % 10 + '0';
-	conv[4] = (xx) % 10 + '0';
-	conv[5] = 0;
-	return conv;
+    conv[0] = (xx / 1000) % 10 + '0';
+  else
+    conv[0] = '-';
+  xx = abs(xx);
+  conv[1] = '.';
+  conv[2] = (xx / 100) % 10 + '0';
+  conv[3] = (xx / 10) % 10 + '0';
+  conv[4] = (xx) % 10 + '0';
+  conv[5] = 0;
+  return conv;
 }
 
 // Convert float to string with 1.23 format

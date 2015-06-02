@@ -245,6 +245,8 @@ Here are some standard links for getting your machine calibrated:
 //#define PID_BED_DEBUG // Sends debug data to the serial port.
 
 #ifdef PIDTEMPBED
+    #define PID_BED_INTEGRAL_DRIVE_MAX MAX_BED_POWER //limit for the integral term
+
 //120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
 //from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
     #define  DEFAULT_bedKp 218.62
@@ -482,7 +484,7 @@ const bool Z_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the logic 
   // X and Y offsets must be integers
   #define X_PROBE_OFFSET_FROM_EXTRUDER -40   // Probe on: -left  +right
   #define Y_PROBE_OFFSET_FROM_EXTRUDER 0     // Probe on: -front +behind
-  #define Z_PROBE_OFFSET_FROM_EXTRUDER -0.3  // -below (always!)
+  #define Z_PROBE_OFFSET_FROM_EXTRUDER -0.9  // -below (always!)
 
   #define Z_RAISE_BEFORE_HOMING 4       // (in mm) Raise Z before homing (G28) for Probe Clearance.
                                         // Be sure you have this distance over your Z_MAX_POS in case
