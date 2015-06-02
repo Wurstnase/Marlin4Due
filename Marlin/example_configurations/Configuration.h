@@ -118,7 +118,7 @@ Here are some standard links for getting your machine calibrated:
 // 1010 is Pt1000 with 1k pullup (non standard)
 // 147 is Pt100 with 4k7 pullup
 // 110 is Pt100 with 1k pullup (non standard)
-// 998 and 999 are Dummy Tables. They will ALWAYS read 25??C or the temperature defined below. 
+// 998 and 999 are Dummy Tables. They will ALWAYS read 25°C or the temperature defined below. 
 //     Use it for Testing or Development purposes. NEVER for production machine.
 //     #define DUMMY_THERMISTOR_998_VALUE 25
 //     #define DUMMY_THERMISTOR_999_VALUE 100
@@ -510,7 +510,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 
 // default settings
 
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {320,320,12800,276} 			// default steps per unit for SparkCube 1/64??steps
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {320,320,12800,276} 			// default steps per unit for SparkCube 1/64µsteps
 #define DEFAULT_MAX_FEEDRATE          {500, 500, 4, 150}  			// (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {3000,3000,100,8000}			// X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
 
@@ -570,8 +570,8 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 //#define LANGUAGE_INCLUDE GENERATE_LANGUAGE_INCLUDE(en)
 
 // Character based displays can have different extended charsets.
-#define DISPLAY_CHARSET_HD44780_JAPAN     // "??????????????23??"
-//#define DISPLAY_CHARSET_HD44780_WESTERN // "????????????????????" if you see a '~' instead of a 'arrow_right' at the right of submenuitems - this is the right one.
+#define DISPLAY_CHARSET_HD44780_JAPAN     // "ääööüüß23°"
+//#define DISPLAY_CHARSET_HD44780_WESTERN // "ÄäÖöÜüß²³°" if you see a '~' instead of a 'arrow_right' at the right of submenuitems - this is the right one.
 
 //#define ULTRA_LCD  //general LCD support, also 16x2
 //#define DOGLCD  // Support for SPI LCD 128x64 (Controller ST7565R graphic Display Family)
@@ -729,6 +729,9 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
   #define NEWPANEL
   #define ULTIPANEL
 #endif
+
+// Tiny SSD1306 OLED I2C 128x64 FULL GRAPHICS CONTROLLER
+#define SSD1306_OLED_I2C_CONTROLLER
 
 // Shift register panels
 // ---------------------
