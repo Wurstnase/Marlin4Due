@@ -6,7 +6,8 @@
 
 //
 #ifdef MB(RAMPS_FD_V1)
-  //#define INVERTED_HEATER_PINS
+  #define INVERTED_HEATER_PINS
+   //WARNING:If you have a RAMPS_FD_V1 modded for bugfix (same http://forums.reprap.org/read.php?219,424146,507810), you must use RAMPS_FD_V2 configuration 
   // No EEPROM
   // Use 4k7 thermistor tables
 #else
