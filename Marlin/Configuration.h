@@ -344,8 +344,8 @@ const bool Z_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the logic 
 
 // For Inverting Stepper Enable Pins (Active Low) use 0, Non Inverting (Active High) use 1
 // :{0:'Low',1:'High'}
-#define X_ENABLE_ON 1
-#define Y_ENABLE_ON 1
+#define X_ENABLE_ON 0
+#define Y_ENABLE_ON 0
 #define Z_ENABLE_ON 1
 #define E_ENABLE_ON 1 // For all extruders
 
@@ -570,9 +570,10 @@ const bool Z_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the logic 
 
 // default settings
 
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {640,640,3200,1100}     // default steps per unit for Ultimaker
-#define DEFAULT_MAX_FEEDRATE          {500, 500, 50, 150}      // (mm/sec)
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {160,160,3200,1100}     // default steps per unit for Ultimaker
+#define DEFAULT_MAX_FEEDRATE          {500, 500, 50, 150}     // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {5000,5000,200,8000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
+#define ENABLE_HIGH_SPEED_STEPPING    false                    // some drivers are to slow. set this to false if your motor doesn't rotate.
 
 #define DEFAULT_ACCELERATION          1000    // X, Y, Z and E acceleration in mm/s^2 for printing moves
 #define DEFAULT_RETRACT_ACCELERATION  5000   // E acceleration in mm/s^2 for retracts
