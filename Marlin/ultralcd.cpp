@@ -289,7 +289,7 @@ static void lcd_goto_menu(menuFunc_t menu, const bool feedback=false, const uint
  */
 
 static void lcd_status_screen() {
-	encoderRateMultiplierEnabled = false;
+  encoderRateMultiplierEnabled = false;
 
   #ifdef LCD_PROGRESS_BAR
     millis_t ms = millis();
@@ -508,16 +508,16 @@ static void lcd_tune_menu() {
     MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_BED, &target_temperature_bed, 0, BED_MAXTEMP - 15);
   #endif
   MENU_MULTIPLIER_ITEM_EDIT(int3, MSG_FAN_SPEED, &fanSpeed, 0, 255);
-  MENU_ITEM_EDIT(int3, MSG_FLOW, &extruder_multiply[active_extruder], 10, 999);
-  MENU_ITEM_EDIT(int3, MSG_FLOW MSG_F0, &extruder_multiply[0], 10, 999);
+  MENU_ITEM_EDIT(int3, MSG_FLOW, &extruder_multiplier[active_extruder], 10, 999);
+  MENU_ITEM_EDIT(int3, MSG_FLOW MSG_N0, &extruder_multiplier[0], 10, 999);
   #if TEMP_SENSOR_1 != 0
-    MENU_ITEM_EDIT(int3, MSG_FLOW MSG_F1, &extruder_multiply[1], 10, 999);
+    MENU_ITEM_EDIT(int3, MSG_FLOW MSG_N1, &extruder_multiplier[1], 10, 999);
   #endif
   #if TEMP_SENSOR_2 != 0
-    MENU_ITEM_EDIT(int3, MSG_FLOW MSG_F2, &extruder_multiply[2], 10, 999);
+    MENU_ITEM_EDIT(int3, MSG_FLOW MSG_N2, &extruder_multiplier[2], 10, 999);
   #endif
   #if TEMP_SENSOR_3 != 0
-    MENU_ITEM_EDIT(int3, MSG_FLOW MSG_F3, &extruder_multiply[3], 10, 999);
+    MENU_ITEM_EDIT(int3, MSG_FLOW MSG_N3, &extruder_multiplier[3], 10, 999);
   #endif
 
   #ifdef BABYSTEPPING
@@ -535,12 +535,11 @@ static void lcd_tune_menu() {
 
 void _lcd_preheat(int endnum, const float temph, const float tempb, const int fan) {
   if (temph > 0) setTargetHotend(temph, endnum);
-  setTargetBed(tempb);
+  #if TEMP_SENSOR_BED != 0
+    setTargetBed(tempb);
+  #endif
   fanSpeed = fan;
   lcd_return_to_status();
-  #ifdef WATCH_TEMP_PERIOD
-    if (endnum >= 0) start_watching_heater(endnum);
-  #endif
 }
 void lcd_preheat_pla0() { _lcd_preheat(0, plaPreheatHotendTemp, plaPreheatHPBTemp, plaPreheatFanSpeed); }
 void lcd_preheat_abs0() { _lcd_preheat(0, absPreheatHotendTemp, absPreheatHPBTemp, absPreheatFanSpeed); }
@@ -622,11 +621,7 @@ void lcd_preheat_abs0() { _lcd_preheat(0, absPreheatHotendTemp, absPreheatHPBTem
 #endif // more than one temperature sensor present
 
 void lcd_cooldown() {
-  setTargetHotend0(0);
-  setTargetHotend1(0);
-  setTargetHotend2(0);
-  setTargetHotend3(0);
-  setTargetBed(0);
+  disable_all_heaters();
   fanSpeed = 0;
   lcd_return_to_status();
 }
@@ -892,7 +887,6 @@ static void lcd_control_menu() {
  * "Control" > "Temperature" submenu
  *
  */
-
 static void lcd_control_temperature_menu() {
   START_MENU(lcd_control_menu);
   //
@@ -1130,13 +1124,24 @@ static void lcd_control_volumetric_menu() {
 #ifdef HAS_LCD_CONTRAST
   static void lcd_set_contrast() {
     if (encoderPosition != 0) {
-      lcd_contrast -= encoderPosition;
-      lcd_contrast &= 0x3F;
+      #ifdef U8GLIB_LM6059_AF
+        lcd_contrast += encoderPosition;
+        lcd_contrast &= 0xFF;
+      #else
+        lcd_contrast -= encoderPosition;
+        lcd_contrast &= 0x3F;
+      #endif
       encoderPosition = 0;
       lcdDrawUpdate = 1;
       u8g.setContrast(lcd_contrast);
     }
-    if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR(MSG_CONTRAST), itostr2(lcd_contrast));
+    if (lcdDrawUpdate) {
+      #ifdef U8GLIB_LM6059_AF
+        lcd_implementation_drawedit(PSTR(MSG_CONTRAST), itostr3(lcd_contrast));
+      #else
+        lcd_implementation_drawedit(PSTR(MSG_CONTRAST), itostr2(lcd_contrast));
+      #endif
+    }
     if (LCD_CLICKED) lcd_goto_menu(lcd_control_menu);
   }
 #endif // HAS_LCD_CONTRAST
@@ -1185,7 +1190,7 @@ static void lcd_sd_updir() {
  *
  */
 void lcd_sdcard_menu() {
-  if (lcdDrawUpdate == 0 && LCD_CLICKED == 0) return;	// nothing to do (so don't thrash the SD card)
+  if (lcdDrawUpdate == 0 && LCD_CLICKED == 0) return; // nothing to do (so don't thrash the SD card)
   uint16_t fileCnt = card.getnrfilenames();
   START_MENU(lcd_main_menu);
   MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
@@ -1850,18 +1855,18 @@ char *ftostr32(const float &x) {
 
 // Convert float to string with 1.234 format
 char *ftostr43(const float &x) {
-	long xx = x * 1000;
+  long xx = x * 1000;
     if (xx >= 0)
-		conv[0] = (xx / 1000) % 10 + '0';
-	else
-		conv[0] = '-';
-	xx = abs(xx);
-	conv[1] = '.';
-	conv[2] = (xx / 100) % 10 + '0';
-	conv[3] = (xx / 10) % 10 + '0';
-	conv[4] = (xx) % 10 + '0';
-	conv[5] = 0;
-	return conv;
+    conv[0] = (xx / 1000) % 10 + '0';
+  else
+    conv[0] = '-';
+  xx = abs(xx);
+  conv[1] = '.';
+  conv[2] = (xx / 100) % 10 + '0';
+  conv[3] = (xx / 10) % 10 + '0';
+  conv[4] = (xx) % 10 + '0';
+  conv[5] = 0;
+  return conv;
 }
 
 // Convert float to string with 1.23 format

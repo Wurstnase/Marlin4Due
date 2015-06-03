@@ -50,9 +50,6 @@
 
 #define strncpy_P(dest, src, num) strncpy((dest), (src), (num))
 
-#define HIGH 1
-#define LOW 0
-
 // --------------------------------------------------------------------------
 // Types
 // --------------------------------------------------------------------------
@@ -140,6 +137,10 @@ void HAL_timer_clear (Tc* tc, uint32_t channel);
 void tone(uint8_t pin, int frequency);
 void noTone(uint8_t pin);
 //void tone(uint8_t pin, int frequency, long duration);
+
+uint16_t getAdcReading(adc_channel_num_t chan);
+void startAdcConversion(adc_channel_num_t chan);
+adc_channel_num_t pinToAdcChannel(int pin);
 
 // --------------------------------------------------------------------------
 //

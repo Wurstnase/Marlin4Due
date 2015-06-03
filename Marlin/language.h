@@ -20,6 +20,7 @@
 // de       German
 // es       Spanish
 // ru       Russian
+// bg       Bulgarian
 // it       Italian
 // pt       Portuguese
 // pt-br    Portuguese (Brazil)
@@ -32,8 +33,8 @@
 // kana_utf Japanese
 // cn       Chinese
 
+// fallback if no language is set, don't change
 #ifndef LANGUAGE_INCLUDE
-  // pick your language from the list above
   #define LANGUAGE_INCLUDE GENERATE_LANGUAGE_INCLUDE(en)
 #endif
 
@@ -45,34 +46,22 @@
 
 #if MB(ULTIMAKER)|| MB(ULTIMAKER_OLD)|| MB(ULTIMAIN_2)
   #define MACHINE_NAME "Ultimaker"
-  #define FIRMWARE_URL "http://firmware.ultimaker.com"
+  #define SOURCE_CODE_URL "http://firmware.ultimaker.com"
 #elif MB(RUMBA)
   #define MACHINE_NAME "Rumba"
 #elif MB(3DRAG)
   #define MACHINE_NAME "3Drag"
-  #define FIRMWARE_URL "http://3dprint.elettronicain.it/"
+  #define SOURCE_CODE_URL "http://3dprint.elettronicain.it/"
 #elif MB(K8200)
   #define MACHINE_NAME "K8200"
+  #define SOURCE_CODE_URL "https://github.com/CONSULitAS/Marlin-K8200"
 #elif MB(5DPRINT)
   #define MACHINE_NAME "Makibox"
 #elif MB(SAV_MKI)
   #define MACHINE_NAME "SAV MkI"
-  #define FIRMWARE_URL "https://github.com/fmalpartida/Marlin/tree/SAV-MkI-config"
-#elif MB(WITBOX)
-  #define MACHINE_NAME "WITBOX"
-  #define FIRMWARE_URL "http://www.bq.com/gb/downloads-witbox.html"
-#elif MB(HEPHESTOS)
-  #define MACHINE_NAME "HEPHESTOS"
-  #define FIRMWARE_URL "http://www.bq.com/gb/downloads-prusa-i3-hephestos.html"
-#elif MB(BRAINWAVE_PRO)
-  #define MACHINE_NAME "Kossel Pro"
-  #ifndef FIRMWARE_URL
-    #define FIRMWARE_URL "https://github.com/OpenBeamUSA/Marlin/"
-  #endif
-#else
-  #ifndef MACHINE_NAME
-    #define MACHINE_NAME "3D Printer"
-  #endif
+  #define SOURCE_CODE_URL "https://github.com/fmalpartida/Marlin/tree/SAV-MkI-config"
+#elif !defined(MACHINE_NAME)
+  #define MACHINE_NAME "3D Printer"
 #endif
 
 #ifdef CUSTOM_MENDEL_NAME
@@ -85,8 +74,8 @@
   #define MACHINE_NAME CUSTOM_MACHINE_NAME
 #endif
 
-#ifndef FIRMWARE_URL
-  #define FIRMWARE_URL "https://github.com/MarlinFirmware/Marlin"
+#ifndef SOURCE_CODE_URL
+  #define SOURCE_CODE_URL "https://github.com/MarlinFirmware/Marlin"
 #endif
 
 #ifndef BUILD_VERSION
@@ -133,18 +122,12 @@
 #define MSG_END_FILE_LIST                   "End file list"
 #define MSG_INVALID_EXTRUDER                "Invalid extruder"
 #define MSG_INVALID_SOLENOID                "Invalid solenoid"
-#define MSG_M104_INVALID_EXTRUDER           "M104 " MSG_INVALID_EXTRUDER " "
-#define MSG_M105_INVALID_EXTRUDER           "M105 " MSG_INVALID_EXTRUDER " "
-#define MSG_M109_INVALID_EXTRUDER           "M109 " MSG_INVALID_EXTRUDER " "
-#define MSG_M200_INVALID_EXTRUDER           "M200 " MSG_INVALID_EXTRUDER " "
-#define MSG_M218_INVALID_EXTRUDER           "M218 " MSG_INVALID_EXTRUDER " "
-#define MSG_M221_INVALID_EXTRUDER           "M221 " MSG_INVALID_EXTRUDER " "
 #define MSG_ERR_NO_THERMISTORS              "No thermistors - no temperature"
 #define MSG_HEATING                         "Heating..."
 #define MSG_HEATING_COMPLETE                "Heating done."
 #define MSG_BED_HEATING                     "Bed Heating."
 #define MSG_BED_DONE                        "Bed done."
-#define MSG_M115_REPORT                     "FIRMWARE_NAME:Marlin " BUILD_VERSION " FIRMWARE_URL:" FIRMWARE_URL " PROTOCOL_VERSION:" PROTOCOL_VERSION " MACHINE_TYPE:" MACHINE_NAME " EXTRUDER_COUNT:" STRINGIFY(EXTRUDERS) " UUID:" MACHINE_UUID "\n"
+#define MSG_M115_REPORT                     "FIRMWARE_NAME:Marlin " BUILD_VERSION " SOURCE_CODE_URL:" SOURCE_CODE_URL " PROTOCOL_VERSION:" PROTOCOL_VERSION " MACHINE_TYPE:" MACHINE_NAME " EXTRUDER_COUNT:" STRINGIFY(EXTRUDERS) " UUID:" MACHINE_UUID "\n"
 #define MSG_COUNT_X                         " Count X: "
 #define MSG_ERR_KILLED                      "Printer halted. kill() called!"
 #define MSG_ERR_STOPPED                     "Printer stopped due to errors. Fix the error and use M999 to restart. (Temperature is reset. Set it after restarting)"
@@ -222,15 +205,16 @@
 #define MSG_PID_DEBUG_PTERM                 " pTerm "
 #define MSG_PID_DEBUG_ITERM                 " iTerm "
 #define MSG_PID_DEBUG_DTERM                 " dTerm "
-#define MSG_HEATING_FAILED                  "Heating failed"
-#define MSG_EXTRUDER_SWITCHED_OFF           "Extruder switched off. Temperature difference between temp sensors is too high !"
-
 #define MSG_INVALID_EXTRUDER_NUM            " - Invalid extruder number !"
-#define MSG_THERMAL_RUNAWAY_STOP            "Thermal Runaway, system stopped! Heater_ID: "
-#define MSG_SWITCHED_OFF_MAX                " switched off. MAXTEMP triggered !!"
-#define MSG_MINTEMP_EXTRUDER_OFF            ": Extruder switched off. MINTEMP triggered !"
-#define MSG_MAXTEMP_EXTRUDER_OFF            ": Extruder" MSG_SWITCHED_OFF_MAX
-#define MSG_MAXTEMP_BED_OFF                 "Heated bed" MSG_SWITCHED_OFF_MAX
+
+#define MSG_HEATER_BED                      "bed"
+#define MSG_STOPPED_HEATER                  ", system stopped! Heater_ID: "
+#define MSG_REDUNDANCY                      "Heater switched off. Temperature difference between temp sensors is too high !"
+#define MSG_T_HEATING_FAILED                "Heating failed"
+#define MSG_T_THERMAL_RUNAWAY               "Thermal Runaway"
+#define MSG_T_MAXTEMP                       "MAXTEMP triggered"
+#define MSG_T_MINTEMP                       "MINTEMP triggered"
+
 
 // LCD Menu Messages
 

@@ -61,13 +61,11 @@ extern float current_temperature_bed;
 
   #ifdef PID_PARAMS_PER_EXTRUDER
     extern float Kp[EXTRUDERS], Ki[EXTRUDERS], Kd[EXTRUDERS], Kc[EXTRUDERS]; // one param per extruder
-    extern short Km[EXTRUDERS];
     #define PID_PARAM(param,e) param[e] // use macro to point to array value
   #else
     extern float Kp, Ki, Kd, Kc; // one param per extruder - saves 20 or 36 bytes of ram (inc array pointer)
-    extern short Km;
     #define PID_PARAM(param, e) param // use macro to point directly to value
-  #endif // PID_PARAMS_PER_EXTRUDER	
+  #endif // PID_PARAMS_PER_EXTRUDER 
   float scalePID_i(float i);
   float scalePID_d(float d);
   float unscalePID_i(float i);
@@ -98,7 +96,16 @@ FORCE_INLINE float degBed() { return current_temperature_bed; }
 FORCE_INLINE float degTargetHotend(uint8_t extruder) { return target_temperature[extruder]; }
 FORCE_INLINE float degTargetBed() { return target_temperature_bed; }
 
-FORCE_INLINE void setTargetHotend(const float &celsius, uint8_t extruder) { target_temperature[extruder] = celsius; }
+#ifdef THERMAL_PROTECTION_HOTENDS
+  void start_watching_heater(int e=0);
+#endif
+
+FORCE_INLINE void setTargetHotend(const float &celsius, uint8_t extruder) {
+  target_temperature[extruder] = celsius;
+  #ifdef THERMAL_PROTECTION_HOTENDS
+    start_watching_heater(extruder);
+  #endif
+}
 FORCE_INLINE void setTargetBed(const float &celsius) { target_temperature_bed = celsius; }
 
 FORCE_INLINE bool isHeatingHotend(uint8_t extruder) { return target_temperature[extruder] > current_temperature[extruder]; }
@@ -138,10 +145,6 @@ void PID_autotune(float temp, int extruder, int ncycles);
 
 void setExtruderAutoFanState(int pin, bool state);
 void checkExtruderAutoFans();
-
-#ifdef THERMAL_PROTECTION_HOTENDS
-  void start_watching_heater(int e=0);
-#endif
 
 FORCE_INLINE void autotempShutdown() {
   #ifdef AUTOTEMP

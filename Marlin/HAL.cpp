@@ -256,19 +256,18 @@ void HAL_timer_disable_interrupt (uint8_t timer_num) {
 }
 
 void HAL_timer_set_count (Tc* tc, uint32_t channel, uint32_t count) {
-  // if(count < 210) count = 210;
-	// const tTimerConfig *pConfig = &TimerConfig [timer_num];
-	// pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_RC = count;
-	//TC_SetRC (pConfig->pTimerRegs, pConfig->channel, count);
+  
+  uint32_t counter_value = tc->TC_CHANNEL[channel].TC_CV + 5;
   if(count < 210) count = 210;
+  count = counter_value <= count ? count : counter_value;
   
 	tc->TC_CHANNEL[channel].TC_RC = count;
 
-	if(tc->TC_CHANNEL[channel].TC_CV > count) {
-    // debug_counter = count;
-		tc->TC_CHANNEL[channel].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
-    // TC_Start(pConfig->pTimerRegs, pConfig->channel);
-  }
+	// if(tc->TC_CHANNEL[channel].TC_CV > count) {
+ //    // debug_counter = count;
+	// 	tc->TC_CHANNEL[channel].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
+ //    // TC_Start(pConfig->pTimerRegs, pConfig->channel);
+ //  }
 }
 
 void HAL_timer_isr_status (Tc* tc, uint32_t channel) {
@@ -350,6 +349,29 @@ HAL_BEEPER_TIMER_ISR {
 // --------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------
+
+uint16_t getAdcReading(adc_channel_num_t chan)
+{
+  uint16_t rslt = (uint16_t) adc_get_channel_value(ADC, chan);
+  adc_disable_channel(ADC, chan);
+  return rslt;
+}
+
+void startAdcConversion(adc_channel_num_t chan)
+{
+  adc_enable_channel(ADC, chan);
+  adc_start(ADC );
+}
+
+// Convert an Arduino Due pin number to the corresponding ADC channel number
+adc_channel_num_t pinToAdcChannel(int pin)
+{
+  if (pin < A0)
+  {
+    pin += A0;
+  }
+  return (adc_channel_num_t) (int) g_APinDescription[pin].ulADCChannelNumber;
+}
 
 // --------------------------------------------------------------------------
 //! @brief
