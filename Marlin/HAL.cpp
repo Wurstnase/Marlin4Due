@@ -297,6 +297,7 @@ void HAL_timer_clear (Tc* tc, uint32_t channel) {
 }
 
 // Due have no tone, this is from Repetier 0.92.3
+static uint32_t tone_pin;
 
 void tone(uint8_t pin, int frequency) {
   // set up timer counter 1 channel 0 to generate interrupts for

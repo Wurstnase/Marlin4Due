@@ -60,7 +60,6 @@
 
 // reset reason set by bootloader
 extern uint8_t MCUSR;
-static uint32_t tone_pin;
 volatile static uint32_t debug_counter;
 
 // --------------------------------------------------------------------------
