@@ -228,7 +228,7 @@ void st_wake_up() {
 
 FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   unsigned long timer;
-  if (step_rate > MAX_STEP_FREQUENCY) step_rate = MAX_STEP_FREQUENCY;
+  // if (step_rate > MAX_STEP_FREQUENCY) step_rate = MAX_STEP_FREQUENCY;
 
   #if ENABLE_HIGH_SPEED_STEPPING
     if(step_rate > (2 * DOUBLE_STEP_FREQUENCY)) { // If steprate > 2*DOUBLE_STEP_FREQUENCY >> step 4 times
@@ -247,7 +247,7 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
 
   timer = HAL_TIMER_RATE / step_rate;
   
-  if(timer < 50) { timer = 50; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(840kHz this should never happen)
+  // if(timer < 50) { timer = 50; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(840kHz this should never happen)
   return timer;
 }
 
@@ -296,6 +296,7 @@ void set_stepper_direction() {
 
 // Initializes the trapezoid generator from the current block. Called whenever a new
 // block begins.
+
 FORCE_INLINE void trapezoid_generator_reset() {
 
   if (current_block->direction_bits != out_bits) {

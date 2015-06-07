@@ -257,11 +257,10 @@ void HAL_timer_disable_interrupt (uint8_t timer_num) {
 
 void HAL_timer_set_count (Tc* tc, uint32_t channel, uint32_t count) {
   
-  uint32_t counter_value = tc->TC_CHANNEL[channel].TC_CV + 5;
-  if(count < 210) count = 210;
-  count = counter_value <= count ? count : counter_value;
-  
-	tc->TC_CHANNEL[channel].TC_RC = count;
+  uint32_t counter_value = tc->TC_CHANNEL[channel].TC_CV + 42;
+  if(count < 120) count = 120;
+    
+	tc->TC_CHANNEL[channel].TC_RC = (counter_value <= count) ? count : counter_value;
 
 	// if(tc->TC_CHANNEL[channel].TC_CV > count) {
  //    // debug_counter = count;
