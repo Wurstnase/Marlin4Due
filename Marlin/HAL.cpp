@@ -185,7 +185,6 @@ static const tTimerConfig TimerConfig [NUM_HARDWARE_TIMERS] =
 
 void HAL_step_timer_start() {
   pmc_set_writeprotect(false); //remove write protection on registers
-  // NVIC_SetPriorityGrouping(4);
   
   // Timer for stepper
   // Timer 3 HAL.h STEP_TIMER_NUM
@@ -197,11 +196,9 @@ void HAL_step_timer_start() {
   uint32_t channel = STEP_TIMER_CHANNEL;
   
   pmc_enable_periph_clk((uint32_t)irq); //we need a clock?
-  // NVIC_SetPriority(irq, NVIC_EncodePriority(4, 4, 0));
   
   tc->TC_CHANNEL[channel].TC_CCR = TC_CCR_CLKDIS;
   
-  // TC_Configure(tc, channel, TC_CMR_TCCLKS_TIMER_CLOCK1 | TC_CMR_CPCTRG); //set clock rate (CLOCK1 is MCK/2) and reset counter register C on match
   tc->TC_CHANNEL[channel].TC_SR; // clear status register
   tc->TC_CHANNEL[channel].TC_CMR =  TC_CMR_WAVSEL_UP_RC | TC_CMR_WAVE | TC_CMR_TCCLKS_TIMER_CLOCK1;
 
@@ -209,11 +206,7 @@ void HAL_step_timer_start() {
   tc->TC_CHANNEL[channel].TC_IDR = ~TC_IER_CPCS;
   tc->TC_CHANNEL[channel].TC_RC   = (VARIANT_MCK >> 1) / 1000; // start with 1kHz as frequency; //interrupt occurs every x interations of the timer counter
   
-  // TC_Start(tc, channel); //start timer counter
   tc->TC_CHANNEL[channel].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
-    
-  //tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS;
-  //tc->TC_CHANNEL[channel].TC_IDR =~ TC_IER_CPCS;
   
   NVIC_EnableIRQ(irq); //enable Nested Vector Interrupt Controller
 }
@@ -237,10 +230,6 @@ void HAL_temp_timer_start (uint8_t timer_num) {
 	tc->TC_CHANNEL[channel].TC_RC   = (VARIANT_MCK >> 7) / TEMP_FREQUENCY;
 	TC_Start(tc, channel);
 
-	//enable interrupt on RC compare
-	//tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS;
-	//tc->TC_CHANNEL[channel].TC_IDR = ~TC_IER_CPCS;
-
 	NVIC_EnableIRQ(irq);
 }
 
@@ -255,45 +244,10 @@ void HAL_timer_disable_interrupt (uint8_t timer_num) {
 	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IDR = TC_IER_CPCS; //disable interrupt
 }
 
-void HAL_timer_set_count (Tc* tc, uint32_t channel, uint32_t count) {
-  
-  uint32_t counter_value = tc->TC_CHANNEL[channel].TC_CV + 5;
-  if(count < 210) count = 210;
-  count = counter_value <= count ? count : counter_value;
-  
-	tc->TC_CHANNEL[channel].TC_RC = count;
-
-	// if(tc->TC_CHANNEL[channel].TC_CV > count) {
- //    // debug_counter = count;
-	// 	tc->TC_CHANNEL[channel].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
- //    // TC_Start(pConfig->pTimerRegs, pConfig->channel);
- //  }
-}
-
-void HAL_timer_isr_status (Tc* tc, uint32_t channel) {
-	// const tTimerConfig *pConfig = &TimerConfig [timer_num];
-  tc->TC_CHANNEL[channel].TC_SR; // clear status register
-	// pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_SR;
-	// TC_GetStatus (pConfig->pTimerRegs, pConfig->channel);
-}
-
 int HAL_timer_get_count (uint8_t timer_num) {
 	Tc *tc = TimerConfig [timer_num].pTimerRegs;
 	uint32_t channel = TimerConfig [timer_num].channel;
 	return tc->TC_CHANNEL[channel].TC_RC;
-}
-
-uint32_t HAL_timer_get_count_value () {
-  Tc *tc = STEP_TIMER_COUNTER;
-  uint32_t channel = STEP_TIMER_CHANNEL;
-  return tc->TC_CHANNEL[channel].TC_CV;
-}
-
-void HAL_timer_clear (Tc* tc, uint32_t channel) {
-  tc->TC_CHANNEL[channel].TC_IDR = TC_IER_CPCS;
-  tc->TC_CHANNEL[channel].TC_SR;
-  tc->TC_CHANNEL[channel].TC_IER = TC_IER_CPCS; 
-  tc->TC_CHANNEL[channel].TC_IDR = ~TC_IER_CPCS;
 }
 
 // Due have no tone, this is from Repetier 0.92.3
@@ -314,8 +268,7 @@ void tone(uint8_t pin, int frequency) {
   tone_pin = pin;
   pmc_set_writeprotect(false);
   pmc_enable_periph_clk((uint32_t)irq);
-  // set interrupt to lowest possible priority
-  NVIC_SetPriority((IRQn_Type)irq, NVIC_EncodePriority(4, 6, 3));
+  
   TC_Configure(tc, channel, TC_CMR_WAVE | TC_CMR_WAVSEL_UP_RC | 
                TC_CMR_TCCLKS_TIMER_CLOCK4);  // TIMER_CLOCK4 -> 128 divisor
   uint32_t rc = VARIANT_MCK / 128 / frequency; 
