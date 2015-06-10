@@ -17,3 +17,6 @@ applet/
 *.idea
 *.cproject
 *.project
+*.cpp.d
+*.c.d
+*.mk
