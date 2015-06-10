@@ -74,6 +74,9 @@
 		<configuration configurationName="Release">
 			<resource resourceType="PROJECT" workspacePath="/Marlin"/>
 		</configuration>
+		<configuration configurationName="Default">
+			<resource resourceType="PROJECT" workspacePath="/Marlin"/>
+		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>
