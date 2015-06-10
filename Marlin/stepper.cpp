@@ -230,7 +230,7 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
   unsigned long timer;
   // if (step_rate > MAX_STEP_FREQUENCY) step_rate = MAX_STEP_FREQUENCY;
 
-  #if ENABLE_HIGH_SPEED_STEPPING
+  #if defined(ENABLE_HIGH_SPEED_STEPPING)
     if(step_rate > (2 * DOUBLE_STEP_FREQUENCY)) { // If steprate > 2*DOUBLE_STEP_FREQUENCY >> step 4 times
       step_rate = (step_rate >> 2);
       step_loops = 4;
@@ -247,7 +247,6 @@ FORCE_INLINE unsigned long calc_timer(unsigned long step_rate) {
 
   timer = HAL_TIMER_RATE / step_rate;
   
-  // if(timer < 50) { timer = 50; MYSERIAL.print(MSG_STEPPER_TOO_HIGH); MYSERIAL.println(step_rate); }//(840kHz this should never happen)
   return timer;
 }
 
@@ -334,6 +333,8 @@ FORCE_INLINE void trapezoid_generator_reset() {
 // "The Stepper Driver Interrupt" - This timer interrupt is the workhorse.
 // It pops blocks from the block_buffer and executes them by pulsing the stepper pins appropriately.
 HAL_STEP_TIMER_ISR {
+
+  //STEP_TIMER_COUNTER->TC_CHANNEL[STEP_TIMER_CHANNEL].TC_SR;
   HAL_timer_isr_status (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL);
 
   if (cleaning_buffer_counter)
@@ -537,7 +538,20 @@ HAL_STEP_TIMER_ISR {
       old_endstop_bits = current_endstop_bits;
     }
 
-    #if (ENABLE_HIGH_SPEED_STEPPING)
+	#define _COUNTER(axis) counter_## axis
+	#define _APPLY_STEP(AXIS) AXIS ##_APPLY_STEP
+	#define _INVERT_STEP_PIN(AXIS) INVERT_## AXIS ##_STEP_PIN
+
+	#define STEP_START(axis, AXIS) \
+	  _COUNTER(axis) += current_block->steps[_AXIS(AXIS)]; \
+	  if (_COUNTER(axis) > 0) { \
+		_APPLY_STEP(AXIS)(!_INVERT_STEP_PIN(AXIS),0); \
+		_COUNTER(axis) -= current_block->step_event_count; \
+		count_position[_AXIS(AXIS)] += count_direction[_AXIS(AXIS)]; }
+
+	#define STEP_END(axis, AXIS) _APPLY_STEP(AXIS)(_INVERT_STEP_PIN(AXIS),0)
+
+    #if defined(ENABLE_HIGH_SPEED_STEPPING)
       // Take multiple steps per interrupt (For high speed moves)
       for (int8_t i = 0; i < step_loops; i++) {
 
@@ -634,7 +648,7 @@ HAL_STEP_TIMER_ISR {
       // ensure we're running at the correct step rate, even if we just came off an acceleration
       step_loops = step_loops_nominal;
     }
-    #if !(ENABLE_HIGH_SPEED_STEPPING)
+    #if !defined(ENABLE_HIGH_SPEED_STEPPING)
       STEP_END(x, X);
       STEP_END(y, Y);
       STEP_END(z, Z);

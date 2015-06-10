@@ -211,7 +211,6 @@ Here are some standard links for getting your machine calibrated:
   #define  DEFAULT_Ki 4.77
   #define  DEFAULT_Kd 75.06
 
-
 // MakerGear
 //    #define  DEFAULT_Kp 7.0
 //    #define  DEFAULT_Ki 0.1
@@ -573,7 +572,7 @@ const bool Z_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the logic 
 #define DEFAULT_AXIS_STEPS_PER_UNIT   {640,640,3200,1100}     // default steps per unit for Ultimaker
 #define DEFAULT_MAX_FEEDRATE          {500, 500, 50, 150}     // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {5000,5000,200,8000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
-#define ENABLE_HIGH_SPEED_STEPPING    true                    // some drivers are to slow. set this to false if your motor doesn't rotate.
+#define ENABLE_HIGH_SPEED_STEPPING  // Activate for very high stepping rates, normally only needed for 1/64 or more micro steps (AXIS_STEPS_PER_UNIT * MAX_FEEDRATE > 150,000)
 
 #define DEFAULT_ACCELERATION          1000    // X, Y, Z and E acceleration in mm/s^2 for printing moves
 #define DEFAULT_RETRACT_ACCELERATION  5000   // E acceleration in mm/s^2 for retracts

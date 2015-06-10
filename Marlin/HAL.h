@@ -41,6 +41,7 @@
 // --------------------------------------------------------------------------
 
 #define analogInputToDigitalPin(IO) IO
+#define FORCE_INLINE __attribute__((always_inline)) inline
 
 #define     CRITICAL_SECTION_START	uint32_t primask=__get_PRIMASK(); __disable_irq();
 #define     CRITICAL_SECTION_END    if (primask==0) __enable_irq();
@@ -122,15 +123,24 @@ unsigned char eeprom_read_byte(unsigned char *pos);
 
 void HAL_step_timer_start(void);
 void HAL_temp_timer_start (uint8_t timer_num);
-void HAL_timer_set_count (Tc *tc, uint32_t channel, uint32_t count);
 
 void HAL_timer_enable_interrupt (uint8_t timer_num);
 void HAL_timer_disable_interrupt (uint8_t timer_num);
 
-void HAL_timer_isr_status (Tc *tc, uint32_t channel);
+FORCE_INLINE
+void HAL_timer_set_count (Tc* tc, uint32_t channel, uint32_t count) {
+
+  uint32_t counter_value = tc->TC_CHANNEL[channel].TC_CV + 42;
+  if(count < 210) count = 210;
+  tc->TC_CHANNEL[channel].TC_RC = (counter_value <= count) ? count : counter_value;
+}
+
+FORCE_INLINE
+void HAL_timer_isr_status (Tc* tc, uint32_t channel) {
+  tc->TC_CHANNEL[channel].TC_SR; // clear status register
+}
+
 int HAL_timer_get_count (uint8_t timer_num);
-uint32_t HAL_timer_get_count_value ();
-void HAL_timer_clear (Tc* tc, uint32_t channel);
 //
 
 void tone(uint8_t pin, int frequency);

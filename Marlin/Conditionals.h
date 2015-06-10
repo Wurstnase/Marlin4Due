@@ -299,8 +299,8 @@
   /**
    * MAX_STEP_FREQUENCY differs for TOSHIBA
    */
-  #ifdef CONFIG_STEPPERS_TOSHIBA
-    #define MAX_STEP_FREQUENCY 120000 // Max step frequency for Toshiba Stepper Controllers
+  #if defined(CONFIG_STEPPERS_TOSHIBA) || !defined(ENABLE_HIGH_SPEED_STEPPING)
+    #define MAX_STEP_FREQUENCY 150000 // Max step frequency for Toshiba Stepper Controllers
     #define DOUBLE_STEP_FREQUENCY MAX_STEP_FREQUENCY
   #else
     #define MAX_STEP_FREQUENCY 500000    // Max step frequency for the Due is approx. 330kHz
