@@ -47,9 +47,9 @@ arduino.ar(Reset.cpp.o)       arduino.ar(CDC.cpp.o) (initiateReset)
                               arduino.ar(USBCore.cpp.o) (UDD_SetStack)
 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(dacc.o)
                               arduino.ar(wiring_analog.c.o) (dacc_reset)
-/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+/home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
                               /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o) (PIOA_Handler)
-/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+/home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                               /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o) (NMI_Handler)
 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libm.a(lib_a-s_ceil.o)
                               ./planner.cpp.o (ceil)
@@ -136,7 +136,7 @@ arduino.ar(Reset.cpp.o)       arduino.ar(CDC.cpp.o) (initiateReset)
 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-init.o)
                               /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/crt0.o (__libc_init_array)
 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-iprintf.o)
-                              /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o (iprintf)
+                              /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o (iprintf)
 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-malloc.o)
                               ./qr_solve.cpp.o (malloc)
 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-mallocr.o)
@@ -308,10 +308,10 @@ Discarded input sections
  .ARM.exidx     0x0000000000000000        0x8 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/crt0.o
  .ARM.attributes
                 0x0000000000000000       0x1b /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/crt0.o
- .text          0x0000000000000000        0x0 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
- .data          0x0000000000000000        0x0 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
- .bss           0x0000000000000000        0x0 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
- .text.link     0x0000000000000000        0x8 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .text          0x0000000000000000        0x0 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
+ .data          0x0000000000000000        0x0 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
+ .bss           0x0000000000000000        0x0 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
+ .text.link     0x0000000000000000        0x8 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
  .text          0x0000000000000000        0x0 ./.ino.cpp.o
  .data          0x0000000000000000        0x0 ./.ino.cpp.o
  .bss           0x0000000000000000        0x0 ./.ino.cpp.o
@@ -322,7 +322,7 @@ Discarded input sections
  .debug_aranges
                 0x0000000000000000       0x18 ./.ino.cpp.o
  .debug_line    0x0000000000000000      0x47e ./.ino.cpp.o
- .debug_str     0x0000000000000000     0x1f76 ./.ino.cpp.o
+ .debug_str     0x0000000000000000     0x1f6a ./.ino.cpp.o
  .comment       0x0000000000000000       0x81 ./.ino.cpp.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./.ino.cpp.o
@@ -500,7 +500,7 @@ Discarded input sections
  .debug_aranges
                 0x0000000000000000       0x18 ./blinkm.cpp.o
  .debug_line    0x0000000000000000      0x42e ./blinkm.cpp.o
- .debug_str     0x0000000000000000      0x849 ./blinkm.cpp.o
+ .debug_str     0x0000000000000000      0x83d ./blinkm.cpp.o
  .comment       0x0000000000000000       0x81 ./blinkm.cpp.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./blinkm.cpp.o
@@ -528,7 +528,7 @@ Discarded input sections
  .debug_aranges
                 0x0000000000000000       0x18 ./digipot_mcp4451.cpp.o
  .debug_line    0x0000000000000000      0x42e ./digipot_mcp4451.cpp.o
- .debug_str     0x0000000000000000      0x852 ./digipot_mcp4451.cpp.o
+ .debug_str     0x0000000000000000      0x846 ./digipot_mcp4451.cpp.o
  .comment       0x0000000000000000       0x81 ./digipot_mcp4451.cpp.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./digipot_mcp4451.cpp.o
@@ -542,7 +542,7 @@ Discarded input sections
  .debug_aranges
                 0x0000000000000000       0x18 ./mesh_bed_leveling.cpp.o
  .debug_line    0x0000000000000000      0x42e ./mesh_bed_leveling.cpp.o
- .debug_str     0x0000000000000000      0x854 ./mesh_bed_leveling.cpp.o
+ .debug_str     0x0000000000000000      0x848 ./mesh_bed_leveling.cpp.o
  .comment       0x0000000000000000       0x81 ./mesh_bed_leveling.cpp.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./mesh_bed_leveling.cpp.o
@@ -586,7 +586,7 @@ Discarded input sections
  .debug_aranges
                 0x0000000000000000       0x18 ./servo.cpp.o
  .debug_line    0x0000000000000000      0x42e ./servo.cpp.o
- .debug_str     0x0000000000000000      0x848 ./servo.cpp.o
+ .debug_str     0x0000000000000000      0x83c ./servo.cpp.o
  .comment       0x0000000000000000       0x81 ./servo.cpp.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./servo.cpp.o
@@ -623,7 +623,7 @@ Discarded input sections
  .debug_aranges
                 0x0000000000000000       0x18 ./stepper_indirection.cpp.o
  .debug_line    0x0000000000000000      0x42e ./stepper_indirection.cpp.o
- .debug_str     0x0000000000000000      0x856 ./stepper_indirection.cpp.o
+ .debug_str     0x0000000000000000      0x84a ./stepper_indirection.cpp.o
  .comment       0x0000000000000000       0x81 ./stepper_indirection.cpp.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./stepper_indirection.cpp.o
@@ -1051,7 +1051,7 @@ Discarded input sections
                 0x0000000000000000       0x28 ./Libraries/U8glib/utility/u8g_com_arduino_common.c.o
  .debug_ranges  0x0000000000000000       0x18 ./Libraries/U8glib/utility/u8g_com_arduino_common.c.o
  .debug_line    0x0000000000000000      0x367 ./Libraries/U8glib/utility/u8g_com_arduino_common.c.o
- .debug_str     0x0000000000000000      0x533 ./Libraries/U8glib/utility/u8g_com_arduino_common.c.o
+ .debug_str     0x0000000000000000      0x527 ./Libraries/U8glib/utility/u8g_com_arduino_common.c.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/utility/u8g_com_arduino_common.c.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/utility/u8g_com_arduino_common.c.o
@@ -1076,7 +1076,7 @@ Discarded input sections
                 0x0000000000000000       0x30 ./Libraries/U8glib/utility/u8g_com_arduino_fast_parallel.c.o
  .debug_ranges  0x0000000000000000       0x88 ./Libraries/U8glib/utility/u8g_com_arduino_fast_parallel.c.o
  .debug_line    0x0000000000000000      0x57e ./Libraries/U8glib/utility/u8g_com_arduino_fast_parallel.c.o
- .debug_str     0x0000000000000000      0xab7 ./Libraries/U8glib/utility/u8g_com_arduino_fast_parallel.c.o
+ .debug_str     0x0000000000000000      0xaab ./Libraries/U8glib/utility/u8g_com_arduino_fast_parallel.c.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/utility/u8g_com_arduino_fast_parallel.c.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/utility/u8g_com_arduino_fast_parallel.c.o
@@ -1093,7 +1093,7 @@ Discarded input sections
                 0x0000000000000000       0x20 ./Libraries/U8glib/utility/u8g_com_arduino_hw_spi.c.o
  .debug_ranges  0x0000000000000000       0x50 ./Libraries/U8glib/utility/u8g_com_arduino_hw_spi.c.o
  .debug_line    0x0000000000000000      0x482 ./Libraries/U8glib/utility/u8g_com_arduino_hw_spi.c.o
- .debug_str     0x0000000000000000      0x5d5 ./Libraries/U8glib/utility/u8g_com_arduino_hw_spi.c.o
+ .debug_str     0x0000000000000000      0x5c9 ./Libraries/U8glib/utility/u8g_com_arduino_hw_spi.c.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/utility/u8g_com_arduino_hw_spi.c.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/utility/u8g_com_arduino_hw_spi.c.o
@@ -1130,7 +1130,7 @@ Discarded input sections
                 0x0000000000000000       0x30 ./Libraries/U8glib/utility/u8g_com_arduino_no_en_parallel.c.o
  .debug_ranges  0x0000000000000000       0x88 ./Libraries/U8glib/utility/u8g_com_arduino_no_en_parallel.c.o
  .debug_line    0x0000000000000000      0x587 ./Libraries/U8glib/utility/u8g_com_arduino_no_en_parallel.c.o
- .debug_str     0x0000000000000000      0xaab ./Libraries/U8glib/utility/u8g_com_arduino_no_en_parallel.c.o
+ .debug_str     0x0000000000000000      0xa9f ./Libraries/U8glib/utility/u8g_com_arduino_no_en_parallel.c.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/utility/u8g_com_arduino_no_en_parallel.c.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/utility/u8g_com_arduino_no_en_parallel.c.o
@@ -1149,7 +1149,7 @@ Discarded input sections
                 0x0000000000000000       0x28 ./Libraries/U8glib/utility/u8g_com_arduino_parallel.c.o
  .debug_ranges  0x0000000000000000       0x18 ./Libraries/U8glib/utility/u8g_com_arduino_parallel.c.o
  .debug_line    0x0000000000000000      0x3c3 ./Libraries/U8glib/utility/u8g_com_arduino_parallel.c.o
- .debug_str     0x0000000000000000      0x583 ./Libraries/U8glib/utility/u8g_com_arduino_parallel.c.o
+ .debug_str     0x0000000000000000      0x577 ./Libraries/U8glib/utility/u8g_com_arduino_parallel.c.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/utility/u8g_com_arduino_parallel.c.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/utility/u8g_com_arduino_parallel.c.o
@@ -1206,7 +1206,7 @@ Discarded input sections
                 0x0000000000000000       0x30 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_custom.c.o
  .debug_ranges  0x0000000000000000       0x58 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_custom.c.o
  .debug_line    0x0000000000000000      0x3f7 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_custom.c.o
- .debug_str     0x0000000000000000      0x63b ./Libraries/U8glib/utility/u8g_com_arduino_st7920_custom.c.o
+ .debug_str     0x0000000000000000      0x62f ./Libraries/U8glib/utility/u8g_com_arduino_st7920_custom.c.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_custom.c.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_custom.c.o
@@ -1224,7 +1224,7 @@ Discarded input sections
                 0x0000000000000000       0x20 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_hw_spi.c.o
  .debug_ranges  0x0000000000000000       0x10 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_hw_spi.c.o
  .debug_line    0x0000000000000000      0x2f1 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_hw_spi.c.o
- .debug_str     0x0000000000000000      0x4ed ./Libraries/U8glib/utility/u8g_com_arduino_st7920_hw_spi.c.o
+ .debug_str     0x0000000000000000      0x4e1 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_hw_spi.c.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_hw_spi.c.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_hw_spi.c.o
@@ -1245,7 +1245,7 @@ Discarded input sections
                 0x0000000000000000       0x30 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_spi.c.o
  .debug_ranges  0x0000000000000000       0x58 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_spi.c.o
  .debug_line    0x0000000000000000      0x3fc ./Libraries/U8glib/utility/u8g_com_arduino_st7920_spi.c.o
- .debug_str     0x0000000000000000      0x627 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_spi.c.o
+ .debug_str     0x0000000000000000      0x61b ./Libraries/U8glib/utility/u8g_com_arduino_st7920_spi.c.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_spi.c.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/utility/u8g_com_arduino_st7920_spi.c.o
@@ -1265,7 +1265,7 @@ Discarded input sections
                 0x0000000000000000       0x28 ./Libraries/U8glib/utility/u8g_com_arduino_std_sw_spi.c.o
  .debug_ranges  0x0000000000000000       0x18 ./Libraries/U8glib/utility/u8g_com_arduino_std_sw_spi.c.o
  .debug_line    0x0000000000000000      0x3b3 ./Libraries/U8glib/utility/u8g_com_arduino_std_sw_spi.c.o
- .debug_str     0x0000000000000000      0x58a ./Libraries/U8glib/utility/u8g_com_arduino_std_sw_spi.c.o
+ .debug_str     0x0000000000000000      0x57e ./Libraries/U8glib/utility/u8g_com_arduino_std_sw_spi.c.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/utility/u8g_com_arduino_std_sw_spi.c.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/utility/u8g_com_arduino_std_sw_spi.c.o
@@ -1292,7 +1292,7 @@ Discarded input sections
                 0x0000000000000000       0x38 ./Libraries/U8glib/utility/u8g_com_arduino_sw_spi.c.o
  .debug_ranges  0x0000000000000000       0x90 ./Libraries/U8glib/utility/u8g_com_arduino_sw_spi.c.o
  .debug_line    0x0000000000000000      0x500 ./Libraries/U8glib/utility/u8g_com_arduino_sw_spi.c.o
- .debug_str     0x0000000000000000      0xaca ./Libraries/U8glib/utility/u8g_com_arduino_sw_spi.c.o
+ .debug_str     0x0000000000000000      0xabe ./Libraries/U8glib/utility/u8g_com_arduino_sw_spi.c.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/utility/u8g_com_arduino_sw_spi.c.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/utility/u8g_com_arduino_sw_spi.c.o
@@ -1331,7 +1331,7 @@ Discarded input sections
                 0x0000000000000000       0x58 ./Libraries/U8glib/utility/u8g_com_arduino_t6963.c.o
  .debug_ranges  0x0000000000000000       0x90 ./Libraries/U8glib/utility/u8g_com_arduino_t6963.c.o
  .debug_line    0x0000000000000000      0x633 ./Libraries/U8glib/utility/u8g_com_arduino_t6963.c.o
- .debug_str     0x0000000000000000      0xbd8 ./Libraries/U8glib/utility/u8g_com_arduino_t6963.c.o
+ .debug_str     0x0000000000000000      0xbcc ./Libraries/U8glib/utility/u8g_com_arduino_t6963.c.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/utility/u8g_com_arduino_t6963.c.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/utility/u8g_com_arduino_t6963.c.o
@@ -1467,7 +1467,7 @@ Discarded input sections
                 0x0000000000000000       0x70 ./Libraries/U8glib/utility/u8g_com_i2c.c.o
  .debug_ranges  0x0000000000000000      0x220 ./Libraries/U8glib/utility/u8g_com_i2c.c.o
  .debug_line    0x0000000000000000      0x679 ./Libraries/U8glib/utility/u8g_com_i2c.c.o
- .debug_str     0x0000000000000000      0x92e ./Libraries/U8glib/utility/u8g_com_i2c.c.o
+ .debug_str     0x0000000000000000      0x922 ./Libraries/U8glib/utility/u8g_com_i2c.c.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/utility/u8g_com_i2c.c.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/utility/u8g_com_i2c.c.o
@@ -1563,7 +1563,7 @@ Discarded input sections
                 0x0000000000000000       0x30 ./Libraries/U8glib/utility/u8g_delay.c.o
  .debug_ranges  0x0000000000000000       0x20 ./Libraries/U8glib/utility/u8g_delay.c.o
  .debug_line    0x0000000000000000      0x365 ./Libraries/U8glib/utility/u8g_delay.c.o
- .debug_str     0x0000000000000000      0x2d0 ./Libraries/U8glib/utility/u8g_delay.c.o
+ .debug_str     0x0000000000000000      0x2c4 ./Libraries/U8glib/utility/u8g_delay.c.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/utility/u8g_delay.c.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/utility/u8g_delay.c.o
@@ -1687,7 +1687,7 @@ Discarded input sections
                 0x0000000000000000       0x48 ./Libraries/U8glib/utility/u8g_dev_ht1632.c.o
  .debug_ranges  0x0000000000000000       0x38 ./Libraries/U8glib/utility/u8g_dev_ht1632.c.o
  .debug_line    0x0000000000000000      0x409 ./Libraries/U8glib/utility/u8g_dev_ht1632.c.o
- .debug_str     0x0000000000000000      0x63c ./Libraries/U8glib/utility/u8g_dev_ht1632.c.o
+ .debug_str     0x0000000000000000      0x630 ./Libraries/U8glib/utility/u8g_dev_ht1632.c.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/utility/u8g_dev_ht1632.c.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/utility/u8g_dev_ht1632.c.o
@@ -5380,7 +5380,7 @@ Discarded input sections
                 0x0000000000000000       0x48 ./Libraries/U8glib/U8glib.cpp.o
  .debug_ranges  0x0000000000000000       0x80 ./Libraries/U8glib/U8glib.cpp.o
  .debug_line    0x0000000000000000      0x31c ./Libraries/U8glib/U8glib.cpp.o
- .debug_str     0x0000000000000000     0x297a ./Libraries/U8glib/U8glib.cpp.o
+ .debug_str     0x0000000000000000     0x296e ./Libraries/U8glib/U8glib.cpp.o
  .comment       0x0000000000000000       0x81 ./Libraries/U8glib/U8glib.cpp.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/U8glib/U8glib.cpp.o
@@ -5479,7 +5479,7 @@ Discarded input sections
                 0x0000000000000000       0xf8 ./Libraries/LiquidTWI2/LiquidTWI2.cpp.o
  .debug_ranges  0x0000000000000000      0x2d8 ./Libraries/LiquidTWI2/LiquidTWI2.cpp.o
  .debug_line    0x0000000000000000      0x9c4 ./Libraries/LiquidTWI2/LiquidTWI2.cpp.o
- .debug_str     0x0000000000000000      0x9fe ./Libraries/LiquidTWI2/LiquidTWI2.cpp.o
+ .debug_str     0x0000000000000000      0x9f2 ./Libraries/LiquidTWI2/LiquidTWI2.cpp.o
  .comment       0x0000000000000000       0x81 ./Libraries/LiquidTWI2/LiquidTWI2.cpp.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/LiquidTWI2/LiquidTWI2.cpp.o
@@ -5555,7 +5555,7 @@ Discarded input sections
                 0x0000000000000000       0xf8 ./Libraries/LiquidCrystal_I2C/LiquidCrystal_I2C.cpp.o
  .debug_ranges  0x0000000000000000      0x2b0 ./Libraries/LiquidCrystal_I2C/LiquidCrystal_I2C.cpp.o
  .debug_line    0x0000000000000000      0x82a ./Libraries/LiquidCrystal_I2C/LiquidCrystal_I2C.cpp.o
- .debug_str     0x0000000000000000      0xb71 ./Libraries/LiquidCrystal_I2C/LiquidCrystal_I2C.cpp.o
+ .debug_str     0x0000000000000000      0xb65 ./Libraries/LiquidCrystal_I2C/LiquidCrystal_I2C.cpp.o
  .comment       0x0000000000000000       0x81 ./Libraries/LiquidCrystal_I2C/LiquidCrystal_I2C.cpp.o
  .ARM.attributes
                 0x0000000000000000       0x33 ./Libraries/LiquidCrystal_I2C/LiquidCrystal_I2C.cpp.o
@@ -6101,18 +6101,18 @@ Discarded input sections
                 0x0000000000000000       0x14 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(dacc.o)
  .text.dacc_get_analog_control
                 0x0000000000000000        0x6 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(dacc.o)
- .text          0x0000000000000000        0x0 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
- .data          0x0000000000000000        0x0 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
- .bss           0x0000000000000000        0x0 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+ .text          0x0000000000000000        0x0 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
+ .data          0x0000000000000000        0x0 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
+ .bss           0x0000000000000000        0x0 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
  .text.attachInterrupt
-                0x0000000000000000      0x18c /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                0x0000000000000000      0x18c /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
  .text.detachInterrupt
-                0x0000000000000000       0x18 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                0x0000000000000000       0x18 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
  .bss.enabled.9363
-                0x0000000000000000        0x4 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
- .text          0x0000000000000000        0x0 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
- .data          0x0000000000000000        0x0 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
- .bss           0x0000000000000000        0x0 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+                0x0000000000000000        0x4 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
+ .text          0x0000000000000000        0x0 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+ .data          0x0000000000000000        0x0 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+ .bss           0x0000000000000000        0x0 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
  .text          0x0000000000000000        0x0 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libm.a(lib_a-s_ceil.o)
  .data          0x0000000000000000        0x0 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libm.a(lib_a-s_ceil.o)
  .bss           0x0000000000000000        0x0 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libm.a(lib_a-s_ceil.o)
@@ -6545,7 +6545,7 @@ LOAD /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-e
 LOAD /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/armv7-m/crtbegin.o
 LOAD /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/crt0.o
 START GROUP
-LOAD /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+LOAD /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
 LOAD ./.ino.cpp.o
 LOAD ./HAL.cpp.o
 LOAD ./Marlin_main.cpp.o
@@ -6685,7 +6685,7 @@ LOAD ./Libraries/LiquidCrystal_I2C/LiquidCrystal_I2C.cpp.o
 LOAD ./Libraries/LiquidCrystal/src/LiquidCrystal.cpp.o
 LOAD arduino.ar
 LOAD /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a
-LOAD /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar
+LOAD /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar
 END GROUP
 LOAD /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libm.a
 START GROUP
@@ -6704,25 +6704,25 @@ LOAD /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-e
                 0x0000000000080000                exception_table
  *(.text .text.* .gnu.linkonce.t.*)
  .text          0x00000000000800f4       0x54 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/armv7-m/crtbegin.o
- .text._sbrk    0x0000000000080148       0x1c /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .text._sbrk    0x0000000000080148       0x1c /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                 0x0000000000080148                _sbrk
- .text._close   0x0000000000080164        0x8 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .text._close   0x0000000000080164        0x8 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                 0x0000000000080164                _close
- .text._fstat   0x000000000008016c        0xc /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .text._fstat   0x000000000008016c        0xc /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                 0x000000000008016c                _fstat
- .text._isatty  0x0000000000080178        0x4 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .text._isatty  0x0000000000080178        0x4 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                 0x0000000000080178                _isatty
- .text._lseek   0x000000000008017c        0x4 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .text._lseek   0x000000000008017c        0x4 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                 0x000000000008017c                _lseek
- .text._read    0x0000000000080180        0x4 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .text._read    0x0000000000080180        0x4 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                 0x0000000000080180                _read
- .text._write   0x0000000000080184       0x2c /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .text._write   0x0000000000080184       0x2c /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                 0x0000000000080184                _write
- .text._exit    0x00000000000801b0       0x10 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .text._exit    0x00000000000801b0       0x10 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                 0x00000000000801b0                _exit
- .text._kill    0x00000000000801c0        0x4 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .text._kill    0x00000000000801c0        0x4 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                 0x00000000000801c0                _kill
- .text._getpid  0x00000000000801c4        0x8 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .text._getpid  0x00000000000801c4        0x8 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                 0x00000000000801c4                _getpid
  .text._Z3cliv  0x00000000000801cc        0x4 ./HAL.cpp.o
                 0x00000000000801cc                cli()
@@ -8194,18 +8194,18 @@ LOAD /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-e
                 0x0000000000096bcc        0x8 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(dacc.o)
                 0x0000000000096bcc                dacc_set_analog_control
  .text.PIOA_Handler
-                0x0000000000096bd4       0x2c /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                0x0000000000096bd4       0x2c /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
                 0x0000000000096bd4                PIOA_Handler
  .text.PIOB_Handler
-                0x0000000000096c00       0x2c /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                0x0000000000096c00       0x2c /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
                 0x0000000000096c00                PIOB_Handler
  .text.PIOC_Handler
-                0x0000000000096c2c       0x2c /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                0x0000000000096c2c       0x2c /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
                 0x0000000000096c2c                PIOC_Handler
  .text.PIOD_Handler
-                0x0000000000096c58       0x2c /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                0x0000000000096c58       0x2c /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
                 0x0000000000096c58                PIOD_Handler
- .text.__halt   0x0000000000096c84        0x4 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+ .text.__halt   0x0000000000096c84        0x4 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                 0x0000000000096c84                DACC_Handler
                 0x0000000000096c84                DebugMon_Handler
                 0x0000000000096c84                DMAC_Handler
@@ -8240,13 +8240,13 @@ LOAD /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-e
                 0x0000000000096c84                TC5_Handler
                 0x0000000000096c84                SPI0_Handler
  .text.SVC_Handler
-                0x0000000000096c88        0x4 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+                0x0000000000096c88        0x4 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                 0x0000000000096c88                SVC_Handler
  .text.PendSV_Handler
-                0x0000000000096c8c        0x4 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+                0x0000000000096c8c        0x4 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                 0x0000000000096c8c                PendSV_Handler
  .text.SysTick_Handler
-                0x0000000000096c90       0x18 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+                0x0000000000096c90       0x18 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                 0x0000000000096c90                SysTick_Handler
  .text.ceil     0x0000000000096ca8      0x120 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libm.a(lib_a-s_ceil.o)
                 0x0000000000096ca8                ceil
@@ -8674,7 +8674,7 @@ LOAD /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-e
  .glue_7        0x0000000000000000        0x0 linker stubs
  *(.rodata .rodata* .gnu.linkonce.r.*)
  .rodata.str1.4
-                0x00000000000a1da8       0x19 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+                0x00000000000a1da8       0x19 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                                          0x1c (size before relaxing)
  *fill*         0x00000000000a1dc1        0x3 
  .rodata._ZL11TimerConfig
@@ -9189,7 +9189,7 @@ LOAD /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-e
  *(.bss .bss.*)
  .bss           0x0000000020070a50       0x1c /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/armv7-m/crtbegin.o
  .bss.heap.6416
-                0x0000000020070a6c        0x4 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+                0x0000000020070a6c        0x4 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
  .bss.MCUSR     0x0000000020070a70        0x1 ./HAL.cpp.o
                 0x0000000020070a70                MCUSR
  .bss._ZL18eeprom_initialised
@@ -9711,13 +9711,13 @@ LOAD /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-e
  .bss.ul_send_fifo_ptr
                 0x000000002007264c       0x28 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(uotghs_device.o)
  .bss.callbacksPioA
-                0x0000000020072674       0x80 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                0x0000000020072674       0x80 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
  .bss.callbacksPioB
-                0x00000000200726f4       0x80 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                0x00000000200726f4       0x80 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
  .bss.callbacksPioC
-                0x0000000020072774       0x80 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                0x0000000020072774       0x80 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
  .bss.callbacksPioD
-                0x00000000200727f4       0x80 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                0x00000000200727f4       0x80 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
  .bss.__malloc_max_total_mem
                 0x0000000020072874        0x4 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-mallocr.o)
                 0x0000000020072874                __malloc_max_total_mem
@@ -9745,7 +9745,7 @@ LOAD /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-e
                 0x0000000020088000                __StackLimit = (__StackTop - SIZEOF (.stack_dummy))
                 0x0000000020088000                PROVIDE (_sstack, __StackLimit)
                 0x0000000020088000                PROVIDE (_estack, __StackTop)
-OUTPUT(/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.elf elf32-littlearm)
+OUTPUT(/home/nico/github/wurstnase/Marlin4Due/Marlin/Release/Marlin.elf elf32-littlearm)
 
 .ARM.attributes
                 0x0000000000000000       0x29
@@ -9754,7 +9754,7 @@ OUTPUT(/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.
  .ARM.attributes
                 0x000000000000001d       0x2d /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/armv7-m/crtbegin.o
  .ARM.attributes
-                0x000000000000004a       0x33 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+                0x000000000000004a       0x33 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
  .ARM.attributes
                 0x000000000000007d       0x33 ./HAL.cpp.o
  .ARM.attributes
@@ -9850,9 +9850,9 @@ OUTPUT(/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.
  .ARM.attributes
                 0x000000000000098b       0x31 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(dacc.o)
  .ARM.attributes
-                0x00000000000009bc       0x33 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                0x00000000000009bc       0x33 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
  .ARM.attributes
-                0x00000000000009ef       0x33 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+                0x00000000000009ef       0x33 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
  .ARM.attributes
                 0x0000000000000a22       0x2d /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libm.a(lib_a-s_ceil.o)
  .ARM.attributes
@@ -10071,7 +10071,7 @@ OUTPUT(/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.
                 0x0000000000001bfd       0x1d /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/armv7-m/crtn.o
 
 .comment        0x0000000000000000       0xaa
- .comment       0x0000000000000000       0x80 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .comment       0x0000000000000000       0x80 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                                          0x81 (size before relaxing)
  .comment       0x0000000000000000       0x81 ./HAL.cpp.o
  .comment       0x0000000000000000       0x81 ./Marlin_main.cpp.o
@@ -10121,11 +10121,11 @@ OUTPUT(/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.
  .comment       0x0000000000000000       0x2b /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(interrupt_sam_nvic.o)
  .comment       0x0000000000000000       0x2b /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(uotghs_device.o)
  .comment       0x0000000000000000       0x2b /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(dacc.o)
- .comment       0x0000000000000000       0x81 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
- .comment       0x0000000000000000       0x81 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+ .comment       0x0000000000000000       0x81 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
+ .comment       0x0000000000000000       0x81 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
 
 .debug_info     0x0000000000000000    0x5aec1
- .debug_info    0x0000000000000000      0x624 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .debug_info    0x0000000000000000      0x624 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
  .debug_info    0x0000000000000624     0x1de2 ./HAL.cpp.o
  .debug_info    0x0000000000002406     0xe171 ./Marlin_main.cpp.o
  .debug_info    0x0000000000010577     0x3ba3 ./Sd2Card.cpp.o
@@ -10158,11 +10158,11 @@ OUTPUT(/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.
  .debug_info    0x000000000005599d     0x2b70 arduino.ar(CDC.cpp.o)
  .debug_info    0x000000000005850d     0x12bc arduino.ar(HID.cpp.o)
  .debug_info    0x00000000000597c9      0x390 arduino.ar(Reset.cpp.o)
- .debug_info    0x0000000000059b59     0x10be /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
- .debug_info    0x000000000005ac17      0x2aa /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+ .debug_info    0x0000000000059b59     0x10be /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
+ .debug_info    0x000000000005ac17      0x2aa /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
 
 .debug_abbrev   0x0000000000000000     0xa4d1
- .debug_abbrev  0x0000000000000000      0x19c /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .debug_abbrev  0x0000000000000000      0x19c /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
  .debug_abbrev  0x000000000000019c      0x5b3 ./HAL.cpp.o
  .debug_abbrev  0x000000000000074f      0xbf7 ./Marlin_main.cpp.o
  .debug_abbrev  0x0000000000001346      0x5f9 ./Sd2Card.cpp.o
@@ -10195,11 +10195,11 @@ OUTPUT(/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.
  .debug_abbrev  0x0000000000009433      0x61d arduino.ar(CDC.cpp.o)
  .debug_abbrev  0x0000000000009a50      0x588 arduino.ar(HID.cpp.o)
  .debug_abbrev  0x0000000000009fd8      0x134 arduino.ar(Reset.cpp.o)
- .debug_abbrev  0x000000000000a10c      0x2bf /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
- .debug_abbrev  0x000000000000a3cb      0x106 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+ .debug_abbrev  0x000000000000a10c      0x2bf /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
+ .debug_abbrev  0x000000000000a3cb      0x106 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
 
 .debug_loc      0x0000000000000000    0x26701
- .debug_loc     0x0000000000000000      0x18b /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .debug_loc     0x0000000000000000      0x18b /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
  .debug_loc     0x000000000000018b      0x52d ./HAL.cpp.o
  .debug_loc     0x00000000000006b8     0x7cee ./Marlin_main.cpp.o
  .debug_loc     0x00000000000083a6     0x1270 ./Sd2Card.cpp.o
@@ -10228,11 +10228,11 @@ OUTPUT(/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.
  .debug_loc     0x00000000000248ab      0xb2f arduino.ar(USBCore.cpp.o)
  .debug_loc     0x00000000000253da      0x56d arduino.ar(CDC.cpp.o)
  .debug_loc     0x0000000000025947      0x9f9 arduino.ar(HID.cpp.o)
- .debug_loc     0x0000000000026340      0x3c1 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+ .debug_loc     0x0000000000026340      0x3c1 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
 
 .debug_aranges  0x0000000000000000     0x16e8
  .debug_aranges
-                0x0000000000000000       0x70 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+                0x0000000000000000       0x70 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
  .debug_aranges
                 0x0000000000000070       0x98 ./HAL.cpp.o
  .debug_aranges
@@ -10298,12 +10298,12 @@ OUTPUT(/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.
  .debug_aranges
                 0x0000000000001630       0x38 arduino.ar(Reset.cpp.o)
  .debug_aranges
-                0x0000000000001668       0x48 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                0x0000000000001668       0x48 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
  .debug_aranges
-                0x00000000000016b0       0x38 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+                0x00000000000016b0       0x38 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
 
 .debug_ranges   0x0000000000000000     0x7818
- .debug_ranges  0x0000000000000000       0x60 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .debug_ranges  0x0000000000000000       0x60 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
  .debug_ranges  0x0000000000000060      0x278 ./HAL.cpp.o
  .debug_ranges  0x00000000000002d8     0x12e8 ./Marlin_main.cpp.o
  .debug_ranges  0x00000000000015c0      0x3f8 ./Sd2Card.cpp.o
@@ -10336,11 +10336,11 @@ OUTPUT(/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.
  .debug_ranges  0x0000000000007470      0x138 arduino.ar(CDC.cpp.o)
  .debug_ranges  0x00000000000075a8      0x1a0 arduino.ar(HID.cpp.o)
  .debug_ranges  0x0000000000007748       0x28 arduino.ar(Reset.cpp.o)
- .debug_ranges  0x0000000000007770       0x80 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
- .debug_ranges  0x00000000000077f0       0x28 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+ .debug_ranges  0x0000000000007770       0x80 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
+ .debug_ranges  0x00000000000077f0       0x28 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
 
 .debug_line     0x0000000000000000    0x15ac8
- .debug_line    0x0000000000000000      0x478 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .debug_line    0x0000000000000000      0x478 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
  .debug_line    0x0000000000000478      0x895 ./HAL.cpp.o
  .debug_line    0x0000000000000d0d     0x25c4 ./Marlin_main.cpp.o
  .debug_line    0x00000000000032d1      0xb0b ./Sd2Card.cpp.o
@@ -10373,83 +10373,83 @@ OUTPUT(/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.
  .debug_line    0x0000000000013fd0      0x775 arduino.ar(CDC.cpp.o)
  .debug_line    0x0000000000014745      0x6af arduino.ar(HID.cpp.o)
  .debug_line    0x0000000000014df4      0x452 arduino.ar(Reset.cpp.o)
- .debug_line    0x0000000000015246      0x554 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
- .debug_line    0x000000000001579a      0x32e /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+ .debug_line    0x0000000000015246      0x554 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
+ .debug_line    0x000000000001579a      0x32e /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
 
-.debug_str      0x0000000000000000     0xd19c
- .debug_str     0x0000000000000000      0x425 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
-                                        0x4b4 (size before relaxing)
- .debug_str     0x0000000000000425     0x11db ./HAL.cpp.o
-                                       0x1403 (size before relaxing)
- .debug_str     0x0000000000001600     0x4b2f ./Marlin_main.cpp.o
-                                       0x571e (size before relaxing)
- .debug_str     0x000000000000612f      0x531 ./Sd2Card.cpp.o
-                                       0x193d (size before relaxing)
- .debug_str     0x0000000000006660      0x27d ./SdBaseFile.cpp.o
-                                       0x3048 (size before relaxing)
- .debug_str     0x00000000000068dd       0xa0 ./SdFile.cpp.o
-                                       0x2d88 (size before relaxing)
- .debug_str     0x000000000000697d       0xee ./SdVolume.cpp.o
-                                       0x2038 (size before relaxing)
- .debug_str     0x0000000000006a6b      0x153 ./cardreader.cpp.o
-                                       0x3782 (size before relaxing)
- .debug_str     0x0000000000006bbe       0xd1 ./configuration_store.cpp.o
-                                        0xfad (size before relaxing)
- .debug_str     0x0000000000006c8f      0x4ce ./planner.cpp.o
-                                       0x1600 (size before relaxing)
- .debug_str     0x000000000000715d      0x21d ./qr_solve.cpp.o
-                                        0xa9a (size before relaxing)
- .debug_str     0x000000000000737a      0x38f ./stepper.cpp.o
-                                       0x1ab6 (size before relaxing)
- .debug_str     0x0000000000007709      0x662 ./temperature.cpp.o
-                                       0x1705 (size before relaxing)
- .debug_str     0x0000000000007d6b     0x12e3 ./ultralcd.cpp.o
-                                       0x502b (size before relaxing)
- .debug_str     0x000000000000904e       0xa2 ./vector_3.cpp.o
-                                        0xbde (size before relaxing)
- .debug_str     0x00000000000090f0       0x4a ./watchdog.cpp.o
-                                        0x8c9 (size before relaxing)
- .debug_str     0x000000000000913a     0x119e ./Libraries/Wire/Wire.cpp.o
-                                       0x1e88 (size before relaxing)
- .debug_str     0x000000000000a2d8      0x145 ./Libraries/SPI/SPI.cpp.o
-                                        0xe21 (size before relaxing)
- .debug_str     0x000000000000a41d      0x499 ./Libraries/LiquidCrystal/src/LiquidCrystal.cpp.o
-                                        0x858 (size before relaxing)
- .debug_str     0x000000000000a8b6      0x4f3 arduino.ar(variant.cpp.o)
-                                       0x11bb (size before relaxing)
- .debug_str     0x000000000000ada9      0x344 arduino.ar(Print.cpp.o)
-                                        0xf92 (size before relaxing)
- .debug_str     0x000000000000b0ed       0x74 arduino.ar(RingBuffer.cpp.o)
+.debug_str      0x0000000000000000     0xd190
+ .debug_str     0x0000000000000000      0x419 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
+                                        0x4a8 (size before relaxing)
+ .debug_str     0x0000000000000419     0x11db ./HAL.cpp.o
+                                       0x13f7 (size before relaxing)
+ .debug_str     0x00000000000015f4     0x4b2f ./Marlin_main.cpp.o
+                                       0x5712 (size before relaxing)
+ .debug_str     0x0000000000006123      0x531 ./Sd2Card.cpp.o
+                                       0x1931 (size before relaxing)
+ .debug_str     0x0000000000006654      0x27d ./SdBaseFile.cpp.o
+                                       0x303c (size before relaxing)
+ .debug_str     0x00000000000068d1       0xa0 ./SdFile.cpp.o
+                                       0x2d7c (size before relaxing)
+ .debug_str     0x0000000000006971       0xee ./SdVolume.cpp.o
+                                       0x202c (size before relaxing)
+ .debug_str     0x0000000000006a5f      0x153 ./cardreader.cpp.o
+                                       0x3776 (size before relaxing)
+ .debug_str     0x0000000000006bb2       0xd1 ./configuration_store.cpp.o
+                                        0xfa1 (size before relaxing)
+ .debug_str     0x0000000000006c83      0x4ce ./planner.cpp.o
+                                       0x15f4 (size before relaxing)
+ .debug_str     0x0000000000007151      0x21d ./qr_solve.cpp.o
+                                        0xa8e (size before relaxing)
+ .debug_str     0x000000000000736e      0x38f ./stepper.cpp.o
+                                       0x1aaa (size before relaxing)
+ .debug_str     0x00000000000076fd      0x662 ./temperature.cpp.o
+                                       0x16f9 (size before relaxing)
+ .debug_str     0x0000000000007d5f     0x12e3 ./ultralcd.cpp.o
+                                       0x501f (size before relaxing)
+ .debug_str     0x0000000000009042       0xa2 ./vector_3.cpp.o
+                                        0xbd2 (size before relaxing)
+ .debug_str     0x00000000000090e4       0x4a ./watchdog.cpp.o
+                                        0x8bd (size before relaxing)
+ .debug_str     0x000000000000912e     0x119e ./Libraries/Wire/Wire.cpp.o
+                                       0x1e7c (size before relaxing)
+ .debug_str     0x000000000000a2cc      0x145 ./Libraries/SPI/SPI.cpp.o
+                                        0xe15 (size before relaxing)
+ .debug_str     0x000000000000a411      0x499 ./Libraries/LiquidCrystal/src/LiquidCrystal.cpp.o
+                                        0x84c (size before relaxing)
+ .debug_str     0x000000000000a8aa      0x4f3 arduino.ar(variant.cpp.o)
+                                       0x11af (size before relaxing)
+ .debug_str     0x000000000000ad9d      0x344 arduino.ar(Print.cpp.o)
+                                        0xf86 (size before relaxing)
+ .debug_str     0x000000000000b0e1       0x74 arduino.ar(RingBuffer.cpp.o)
                                         0x298 (size before relaxing)
- .debug_str     0x000000000000b161      0x145 arduino.ar(UARTClass.cpp.o)
-                                       0x14d4 (size before relaxing)
- .debug_str     0x000000000000b2a6      0x14f arduino.ar(USARTClass.cpp.o)
-                                       0x153c (size before relaxing)
- .debug_str     0x000000000000b3f5      0x105 arduino.ar(main.cpp.o)
-                                        0x3be (size before relaxing)
- .debug_str     0x000000000000b4fa       0x88 arduino.ar(wiring.c.o)
-                                        0x34f (size before relaxing)
- .debug_str     0x000000000000b582      0x5c4 arduino.ar(wiring_analog.c.o)
-                                       0x102a (size before relaxing)
- .debug_str     0x000000000000bb46       0xa1 arduino.ar(wiring_digital.c.o)
-                                        0x7ee (size before relaxing)
- .debug_str     0x000000000000bbe7      0xbd8 arduino.ar(USBCore.cpp.o)
-                                       0x10a0 (size before relaxing)
- .debug_str     0x000000000000c7bf       0x70 arduino.ar(hooks.c.o)
+ .debug_str     0x000000000000b155      0x145 arduino.ar(UARTClass.cpp.o)
+                                       0x14c8 (size before relaxing)
+ .debug_str     0x000000000000b29a      0x14f arduino.ar(USARTClass.cpp.o)
+                                       0x1530 (size before relaxing)
+ .debug_str     0x000000000000b3e9      0x105 arduino.ar(main.cpp.o)
+                                        0x3b2 (size before relaxing)
+ .debug_str     0x000000000000b4ee       0x88 arduino.ar(wiring.c.o)
+                                        0x343 (size before relaxing)
+ .debug_str     0x000000000000b576      0x5c4 arduino.ar(wiring_analog.c.o)
+                                       0x101e (size before relaxing)
+ .debug_str     0x000000000000bb3a       0xa1 arduino.ar(wiring_digital.c.o)
+                                        0x7e2 (size before relaxing)
+ .debug_str     0x000000000000bbdb      0xbd8 arduino.ar(USBCore.cpp.o)
+                                       0x1094 (size before relaxing)
+ .debug_str     0x000000000000c7b3       0x70 arduino.ar(hooks.c.o)
                                         0x124 (size before relaxing)
- .debug_str     0x000000000000c82f      0x3d9 arduino.ar(CDC.cpp.o)
-                                       0x1af7 (size before relaxing)
- .debug_str     0x000000000000cc08      0x315 arduino.ar(HID.cpp.o)
-                                        0x88e (size before relaxing)
- .debug_str     0x000000000000cf1d       0xdb arduino.ar(Reset.cpp.o)
-                                        0x3a0 (size before relaxing)
- .debug_str     0x000000000000cff8       0xe4 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
-                                        0xb58 (size before relaxing)
- .debug_str     0x000000000000d0dc       0xc0 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
-                                        0x2e5 (size before relaxing)
+ .debug_str     0x000000000000c823      0x3d9 arduino.ar(CDC.cpp.o)
+                                       0x1aeb (size before relaxing)
+ .debug_str     0x000000000000cbfc      0x315 arduino.ar(HID.cpp.o)
+                                        0x882 (size before relaxing)
+ .debug_str     0x000000000000cf11       0xdb arduino.ar(Reset.cpp.o)
+                                        0x394 (size before relaxing)
+ .debug_str     0x000000000000cfec       0xe4 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                                        0xb4c (size before relaxing)
+ .debug_str     0x000000000000d0d0       0xc0 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+                                        0x2d9 (size before relaxing)
 
 .debug_frame    0x0000000000000000     0x5a98
- .debug_frame   0x0000000000000000       0xd4 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+ .debug_frame   0x0000000000000000       0xd4 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
  .debug_frame   0x00000000000000d4      0x180 ./HAL.cpp.o
  .debug_frame   0x0000000000000254      0x5dc ./Marlin_main.cpp.o
  .debug_frame   0x0000000000000830      0x248 ./Sd2Card.cpp.o
@@ -10482,8 +10482,8 @@ OUTPUT(/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.
  .debug_frame   0x0000000000003de4      0x158 arduino.ar(CDC.cpp.o)
  .debug_frame   0x0000000000003f3c      0x1e4 arduino.ar(HID.cpp.o)
  .debug_frame   0x0000000000004120       0x58 arduino.ar(Reset.cpp.o)
- .debug_frame   0x0000000000004178       0xb8 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
- .debug_frame   0x0000000000004230       0x58 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+ .debug_frame   0x0000000000004178       0xb8 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
+ .debug_frame   0x0000000000004230       0x58 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
  .debug_frame   0x0000000000004288       0x38 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libm.a(lib_a-s_ceil.o)
  .debug_frame   0x00000000000042c0       0x30 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libm.a(lib_a-s_cos.o)
  .debug_frame   0x00000000000042f0       0x38 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libm.a(lib_a-s_floor.o)
@@ -10577,13 +10577,13 @@ OUTPUT(/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.
 Cross Reference Table
 
 Symbol                                            File
-ADC_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+ADC_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-BusFault_Handler                                  /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+BusFault_Handler                                  /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-CAN0_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+CAN0_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-CAN1_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+CAN1_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 CDC_GetInterface(unsigned char*)                  arduino.ar(CDC.cpp.o)
                                                   arduino.ar(USBCore.cpp.o)
@@ -10649,17 +10649,17 @@ Config_RetrieveSettings()                         ./configuration_store.cpp.o
 Config_StoreSettings()                            ./configuration_store.cpp.o
                                                   ./ultralcd.cpp.o
                                                   ./Marlin_main.cpp.o
-DACC_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+DACC_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-DMAC_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+DMAC_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-DebugMon_Handler                                  /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+DebugMon_Handler                                  /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-EFC0_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+EFC0_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-EFC1_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+EFC1_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-EMAC_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+EMAC_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 FlushSerialRequestResend()                        ./Marlin_main.cpp.o
 GetTickCount                                      /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(timetick.o)
@@ -10681,9 +10681,9 @@ HID_GetInterface(unsigned char*)                  arduino.ar(HID.cpp.o)
 HID_SendReport(unsigned char, void const*, unsigned long) arduino.ar(HID.cpp.o)
 HID_Setup(Setup&)                                 arduino.ar(HID.cpp.o)
                                                   arduino.ar(USBCore.cpp.o)
-HSMCI_Handler                                     /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+HSMCI_Handler                                     /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-HardFault_Handler                                 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+HardFault_Handler                                 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 Kc                                                ./temperature.cpp.o
                                                   ./ultralcd.cpp.o
@@ -10808,7 +10808,7 @@ LiquidTWI2::setRegister(unsigned char, unsigned char) ./Libraries/LiquidTWI2/Liq
 LiquidTWI2::write(unsigned char)                  ./Libraries/LiquidTWI2/LiquidTWI2.cpp.o
 MCUSR                                             ./HAL.cpp.o
                                                   ./Marlin_main.cpp.o
-MemManage_Handler                                 /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+MemManage_Handler                                 /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 Mouse                                             arduino.ar(HID.cpp.o)
 Mouse_::Mouse_()                                  arduino.ar(HID.cpp.o)
@@ -10821,17 +10821,17 @@ Mouse_::isPressed(unsigned char)                  arduino.ar(HID.cpp.o)
 Mouse_::move(signed char, signed char, signed char) arduino.ar(HID.cpp.o)
 Mouse_::press(unsigned char)                      arduino.ar(HID.cpp.o)
 Mouse_::release(unsigned char)                    arduino.ar(HID.cpp.o)
-NMI_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+NMI_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 PID_autotune(float, int, int)                     ./temperature.cpp.o
                                                   ./Marlin_main.cpp.o
-PIOA_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+PIOA_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-PIOB_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+PIOB_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-PIOC_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+PIOC_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-PIOD_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+PIOD_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 PIO_Clear                                         /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(pio.o)
                                                   ./Libraries/U8glib/utility/u8g_com_i2c.c.o
@@ -10862,7 +10862,7 @@ PIO_SetInput                                      /home/nico/Tools/arduino-1.5.8
 PIO_SetOutput                                     /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(pio.o)
                                                   arduino.ar(wiring_digital.c.o)
 PIO_SetPeripheral                                 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(pio.o)
-PMC_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+PMC_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 PWMC_ConfigureChannel                             /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(pwmc.o)
                                                   arduino.ar(wiring_analog.c.o)
@@ -10894,9 +10894,9 @@ PWMC_SetPeriod                                    /home/nico/Tools/arduino-1.5.8
 PWMC_SetSyncChannelUpdatePeriod                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(pwmc.o)
 PWMC_SetSyncChannelUpdateUnlock                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(pwmc.o)
 PWMC_WriteBuffer                                  /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(pwmc.o)
-PWM_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+PWM_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-PendSV_Handler                                    /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+PendSV_Handler                                    /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 Print::print(Printable const&)                    arduino.ar(Print.cpp.o)
 Print::print(String const&)                       arduino.ar(Print.cpp.o)
@@ -10957,11 +10957,11 @@ Print::write(unsigned char const*, unsigned int)  arduino.ar(Print.cpp.o)
                                                   ./Libraries/LiquidTWI2/LiquidTWI2.cpp.o
                                                   ./Libraries/Wire/Wire.cpp.o
                                                   ./SdFile.cpp.o
-RSTC_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+RSTC_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-RTC_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+RTC_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-RTT_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+RTT_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 Reset_Handler                                     /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 RingBuffer::RingBuffer()                          arduino.ar(RingBuffer.cpp.o)
@@ -10973,11 +10973,11 @@ RingBuffer::store_char(unsigned char)             arduino.ar(RingBuffer.cpp.o)
 Running                                           ./Marlin_main.cpp.o
                                                   ./temperature.cpp.o
 RxLEDPulse                                        arduino.ar(USBCore.cpp.o)
-SMC_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+SMC_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 SPI                                               ./Libraries/SPI/SPI.cpp.o
                                                   ./Sd2Card.cpp.o
-SPI0_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+SPI0_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 SPIClass::SPIClass(Spi*, unsigned long, void (*)()) ./Libraries/SPI/SPI.cpp.o
 SPIClass::SPIClass(Spi*, unsigned long, void (*)()) ./Libraries/SPI/SPI.cpp.o
@@ -11016,14 +11016,14 @@ SPI_GetStatus                                     /home/nico/Tools/arduino-1.5.8
 SPI_IsFinished                                    /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(spi.o)
 SPI_Read                                          /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(spi.o)
 SPI_Write                                         /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(spi.o)
-SSC_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+SSC_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 STRING_LANGUAGE                                   arduino.ar(USBCore.cpp.o)
 STRING_MANUFACTURER                               arduino.ar(USBCore.cpp.o)
 STRING_PRODUCT                                    arduino.ar(USBCore.cpp.o)
-SUPC_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+SUPC_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-SVC_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+SVC_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 Sd2Card::cardCommand(unsigned char, unsigned long) ./Sd2Card.cpp.o
 Sd2Card::cardSize()                               ./Sd2Card.cpp.o
@@ -11182,7 +11182,7 @@ Stream::canWrite() const                          ./Libraries/Wire/Wire.cpp.o
                                                   arduino.ar(CDC.cpp.o)
                                                   arduino.ar(USARTClass.cpp.o)
                                                   arduino.ar(UARTClass.cpp.o)
-SysTick_Handler                                   /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+SysTick_Handler                                   /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 SystemCoreClock                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(system_sam3xa.o)
                                                   arduino.ar(USARTClass.cpp.o)
@@ -11191,9 +11191,9 @@ SystemCoreClock                                   /home/nico/Tools/arduino-1.5.8
 SystemCoreClockUpdate                             /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(system_sam3xa.o)
 SystemInit                                        /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(system_sam3xa.o)
                                                   arduino.ar(variant.cpp.o)
-TC0_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+TC0_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-TC1_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+TC1_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 TC2_Handler                                       ./stepper.cpp.o
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
@@ -11201,13 +11201,13 @@ TC3_Handler                                       ./temperature.cpp.o
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 TC4_Handler                                       ./HAL.cpp.o
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-TC5_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+TC5_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-TC6_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+TC6_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-TC7_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+TC7_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-TC8_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+TC8_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 TC_Configure                                      /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(tc.o)
                                                   arduino.ar(wiring_analog.c.o)
@@ -11228,7 +11228,7 @@ TC_Start                                          /home/nico/Tools/arduino-1.5.8
                                                   ./HAL.cpp.o
 TC_Stop                                           /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(tc.o)
                                                   ./HAL.cpp.o
-TRNG_Handler                                      /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+TRNG_Handler                                      /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 TWI0_Handler                                      ./Libraries/Wire/Wire.cpp.o
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
@@ -11264,7 +11264,7 @@ TWI_WriteByte                                     /home/nico/Tools/arduino-1.5.8
                                                   ./Libraries/Wire/Wire.cpp.o
 TimeTick_Configure                                /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(timetick.o)
 TimeTick_Increment                                /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(timetick.o)
-                                                  /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+                                                  /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
 TwoWire::TwoWire(Twi*, void (*)())                ./Libraries/Wire/Wire.cpp.o
 TwoWire::TwoWire(Twi*, void (*)())                ./Libraries/Wire/Wire.cpp.o
 TwoWire::available()                              ./Libraries/Wire/Wire.cpp.o
@@ -11393,7 +11393,7 @@ USART0_Handler                                    arduino.ar(variant.cpp.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 USART1_Handler                                    arduino.ar(variant.cpp.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-USART2_Handler                                    /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+USART2_Handler                                    /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 USART3_Handler                                    arduino.ar(variant.cpp.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
@@ -11445,14 +11445,14 @@ USBDevice_::detach()                              arduino.ar(USBCore.cpp.o)
 USBDevice_::poll()                                arduino.ar(USBCore.cpp.o)
 USB_DeviceDescriptor                              arduino.ar(USBCore.cpp.o)
 USB_DeviceDescriptorA                             arduino.ar(USBCore.cpp.o)
-UsageFault_Handler                                /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+UsageFault_Handler                                /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 WDT_Disable                                       /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(wdt.o)
 WDT_Enable                                        /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(wdt.o)
                                                   ./watchdog.cpp.o
 WDT_GetPeriod                                     /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(wdt.o)
 WDT_GetStatus                                     /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(wdt.o)
-WDT_Handler                                       /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+WDT_Handler                                       /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 WDT_Restart                                       /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(wdt.o)
                                                   ./watchdog.cpp.o
@@ -11964,7 +11964,7 @@ _cend                                             arduino.ar(USBCore.cpp.o)
 _cleanup                                          /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-findfp.o)
 _cleanup_r                                        /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-findfp.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-makebuf.o)
-_close                                            /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+_close                                            /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-closer.o)
 _close_r                                          /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-closer.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-stdio.o)
@@ -11973,11 +11973,11 @@ _ctype_                                           /home/nico/Tools/arduino-1.5.8
 _dtoa_r                                           /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-dtoa.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-svfprintf.o)
 _ebss                                             ./HAL.cpp.o
-_end                                              /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+_end                                              /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
 _erelocate                                        /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 _estack                                           /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
 _etext                                            /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
-_exit                                             /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+_exit                                             /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-abort.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-exit.o)
 _ezero                                            /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(startup_sam3xa.o)
@@ -12002,7 +12002,7 @@ _free_r                                           /home/nico/Tools/arduino-1.5.8
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-wsetup.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-mallocr.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-malloc.o)
-_fstat                                            /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+_fstat                                            /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-fstatr.o)
 _fstat_r                                          /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-fstatr.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-makebuf.o)
@@ -12010,7 +12010,7 @@ _fwalk                                            /home/nico/Tools/arduino-1.5.8
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-findfp.o)
 _fwalk_reent                                      /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-fwalk.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-fflush.o)
-_getpid                                           /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+_getpid                                           /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-signalr.o)
 _getpid_r                                         /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-signalr.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-signal.o)
@@ -12049,11 +12049,11 @@ _init                                             /home/nico/Tools/arduino-1.5.8
 _init_signal                                      /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-signal.o)
 _init_signal_r                                    /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-signal.o)
 _iprintf_r                                        /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-iprintf.o)
-_isatty                                           /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+_isatty                                           /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-isattyr.o)
 _isatty_r                                         /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-isattyr.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-makebuf.o)
-_kill                                             /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+_kill                                             /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-signalr.o)
 _kill_r                                           /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-signalr.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-signal.o)
@@ -12062,7 +12062,7 @@ _localeconv_r                                     /home/nico/Tools/arduino-1.5.8
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-gdtoa-gethex.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-svfprintf.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-strtod.o)
-_lseek                                            /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+_lseek                                            /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-lseekr.o)
 _lseek_r                                          /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-lseekr.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-stdio.o)
@@ -12088,7 +12088,7 @@ _menu_edit_int3()                                 ./ultralcd.cpp.o
 _menu_edit_long5()                                ./ultralcd.cpp.o
 _mprec_log10                                      /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-mprec.o)
 _raise_r                                          /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-signal.o)
-_read                                             /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+_read                                             /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-readr.o)
 _read_r                                           /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-readr.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-stdio.o)
@@ -12096,7 +12096,7 @@ _realloc_r                                        /home/nico/Tools/arduino-1.5.8
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-svfiprintf.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-fvwrite.o)
 _reclaim_reent                                    /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-reent.o)
-_sbrk                                             /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+_sbrk                                             /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-sbrkr.o)
                                                   ./HAL.cpp.o
 _sbrk_r                                           /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-sbrkr.o)
@@ -12125,7 +12125,7 @@ _vfiprintf_r                                      /home/nico/Tools/arduino-1.5.8
 _wcrtomb_r                                        /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-wcrtomb.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-fputwc.o)
 _wctomb_r                                         /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-wctomb_r.o)
-_write                                            /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+_write                                            /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-writer.o)
 _write_r                                          /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-writer.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-stdio.o)
@@ -12225,7 +12225,7 @@ atan2                                             /home/nico/Tools/arduino-1.5.8
 atexit                                            /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-atexit.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-__call_atexit.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/crt0.o
-attachInterrupt                                   /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+attachInterrupt                                   /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
 autotemp_enabled                                  ./planner.cpp.o
                                                   ./ultralcd.cpp.o
                                                   ./cardreader.cpp.o
@@ -12429,7 +12429,7 @@ delay                                             arduino.ar(wiring.c.o)
                                                   ./configuration_store.cpp.o
                                                   ./Marlin_main.cpp.o
                                                   ./HAL.cpp.o
-detachInterrupt                                   /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+detachInterrupt                                   /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
 digipot_current(unsigned char, int)               ./stepper.cpp.o
 digipot_init()                                    ./stepper.cpp.o
 digitalPotWrite(int, int)                         ./stepper.cpp.o
@@ -12555,7 +12555,7 @@ ftostr5(float const&)                             ./ultralcd.cpp.o
 ftostr51(float const&)                            ./ultralcd.cpp.o
 ftostr52(float const&)                            ./ultralcd.cpp.o
 g_APinDescription                                 arduino.ar(variant.cpp.o)
-                                                  /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                                                  /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
                                                   arduino.ar(wiring_digital.c.o)
                                                   arduino.ar(wiring_analog.c.o)
                                                   ./Libraries/SPI/SPI.cpp.o
@@ -12619,7 +12619,7 @@ initVariant                                       arduino.ar(main.cpp.o)
 initiateReset                                     arduino.ar(Reset.cpp.o)
                                                   arduino.ar(CDC.cpp.o)
 iprintf                                           /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-iprintf.o)
-                                                  /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+                                                  /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
 itostr2(unsigned char const&)                     ./ultralcd.cpp.o
 itostr3(int const&)                               ./ultralcd.cpp.o
 itostr31(int const&)                              ./ultralcd.cpp.o
@@ -12680,7 +12680,7 @@ lcd_strlen_P(char const*)                         ./ultralcd.cpp.o
 lcd_update()                                      ./ultralcd.cpp.o
                                                   ./temperature.cpp.o
                                                   ./Marlin_main.cpp.o
-link                                              /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o
+link                                              /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o
 localeconv                                        /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-locale.o)
 loop                                              ./Marlin_main.cpp.o
                                                   arduino.ar(main.cpp.o)
@@ -12826,7 +12826,7 @@ no_wait_for_cooling                               ./Marlin_main.cpp.o
 ok_to_send()                                      ./Marlin_main.cpp.o
 out_of_range_error(char const*)                   ./Marlin_main.cpp.o
 pendSVHook                                        arduino.ar(hooks.c.o)
-                                                  /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+                                                  /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
 pg_AddPolygonXY                                   ./Libraries/U8glib/utility/u8g_polygon.c.o
 pg_ClearPolygonXY                                 ./Libraries/U8glib/utility/u8g_polygon.c.o
 pg_DrawPolygon                                    ./Libraries/U8glib/utility/u8g_polygon.c.o
@@ -12895,7 +12895,7 @@ pmc_enable_backupmode                             /home/nico/Tools/arduino-1.5.8
 pmc_enable_interrupt                              /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(pmc.o)
 pmc_enable_pck                                    /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(pmc.o)
 pmc_enable_periph_clk                             /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(pmc.o)
-                                                  /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(WInterrupts.c.o)
+                                                  /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(WInterrupts.c.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(uotghs_device.o)
                                                   /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(spi.o)
                                                   arduino.ar(wiring_digital.c.o)
@@ -13114,9 +13114,9 @@ strtol                                            /home/nico/Tools/arduino-1.5.8
                                                   ./Marlin_main.cpp.o
 suicide()                                         ./Marlin_main.cpp.o
 svcHook                                           arduino.ar(hooks.c.o)
-                                                  /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+                                                  /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
 sysTickHook                                       arduino.ar(hooks.c.o)
-                                                  /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+                                                  /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
 system_init_flash                                 /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a(system_sam3xa.o)
 target_direction                                  ./Marlin_main.cpp.o
 target_temperature                                ./temperature.cpp.o
@@ -13129,7 +13129,7 @@ target_temperature_bed                            ./temperature.cpp.o
                                                   ./Marlin_main.cpp.o
 thermal_runaway_protection(TRState*, unsigned long*, float, float, int, int, int) ./temperature.cpp.o
 tickReset                                         arduino.ar(Reset.cpp.o)
-                                                  /home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar(cortex_handlers.c.o)
+                                                  /home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar(cortex_handlers.c.o)
 tolower                                           /home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/../lib/gcc/arm-none-eabi/4.8.3/../../../../arm-none-eabi/lib/armv7-m/libg.a(lib_a-tolower.o)
                                                   ./ultralcd.cpp.o
                                                   ./cardreader.cpp.o

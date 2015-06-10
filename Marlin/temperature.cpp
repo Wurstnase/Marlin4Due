@@ -1208,7 +1208,7 @@ HAL_TEMP_TIMER_ISR {
   // Initialize some variables only at start!
   if (first_start)
   {
-    for (char i = 0; i < 5; i++)
+    for (uint8_t i = 0; i < 5; i++)
     {
       for (int j = 0; j < MEDIAN_COUNT; j++) raw_median_temp[i][j] = 3600 * OVERSAMPLENR;
       max_temp[i] = 0;
@@ -1530,7 +1530,7 @@ HAL_TEMP_TIMER_ISR {
       SET_CURRENT_BED_RAW(4);
       
       //  Reset min/max-holder
-      for (char i = 0; i < 5; i++) {
+      for (uint8_t i = 0; i < 5; i++) {
         max_temp[i] = 0;
         min_temp[i] = 123000;
       }

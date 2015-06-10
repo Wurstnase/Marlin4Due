@@ -75,19 +75,19 @@ all: Marlin
 Marlin: $(FLASH_IMAGE)
 	@echo 'Building target: $@'
 	@echo 'Printing size:'
-	"/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/arm-none-eabi-size" -A "/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.elf"
+	"/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/arm-none-eabi-size" -A "/home/nico/github/wurstnase/Marlin4Due/Marlin/Release/Marlin.elf"
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 arduino.ar: $(AR_OBJ)
 	@echo 'Starting archiver'
-	"/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/arm-none-eabi-ar" rcs  "/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar"   $(AR_OBJ)
+	"/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/arm-none-eabi-ar" rcs  "/home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar"   $(AR_OBJ)
 	@echo 'Finished building: $@'
 	@echo ' '
 
 Marlin.elf: $(LINK_OBJ) $(AR)
 	@echo 'Starting combiner'
-	"/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/arm-none-eabi-gcc" -Os -Wl,--gc-sections -mcpu=cortex-m3 "-T/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/linker_scripts/gcc/flash.ld" "-Wl,-Map,/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.map"  -o "/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.elf" "-L/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release" -mthumb -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--entry=Reset_Handler -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align -Wl,--warn-unresolved-symbols -Wl,--start-group "/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino/syscalls_sam3.c.o"   $(LINK_OBJ) $(AR)  "/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a" "/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/arduino.ar" -Wl,--end-group -lm -gcc
+	"/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/arm-none-eabi-gcc" -Os -Wl,--gc-sections -mcpu=cortex-m3 "-T/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/linker_scripts/gcc/flash.ld" "-Wl,-Map,/home/nico/github/wurstnase/Marlin4Due/Marlin/Release/Marlin.map"  -o "/home/nico/github/wurstnase/Marlin4Due/Marlin/Release/Marlin.elf" "-L/home/nico/github/wurstnase/Marlin4Due/Marlin/Release" -mthumb -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--entry=Reset_Handler -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align -Wl,--warn-unresolved-symbols -Wl,--start-group "/home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino/syscalls_sam3.c.o"   $(LINK_OBJ) $(AR)  "/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants/arduino_due_x/libsam_sam3x8e_gcc_rel.a" "/home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar" -Wl,--end-group -lm -gcc
 	@echo 'Finished building: $@'
 	@echo ' '
 
@@ -99,7 +99,7 @@ Marlin.eep: $(ELF)
 
 Marlin.bin: $(EEP)
 	@echo 'Create Flash image (ihex format)'
-	"/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/arm-none-eabi-objcopy" -O binary  "/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.elf" "/home/nico/Tools/eclipseArduino-15-06-10/workspace/Marlin/Release/Marlin.bin"
+	"/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/arm-none-eabi-objcopy" -O binary  "/home/nico/github/wurstnase/Marlin4Due/Marlin/Release/Marlin.elf" "/home/nico/github/wurstnase/Marlin4Due/Marlin/Release/Marlin.bin"
 	@echo 'Finished building: $@'
 	@echo ' '
 
