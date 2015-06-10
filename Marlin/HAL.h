@@ -122,15 +122,17 @@ unsigned char eeprom_read_byte(unsigned char *pos);
 
 void HAL_step_timer_start(void);
 void HAL_temp_timer_start (uint8_t timer_num);
+
+FORCE_INLINE
 void HAL_timer_set_count (Tc *tc, uint32_t channel, uint32_t count);
 
 void HAL_timer_enable_interrupt (uint8_t timer_num);
 void HAL_timer_disable_interrupt (uint8_t timer_num);
 
+FORCE_INLINE
 void HAL_timer_isr_status (Tc *tc, uint32_t channel);
+
 int HAL_timer_get_count (uint8_t timer_num);
-uint32_t HAL_timer_get_count_value ();
-void HAL_timer_clear (Tc* tc, uint32_t channel);
 //
 
 void tone(uint8_t pin, int frequency);
