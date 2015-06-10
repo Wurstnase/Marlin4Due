@@ -24,4 +24,26 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>Libraries/LiquidCrystal</name>
+			<type>2</type>
+			<locationURI>ArduinoLibPath/LiquidCrystal</locationURI>
+		</link>
+		<link>
+			<name>Libraries/LiquidCrystal_I2C</name>
+			<type>2</type>
+			<locationURI>ArduinoLibPath/LiquidCrystal_I2C</locationURI>
+		</link>
+		<link>
+			<name>Libraries/LiquidTWI2</name>
+			<type>2</type>
+			<locationURI>ArduinoLibPath/LiquidTWI2</locationURI>
+		</link>
+		<link>
+			<name>Libraries/U8glib</name>
+			<type>2</type>
+			<locationURI>ArduinoLibPath/U8glib</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>
