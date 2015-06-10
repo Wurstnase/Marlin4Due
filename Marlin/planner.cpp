@@ -440,12 +440,17 @@ void check_axes_activity() {
         } else {
           fan_kick_end = 0;
         }
-    #endif//FAN_KICKSTART_TIME
-    #ifdef FAN_SOFT_PWM
-      fanSpeedSoftPwm = tail_fan_speed;
+    #endif //FAN_KICKSTART_TIME
+    #ifdef FAN_MIN_PWM
+      #define CALC_FAN_SPEED (tail_fan_speed ? ( FAN_MIN_PWM + (tail_fan_speed * (255 - FAN_MIN_PWM)) / 255 ) : 0)
     #else
-      analogWrite(FAN_PIN, tail_fan_speed);
-    #endif //!FAN_SOFT_PWM
+      #define CALC_FAN_SPEED tail_fan_speed
+    #endif // FAN_MIN_PWM
+    #ifdef FAN_SOFT_PWM
+      fanSpeedSoftPwm = CALC_FAN_SPEED;
+    #else
+      analogWrite(FAN_PIN, CALC_FAN_SPEED);
+    #endif // FAN_SOFT_PWM
   #endif // HAS_FAN
 
   #ifdef AUTOTEMP
@@ -502,7 +507,7 @@ float junction_deviation = 0.1;
 
   #ifdef PREVENT_DANGEROUS_EXTRUDE
     if (de) {
-      if (degHotend(extruder) < extrude_min_temp) {
+      if (degHotend(extruder) < extrude_min_temp && !(marlin_debug_flags & DEBUG_DRYRUN)) {
         position[E_AXIS] = target[E_AXIS]; // Behave as if the move really took place, but ignore E part
         de = 0; // no difference
         SERIAL_ECHO_START;

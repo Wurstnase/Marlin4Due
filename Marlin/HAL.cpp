@@ -244,19 +244,6 @@ void HAL_timer_disable_interrupt (uint8_t timer_num) {
 	pConfig->pTimerRegs->TC_CHANNEL [pConfig->channel].TC_IDR = TC_IER_CPCS; //disable interrupt
 }
 
-void HAL_timer_set_count (Tc* tc, uint32_t channel, uint32_t count) {
-  
-  uint32_t counter_value = tc->TC_CHANNEL[channel].TC_CV + 5;
-  if(count < 210) count = 210;
-  count = counter_value <= count ? count : counter_value;
-  
-	tc->TC_CHANNEL[channel].TC_RC = count;
-}
-
-void HAL_timer_isr_status (Tc* tc, uint32_t channel) {
-  tc->TC_CHANNEL[channel].TC_SR; // clear status register
-}
-
 int HAL_timer_get_count (uint8_t timer_num) {
 	Tc *tc = TimerConfig [timer_num].pTimerRegs;
 	uint32_t channel = TimerConfig [timer_num].channel;
