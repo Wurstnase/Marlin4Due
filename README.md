@@ -13,13 +13,12 @@ A big thanks to Repetier! We've talked a lot in the last weeks.
 ### This is an experimental repository! You should never leave your printer alone.
 
 ### New features are:
-* Steprates up to 400kHz
-* First try of Deadtime-Control for heater
+* Stepping-algorithm optmized now for DRV8825 and A4988 (no need for double or quadstepping; no delays)
+* High speed stepping of approx. 230,000 steps/s, if needed (THB6128, RAPS128 etc.)
+* watchdog implemented (you need to modify one Arduino-file for it; comment out WDT_Disable(WDT) in your variant.cpp)
  
 ### known issues:
-* watchdog doesn't work
 * advanced extruder not implemented
-* some drivers are too slow, i'm working on a solution
 
 ---
 # Marlin 3D Printer Firmware
