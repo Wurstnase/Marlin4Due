@@ -1205,7 +1205,7 @@ static void setup_for_endstop_move() {
       feedrate = homing_feedrate[Z_AXIS];
 
       // Move down until the probe (or endstop?) is triggered
-      float zPosition = -10;
+      float zPosition = -(Z_MAX_POS);
       line_to_z(zPosition);
       st_synchronize();
 
@@ -1493,13 +1493,6 @@ static void setup_for_endstop_move() {
     run_z_probe();
     float measured_z = current_position[Z_AXIS];
 
-    #if Z_RAISE_BETWEEN_PROBINGS > 0
-      if (probe_action == ProbeStay) {
-        do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS); // this also updates current_position
-        st_synchronize();
-      }
-    #endif
-
     #if !defined(Z_PROBE_SLED) && !defined(Z_PROBE_ALLEN_KEY)
       if (probe_action & ProbeStow) stow_z_probe();
     #endif
@@ -1511,6 +1504,8 @@ static void setup_for_endstop_move() {
       SERIAL_PROTOCOL_F(y, 3);
       SERIAL_PROTOCOLPGM(" Z: ");
       SERIAL_PROTOCOL_F(measured_z, 3);
+      SERIAL_PROTOCOLPGM(" real Z: ");
+      SERIAL_PROTOCOL_F(st_get_position(Z_AXIS), 3);
       SERIAL_EOL;
     }
     return measured_z;
@@ -2190,7 +2185,7 @@ inline void gcode_G28() {
 
         destination[X_AXIS] = 1.5 * mlx * x_axis_home_dir;
         destination[Y_AXIS] = 1.5 * mly * home_dir(Y_AXIS);
-        feedrate = min(homing_feedrate[X_AXIS], homing_feedrate[Y_AXIS]) * sqrt(mlratio * mlratio + 1);
+        feedrate = min(homing_feedrate[X_AXIS], homing_feedrate[Y_AXIS]);// * sqrt(mlratio * mlratio + 1);
         line_to_destination();
         st_synchronize();
 
@@ -2836,6 +2831,8 @@ inline void gcode_G28() {
         apply_rotation_xyz(plan_bed_level_matrix, x_tmp, y_tmp, z_tmp); // Apply the correction sending the probe offset
         current_position[Z_AXIS] += z_tmp - real_z;                     // The difference is added to current position and sent to planner.
         sync_plan_position();
+
+        do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS] + Z_RAISE_AFTER_PROBING);
       }
     #endif // !DELTA
 

@@ -127,15 +127,7 @@ void HAL_temp_timer_start (uint8_t timer_num);
 void HAL_timer_enable_interrupt (uint8_t timer_num);
 void HAL_timer_disable_interrupt (uint8_t timer_num);
 
-FORCE_INLINE
-void HAL_timer_set_count (Tc* tc, uint32_t channel, uint32_t count) {
-
-  uint32_t counter_value = tc->TC_CHANNEL[channel].TC_CV + 42;
-  if(count < 210) count = 210;
-  tc->TC_CHANNEL[channel].TC_RC = (counter_value <= count) ? count : counter_value;
-}
-
-FORCE_INLINE
+inline
 void HAL_timer_isr_status (Tc* tc, uint32_t channel) {
   tc->TC_CHANNEL[channel].TC_SR; // clear status register
 }
