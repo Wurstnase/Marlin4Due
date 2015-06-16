@@ -14,7 +14,7 @@ A big thanks to Repetier! We've talked a lot in the last weeks.
 
 ### New features are:
 * Stepping-algorithm optmized now for DRV8825 and A4988 (no need for double or quadstepping; no delays)
-* High speed stepping of approx. 230,000 steps/s, if needed (THB6128, RAPS128 etc.)
+* High speed stepping of approx. 295,000 steps/s, if needed (maybe more with less DOUBLE_STEP_FREQUENCY?)
 * watchdog implemented (you need to modify one Arduino-file for it; comment out WDT_Disable(WDT) in your variant.cpp)
  
 ### known issues:
