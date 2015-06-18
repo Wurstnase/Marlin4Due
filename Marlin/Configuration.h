@@ -170,7 +170,7 @@ Here are some standard links for getting your machine calibrated:
 // When temperature exceeds max temp, your heater will be switched off.
 // This feature exists to protect your hotend from overheating accidentally, but *NOT* from thermistor short/failure!
 // You should use MINTEMP for thermistor short/failure protection.
-#define HEATER_0_MAXTEMP 275
+#define HEATER_0_MAXTEMP 300
 #define HEATER_1_MAXTEMP 275
 #define HEATER_2_MAXTEMP 275
 #define HEATER_3_MAXTEMP 275
@@ -293,7 +293,7 @@ Here are some standard links for getting your machine calibrated:
  */
 
 #define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders
-#define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed
+//#define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed
 
 //===========================================================================
 //============================= Mechanical Settings =========================
@@ -486,9 +486,9 @@ const bool Z_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the logic 
   // X and Y offsets must be integers
   #define X_PROBE_OFFSET_FROM_EXTRUDER -40   // Probe on: -left  +right
   #define Y_PROBE_OFFSET_FROM_EXTRUDER 0     // Probe on: -front +behind
-  #define Z_PROBE_OFFSET_FROM_EXTRUDER -0.9  // -below (always!)
+  #define Z_PROBE_OFFSET_FROM_EXTRUDER -0.95  // -below (always!)
 
-  #define Z_RAISE_BEFORE_HOMING 4       // (in mm) Raise Z before homing (G28) for Probe Clearance.
+  #define Z_RAISE_BEFORE_HOMING 5       // (in mm) Raise Z before homing (G28) for Probe Clearance.
                                         // Be sure you have this distance over your Z_MAX_POS in case
 
   #define XY_TRAVEL_SPEED 8000         // X and Y axis travel speed between probes, in mm/min
@@ -569,7 +569,7 @@ const bool Z_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the logic 
 
 // default settings
 
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {640,640,3200,1100}     // default steps per unit for Ultimaker
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {320,320,3200,287}     // default steps per unit for Ultimaker
 #define DEFAULT_MAX_FEEDRATE          {500, 500, 50, 150}     // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {5000,5000,200,8000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
 #define ENABLE_HIGH_SPEED_STEPPING  // Activate for very high stepping rates, normally only needed for 1/64 or more micro steps (AXIS_STEPS_PER_UNIT * MAX_FEEDRATE > 150,000)
@@ -622,8 +622,8 @@ const bool Z_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the logic 
 #define PLA_PREHEAT_HPB_TEMP 70
 #define PLA_PREHEAT_FAN_SPEED 0   // Insert Value between 0 and 255
 
-#define ABS_PREHEAT_HOTEND_TEMP 240
-#define ABS_PREHEAT_HPB_TEMP 110
+#define ABS_PREHEAT_HOTEND_TEMP 260
+#define ABS_PREHEAT_HPB_TEMP 130
 #define ABS_PREHEAT_FAN_SPEED 0   // Insert Value between 0 and 255
 
 //==============================LCD and SD support=============================
