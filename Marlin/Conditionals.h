@@ -261,7 +261,6 @@
 
   /**
    * AUTOSET LOCATIONS OF LIMIT SWITCHES
-   * Added by ZetaPhoenix 09-15-2012
    */
   #ifdef MANUAL_HOME_POSITIONS  // Use manual limit switch locations
     #define X_HOME_POS MANUAL_X_HOME_POS
@@ -516,6 +515,8 @@
   #if HAS_FAN
     #define WRITE_FAN(v) WRITE(FAN_PIN, v)
   #endif
+
+  #define HAS_BUZZER ((defined(BEEPER) && BEEPER >= 0) || defined(LCD_USE_I2C_BUZZER))
 
 #endif //CONFIGURATION_LCD
 #endif //CONDITIONALS_H

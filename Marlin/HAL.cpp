@@ -295,7 +295,7 @@ void noTone(uint8_t pin) {
 HAL_BEEPER_TIMER_ISR {
     static bool toggle;
 
-    HAL_timer_isr_status (BEEPER_TIMER_COUNTER, BEEPER_TIMER_CHANNEL);
+    HAL_timer_isr_status(BEEPER_TIMER_COUNTER, BEEPER_TIMER_CHANNEL);
     WRITE_VAR(tone_pin, toggle);
     toggle = !toggle;
 }

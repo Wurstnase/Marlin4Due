@@ -296,6 +296,16 @@ void set_stepper_direction() {
 // Initializes the trapezoid generator from the current block. Called whenever a new
 // block begins.
 
+TcChannel *stepperChannel = (STEP_TIMER_COUNTER->TC_CHANNEL + STEP_TIMER_CHANNEL);
+
+FORCE_INLINE
+void HAL_timer_stepper_count(uint32_t count) {
+
+  uint32_t counter_value = stepperChannel->TC_CV + 42;  // we need time for other stuff!
+  //if(count < 105) count = 105;
+  stepperChannel->TC_RC = (counter_value <= count) ? count : counter_value;
+}
+
 FORCE_INLINE void trapezoid_generator_reset() {
 
   if (current_block->direction_bits != out_bits) {
@@ -317,7 +327,7 @@ FORCE_INLINE void trapezoid_generator_reset() {
   step_loops_nominal = step_loops;
   acc_step_rate = current_block->initial_rate;
   acceleration_time = calc_timer(acc_step_rate);
-  HAL_timer_set_count (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL, acceleration_time);
+  //HAL_timer_stepper_count(acceleration_time);
 
   // SERIAL_ECHO_START;
   // SERIAL_ECHOPGM("advance :");
@@ -332,10 +342,12 @@ FORCE_INLINE void trapezoid_generator_reset() {
 
 // "The Stepper Driver Interrupt" - This timer interrupt is the workhorse.
 // It pops blocks from the block_buffer and executes them by pulsing the stepper pins appropriately.
+
 HAL_STEP_TIMER_ISR {
 
   //STEP_TIMER_COUNTER->TC_CHANNEL[STEP_TIMER_CHANNEL].TC_SR;
-  HAL_timer_isr_status (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL);
+  stepperChannel->TC_SR;
+  //stepperChannel->TC_RC = 1000000;
 
   if (cleaning_buffer_counter)
   {
@@ -345,7 +357,7 @@ HAL_STEP_TIMER_ISR {
       if ((cleaning_buffer_counter == 1) && (SD_FINISHED_STEPPERRELEASE)) enqueuecommands_P(PSTR(SD_FINISHED_RELEASECOMMAND));
     #endif
     cleaning_buffer_counter--;
-    HAL_timer_set_count (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL, HAL_TIMER_RATE / 200); //5ms wait
+    HAL_timer_stepper_count(HAL_TIMER_RATE / 200); //5ms wait
     return;
   }
 
@@ -373,7 +385,7 @@ HAL_STEP_TIMER_ISR {
       // #endif
     }
     else {
-        HAL_timer_set_count (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL, HAL_TIMER_RATE / 1000); // 1kHz
+        HAL_timer_stepper_count(HAL_TIMER_RATE / 1000); // 1kHz
     }
   }
 
@@ -387,7 +399,7 @@ HAL_STEP_TIMER_ISR {
       #else
         byte
       #endif
-      current_endstop_bits;
+          current_endstop_bits = 0;
 
       #define _ENDSTOP_PIN(AXIS, MINMAX) AXIS ##_## MINMAX ##_PIN
       #define _ENDSTOP_INVERTING(AXIS, MINMAX) AXIS ##_## MINMAX ##_ENDSTOP_INVERTING
@@ -657,7 +669,7 @@ HAL_STEP_TIMER_ISR {
       #endif
     #endif
 
-    HAL_timer_set_count (STEP_TIMER_COUNTER, STEP_TIMER_CHANNEL, timer);
+    HAL_timer_stepper_count(timer);
 
     // If current block is finished, reset pointer
     if (step_events_completed >= current_block->step_event_count) {

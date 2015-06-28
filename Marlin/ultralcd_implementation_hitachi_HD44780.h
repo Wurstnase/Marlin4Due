@@ -31,7 +31,7 @@
   // encoder click is directly connected
   #define BLEN_C 2 
   #define EN_C BIT(BLEN_C) 
-#endif 
+#endif
   
 #if defined(BTN_BACK) && BTN_BACK > -1
   #define BLEN_D 3
@@ -635,8 +635,8 @@ static void lcd_implementation_status_screen() {
       lcd.print(ftostr12ns(filament_width_meas));
       lcd_printPGM(PSTR(" V"));
       lcd.print(itostr3(100.0*volumetric_multiplier[FILAMENT_SENSOR_EXTRUDER_NUM]));
-      lcd.print('%');
-      return;
+  	  lcd.print('%');
+  	  return;
     }
 
   #endif // FILAMENT_LCD_DISPLAY
