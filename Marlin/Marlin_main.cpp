@@ -1505,7 +1505,7 @@ static void setup_for_endstop_move() {
       SERIAL_PROTOCOLPGM(" Z: ");
       SERIAL_PROTOCOL_F(measured_z, 3);
       SERIAL_PROTOCOLPGM(" real Z: ");
-      SERIAL_PROTOCOL_F(st_get_position(Z_AXIS), 3);
+      SERIAL_PROTOCOL(st_get_position(Z_AXIS));
       SERIAL_EOL;
     }
     return measured_z;
@@ -2185,7 +2185,7 @@ inline void gcode_G28() {
 
         destination[X_AXIS] = 1.5 * mlx * x_axis_home_dir;
         destination[Y_AXIS] = 1.5 * mly * home_dir(Y_AXIS);
-        feedrate = min(homing_feedrate[X_AXIS], homing_feedrate[Y_AXIS]);// * sqrt(mlratio * mlratio + 1);
+        feedrate = min(homing_feedrate[X_AXIS], homing_feedrate[Y_AXIS]) * sqrt(mlratio * mlratio + 1);
         line_to_destination();
         st_synchronize();
 
@@ -2653,7 +2653,7 @@ inline void gcode_G28() {
       #ifdef DELTA
         delta_grid_spacing[0] = xGridSpacing;
         delta_grid_spacing[1] = yGridSpacing;
-        float z_offset = Z_PROBE_OFFSET_FROM_EXTRUDER;
+        float z_offset = zprobe_zoffset;
         if (code_seen(axis_codes[Z_AXIS])) z_offset += code_value();
       #else // !DELTA
         // solve the plane equation ax + by + d = z
@@ -2829,7 +2829,7 @@ inline void gcode_G28() {
               real_z = (float)st_get_position(Z_AXIS) / axis_steps_per_unit[Z_AXIS];  //get the real Z (since the auto bed leveling is already correcting the plane)
 
         apply_rotation_xyz(plan_bed_level_matrix, x_tmp, y_tmp, z_tmp); // Apply the correction sending the probe offset
-        current_position[Z_AXIS] += z_tmp - real_z;                     // The difference is added to current position and sent to planner.
+        current_position[Z_AXIS] = z_tmp - real_z - zprobe_zoffset;;                     // The difference is added to current position and sent to planner.
         sync_plan_position();
 
         do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS] + Z_RAISE_AFTER_PROBING);
@@ -5830,7 +5830,7 @@ void clamp_to_software_endstops(float target[3]) {
     
     float negative_z_offset = 0;
     #ifdef ENABLE_AUTO_BED_LEVELING
-      if (Z_PROBE_OFFSET_FROM_EXTRUDER < 0) negative_z_offset += Z_PROBE_OFFSET_FROM_EXTRUDER;
+      if (zprobe_zoffset < 0) negative_z_offset += zprobe_zoffset;
       if (home_offset[Z_AXIS] < 0) negative_z_offset += home_offset[Z_AXIS];
     #endif
     NOLESS(target[Z_AXIS], min_pos[Z_AXIS] + negative_z_offset);
