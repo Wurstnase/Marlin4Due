@@ -289,7 +289,7 @@ static void lcd_goto_menu(menuFunc_t menu, const bool feedback=false, const uint
  */
 
 static void lcd_status_screen() {
-  encoderRateMultiplierEnabled = false;
+	encoderRateMultiplierEnabled = false;
 
   #ifdef LCD_PROGRESS_BAR
     millis_t ms = millis();
@@ -756,9 +756,9 @@ static void _lcd_move(const char *name, AxisEnum axis, int min, int max) {
   if (lcdDrawUpdate) lcd_implementation_drawedit(name, ftostr31(current_position[axis]));
   if (LCD_CLICKED) lcd_goto_menu(lcd_move_menu_axis);
 }
-static void lcd_move_x() { _lcd_move(PSTR("X"), X_AXIS, X_MIN_POS, X_MAX_POS); }
-static void lcd_move_y() { _lcd_move(PSTR("Y"), Y_AXIS, Y_MIN_POS, Y_MAX_POS); }
-static void lcd_move_z() { _lcd_move(PSTR("Z"), Z_AXIS, Z_MIN_POS, Z_MAX_POS); }
+static void lcd_move_x() { _lcd_move(PSTR(MSG_MOVE_X), X_AXIS, X_MIN_POS, X_MAX_POS); }
+static void lcd_move_y() { _lcd_move(PSTR(MSG_MOVE_Y), Y_AXIS, Y_MIN_POS, Y_MAX_POS); }
+static void lcd_move_z() { _lcd_move(PSTR(MSG_MOVE_Z), Z_AXIS, Z_MIN_POS, Z_MAX_POS); }
 static void lcd_move_e() {
   if (encoderPosition != 0) {
     current_position[E_AXIS] += float((int)encoderPosition) * move_menu_scale;
@@ -766,7 +766,7 @@ static void lcd_move_e() {
     line_to_current(E_AXIS);
     lcdDrawUpdate = 1;
   }
-  if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR("Extruder"), ftostr31(current_position[E_AXIS]));
+  if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR(MSG_MOVE_E), ftostr31(current_position[E_AXIS]));
   if (LCD_CLICKED) lcd_goto_menu(lcd_move_menu_axis);
 }
 
@@ -1190,7 +1190,7 @@ static void lcd_sd_updir() {
  *
  */
 void lcd_sdcard_menu() {
-  if (lcdDrawUpdate == 0 && LCD_CLICKED == 0) return; // nothing to do (so don't thrash the SD card)
+  if (lcdDrawUpdate == 0 && LCD_CLICKED == 0) return;	// nothing to do (so don't thrash the SD card)
   uint16_t fileCnt = card.getnrfilenames();
   START_MENU(lcd_main_menu);
   MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
@@ -1323,6 +1323,13 @@ menu_edit_type(unsigned long, long5, ftostr5, 0.01)
  * Audio feedback for controller clicks
  *
  */
+
+#ifdef LCD_USE_I2C_BUZZER
+  void lcd_buzz(long duration, uint16_t freq) { // called from buzz() in Marlin_main.cpp where lcd is unknown
+    lcd.buzz(duration, freq);
+  }
+#endif
+
 void lcd_quick_feedback() {
   lcdDrawUpdate = 2;
   next_button_update_ms = millis() + 500;
@@ -1334,7 +1341,7 @@ void lcd_quick_feedback() {
     #ifndef LCD_FEEDBACK_FREQUENCY_DURATION_MS
       #define LCD_FEEDBACK_FREQUENCY_DURATION_MS (1000/6)
     #endif    
-    lcd_buzz(LCD_FEEDBACK_FREQUENCY_DURATION_MS, LCD_FEEDBACK_FREQUENCY_HZ);
+    lcd.buzz(LCD_FEEDBACK_FREQUENCY_DURATION_MS, LCD_FEEDBACK_FREQUENCY_HZ);
   #elif defined(BEEPER) && BEEPER >= 0
     #ifndef LCD_FEEDBACK_FREQUENCY_HZ
       #define LCD_FEEDBACK_FREQUENCY_HZ 5000
@@ -1342,7 +1349,7 @@ void lcd_quick_feedback() {
     #ifndef LCD_FEEDBACK_FREQUENCY_DURATION_MS
       #define LCD_FEEDBACK_FREQUENCY_DURATION_MS 2
     #endif
-    lcd_buzz(LCD_FEEDBACK_FREQUENCY_DURATION_MS, LCD_FEEDBACK_FREQUENCY_HZ);
+    buzz(LCD_FEEDBACK_FREQUENCY_DURATION_MS, LCD_FEEDBACK_FREQUENCY_HZ);
   #else
     #ifndef LCD_FEEDBACK_FREQUENCY_DURATION_MS
       #define LCD_FEEDBACK_FREQUENCY_DURATION_MS 2
@@ -1772,24 +1779,6 @@ void lcd_reset_alert_level() { lcd_status_message_level = 0; }
     #endif
   }
 
-  void lcd_buzz(long duration, uint16_t freq) {
-    if (freq > 0) {
-      #if BEEPER > 0
-        SET_OUTPUT(BEEPER);
-        tone(BEEPER, freq);
-        delay(duration);
-        noTone(BEEPER);
-      #elif defined(LCD_USE_I2C_BUZZER)
-        lcd.buzz(duration, freq);
-      #else
-        delay(duration);
-      #endif
-    }
-    else {
-      delay(duration);
-    }
-  }
-
   bool lcd_clicked() { return LCD_CLICKED; }
 
 #endif // ULTIPANEL
@@ -1855,18 +1844,18 @@ char *ftostr32(const float &x) {
 
 // Convert float to string with 1.234 format
 char *ftostr43(const float &x) {
-  long xx = x * 1000;
+	long xx = x * 1000;
     if (xx >= 0)
-    conv[0] = (xx / 1000) % 10 + '0';
-  else
-    conv[0] = '-';
-  xx = abs(xx);
-  conv[1] = '.';
-  conv[2] = (xx / 100) % 10 + '0';
-  conv[3] = (xx / 10) % 10 + '0';
-  conv[4] = (xx) % 10 + '0';
-  conv[5] = 0;
-  return conv;
+		conv[0] = (xx / 1000) % 10 + '0';
+	else
+		conv[0] = '-';
+	xx = abs(xx);
+	conv[1] = '.';
+	conv[2] = (xx / 100) % 10 + '0';
+	conv[3] = (xx / 10) % 10 + '0';
+	conv[4] = (xx) % 10 + '0';
+	conv[5] = 0;
+	return conv;
 }
 
 // Convert float to string with 1.23 format
