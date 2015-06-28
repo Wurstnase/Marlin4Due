@@ -33,7 +33,7 @@
 //!#define _useTimer1
 //!#define _useTimer2
 #define _useTimer3
-#define _useTimer4
+//!#define _useTimer4
 #define _useTimer5
 
 /*
@@ -85,5 +85,5 @@
 #endif
 
 //typedef enum { _timer1, _timer2, _timer3, _timer4, _timer5, _Nbr_16timers } timer16_Sequence_t ;
-typedef enum { _timer3, _timer4, _timer5, _Nbr_16timers } timer16_Sequence_t ;
+typedef enum { _timer3, _timer5, _Nbr_16timers } timer16_Sequence_t ;
 
