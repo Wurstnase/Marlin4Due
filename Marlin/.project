@@ -49,7 +49,7 @@
 		<link>
 			<name>Libraries/U8glib</name>
 			<type>2</type>
-			<locationURI>ArduinoLibPath/U8glib</locationURI>
+			<locationURI>ArduinoPivateLibPath/U8glib</locationURI>
 		</link>
 		<link>
 			<name>Libraries/Wire</name>
@@ -70,15 +70,15 @@
 	<variableList>
 		<variable>
 			<name>ArduinoHardwareLibPath</name>
-			<value>file:/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/libraries</value>
+			<value>file:/home/nico/Tools/arduino-1.5.8/hardware/arduino/sam/libraries</value>
 		</variable>
 		<variable>
 			<name>ArduinoPinPath</name>
-			<value>file:/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam/variants</value>
+			<value>file:/home/nico/Tools/arduino-1.5.8/hardware/arduino/sam/variants</value>
 		</variable>
 		<variable>
 			<name>ArduinoPlatformPath</name>
-			<value>file:/home/nico/Tools/arduino-1.5.8-reprapfirmware/hardware/arduino/sam</value>
+			<value>file:/home/nico/Tools/arduino-1.5.8/hardware/arduino/sam</value>
 		</variable>
 	</variableList>
 </projectDescription>
