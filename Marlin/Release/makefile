@@ -56,7 +56,7 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 AR += \
-/home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar \
+arduino.ar \
 
 ELF += \
 Marlin.elf \
@@ -79,7 +79,7 @@ Marlin: $(FLASH_IMAGE)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-/home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar: $(AR_OBJ)
+arduino.ar: $(AR_OBJ)
 	@echo 'Starting archiver'
 	"/home/nico/Tools/arduino-1.5.8/hardware/tools/gcc-arm-none-eabi-4.8.3-2014q1/bin/arm-none-eabi-ar" rcs  "/home/nico/github/wurstnase/Marlin4Due/Marlin/Release/arduino.ar"   $(AR_OBJ)
 	@echo 'Finished building: $@'
