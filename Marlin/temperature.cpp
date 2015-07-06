@@ -887,17 +887,19 @@ void tp_init() {
 
   // Set analog inputs
   
-  // nothing todo for ARM
+  // Setup channels
+
+  ADC->ADC_MR |= ADC_MR_FREERUN_ON |
+		  	  	 ADC_MR_LOWRES_BITS_12;
   
+  startAdcConversion(pinToAdcChannel(TEMP_1_PIN));
+
   // Use timer0 for temperature measurement
   // Interleave temperature interrupt with millies interrupt
   
   HAL_temp_timer_start(TEMP_TIMER_NUM);
   HAL_timer_enable_interrupt (TEMP_TIMER_NUM);
   
-  // Wait for temperature measurement to settle
-  delay(250);
-
   #define TEMP_MIN_ROUTINE(NR) \
     minttemp[NR] = HEATER_ ## NR ## _MINTEMP; \
     while(analog2temp(minttemp_raw[NR], NR) < HEATER_ ## NR ## _MINTEMP) { \
