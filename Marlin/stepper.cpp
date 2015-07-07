@@ -503,7 +503,7 @@ HAL_STEP_TIMER_ISR {
             }
           #else // !Z_DUAL_ENDSTOPS
 
-            UPDATE_FSR(Z, MIN);
+            UPDATE_ENDSTOP(Z, MIN);
           #endif // !Z_DUAL_ENDSTOPS
         #endif // Z_MIN_PIN
 
