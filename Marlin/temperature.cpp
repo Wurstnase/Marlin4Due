@@ -892,7 +892,26 @@ void tp_init() {
   ADC->ADC_MR |= ADC_MR_FREERUN_ON |
 		  	  	 ADC_MR_LOWRES_BITS_12;
   
-  startAdcConversion(pinToAdcChannel(TEMP_1_PIN));
+  #define START_TEMP(temp_id) startAdcConversion(pinToAdcChannel(TEMP_## temp_id ##_PIN))
+  #define START_BED_TEMP() startAdcConversion(pinToAdcChannel(TEMP_BED_PIN))
+
+  #if HAS_TEMP_0
+    START_TEMP(0);
+  #endif
+  #if HAS_TEMP_BED
+    START_BED_TEMP();
+  #endif
+  #if HAS_TEMP_1
+    START_TEMP(1)
+  #endif
+  #if HAS_TEMP_2
+    START_TEMP(2)
+  #endif
+  #if HAS_TEMP_3
+    START_TEMP(3)
+  #endif
+
+  // startAdcConversion(pinToAdcChannel(TEMP_1_PIN));
 
   // Use timer0 for temperature measurement
   // Interleave temperature interrupt with millies interrupt
@@ -1376,16 +1395,13 @@ HAL_TEMP_TIMER_ISR {
     } // (pwm_count % 64) == 0
   
   #endif // SLOW_PWM_HEATERS
-
-  #define START_TEMP(temp_id) startAdcConversion(pinToAdcChannel(TEMP_## temp_id ##_PIN))
-  #define START_BED_TEMP() startAdcConversion(pinToAdcChannel(TEMP_BED_PIN))
   
-  #define READ_TEMP(temp_id) temp_read = getAdcReading(pinToAdcChannel(TEMP_## temp_id ##_PIN)); \
+  #define READ_TEMP(temp_id) temp_read = getAdcFreerun(pinToAdcChannel(TEMP_## temp_id ##_PIN)); \
     raw_temp_value[temp_id] += temp_read; \
     max_temp[temp_id] = max(max_temp[temp_id], temp_read); \
     min_temp[temp_id] = min(min_temp[temp_id], temp_read)
     
-  #define READ_BED_TEMP(temp_id) temp_read = getAdcReading(pinToAdcChannel(TEMP_BED_PIN)); \
+  #define READ_BED_TEMP(temp_id) temp_read = getAdcFreerun(pinToAdcChannel(TEMP_BED_PIN)); \
     raw_temp_bed_value += temp_read; \
     max_temp[temp_id] = max(max_temp[temp_id], temp_read); \
     min_temp[temp_id] = min(min_temp[temp_id], temp_read)
@@ -1394,7 +1410,7 @@ HAL_TEMP_TIMER_ISR {
   switch(temp_state) {
     case PrepareTemp_0:
       #if HAS_TEMP_0
-        START_TEMP(0);
+        //START_TEMP(0);
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_0;
@@ -1408,7 +1424,7 @@ HAL_TEMP_TIMER_ISR {
 
     case PrepareTemp_BED:
       #if HAS_TEMP_BED
-        START_BED_TEMP();
+        //START_BED_TEMP();
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_BED;
@@ -1483,7 +1499,6 @@ HAL_TEMP_TIMER_ISR {
 
     case StartupDelay:
       temp_state = PrepareTemp_0;
-      analogReadResolution(12); //  ADC need some rework
       break;
 
     // default:
