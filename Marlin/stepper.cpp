@@ -421,6 +421,14 @@ HAL_STEP_TIMER_ISR {
           _ENDSTOP_HIT(AXIS); \
           step_events_completed = current_block->step_event_count; \
         }
+
+	  #define UPDATE_FSR(AXIS,MINMAX) \
+        SET_BIT(current_endstop_bits, _ENDSTOP(AXIS,MINMAX), get_fsr_value()); \
+        if (TEST_ENDSTOP(_ENDSTOP(AXIS, MINMAX))  && (current_block->steps[_AXIS(AXIS)] > 0)) { \
+          endstops_trigsteps[_AXIS(AXIS)] = count_position[_AXIS(AXIS)]; \
+          _ENDSTOP_HIT(AXIS); \
+          step_events_completed = current_block->step_event_count; \
+        }
       
       #ifdef COREXY
         // Head direction in -X axis for CoreXY bots.
@@ -495,7 +503,7 @@ HAL_STEP_TIMER_ISR {
             }
           #else // !Z_DUAL_ENDSTOPS
 
-            UPDATE_ENDSTOP(Z, MIN);
+            UPDATE_FSR(Z, MIN);
           #endif // !Z_DUAL_ENDSTOPS
         #endif // Z_MIN_PIN
 
