@@ -887,17 +887,20 @@ void tp_init() {
 
   // Set analog inputs
   
-  // nothing todo for ARM
+  // Setup channels
+
+  ADC->ADC_MR |= ADC_MR_FREERUN_ON |
+		  	  	 ADC_MR_LOWRES_BITS_12;
   
+  ADC->ADC_CHER |= 0xffff;  // With freerun we can enable all channels. We only pick that one we need.
+
+
   // Use timer0 for temperature measurement
   // Interleave temperature interrupt with millies interrupt
   
   HAL_temp_timer_start(TEMP_TIMER_NUM);
   HAL_timer_enable_interrupt (TEMP_TIMER_NUM);
   
-  // Wait for temperature measurement to settle
-  delay(250);
-
   #define TEMP_MIN_ROUTINE(NR) \
     minttemp[NR] = HEATER_ ## NR ## _MINTEMP; \
     while(analog2temp(minttemp_raw[NR], NR) < HEATER_ ## NR ## _MINTEMP) { \
@@ -1375,15 +1378,17 @@ HAL_TEMP_TIMER_ISR {
   
   #endif // SLOW_PWM_HEATERS
 
-  #define START_TEMP(temp_id) startAdcConversion(pinToAdcChannel(TEMP_## temp_id ##_PIN))
-  #define START_BED_TEMP() startAdcConversion(pinToAdcChannel(TEMP_BED_PIN))
+  #define START_TEMP(temp_id) {}
+    //startAdcConversion(pinToAdcChannel(TEMP_## temp_id ##_PIN))
+  #define START_BED_TEMP() {}
+    //startAdcConversion(pinToAdcChannel(TEMP_BED_PIN))
   
-  #define READ_TEMP(temp_id) temp_read = getAdcReading(pinToAdcChannel(TEMP_## temp_id ##_PIN)); \
+  #define READ_TEMP(temp_id) temp_read = getAdcFreerun(pinToAdcChannel(TEMP_## temp_id ##_PIN)); \
     raw_temp_value[temp_id] += temp_read; \
     max_temp[temp_id] = max(max_temp[temp_id], temp_read); \
     min_temp[temp_id] = min(min_temp[temp_id], temp_read)
     
-  #define READ_BED_TEMP(temp_id) temp_read = getAdcReading(pinToAdcChannel(TEMP_BED_PIN)); \
+  #define READ_BED_TEMP(temp_id) temp_read = getAdcFreerun(pinToAdcChannel(TEMP_BED_PIN)); \
     raw_temp_bed_value += temp_read; \
     max_temp[temp_id] = max(max_temp[temp_id], temp_read); \
     min_temp[temp_id] = min(min_temp[temp_id], temp_read)

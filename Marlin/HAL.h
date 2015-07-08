@@ -143,6 +143,10 @@ uint16_t getAdcReading(adc_channel_num_t chan);
 void startAdcConversion(adc_channel_num_t chan);
 adc_channel_num_t pinToAdcChannel(int pin);
 
+uint16_t getAdcFreerun(adc_channel_num_t chan, bool wait_for_conversion = false);
+uint16_t getAdcSuperSample(adc_channel_num_t chan);
+void stopAdcFreerun(adc_channel_num_t chan);
+
 // --------------------------------------------------------------------------
 //
 // --------------------------------------------------------------------------
