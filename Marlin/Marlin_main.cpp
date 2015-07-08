@@ -6357,10 +6357,37 @@ void disable_all_steppers() {
 /**
  * Standard idle routine keeps the machine alive
  */
+
+inline
+void ms100_idle() {
+	manage_heater();
+	manage_inactivity();
+}
+
+inline
+void ms1000_idle() {
+	lcd_update();
+}
+
+millis_t idle_millis = 0;
+uint8_t counter_ms100 = 0;
+uint8_t counter_ms1000 = 0;
+
 void idle() {
-  manage_heater();
-  manage_inactivity();
-  lcd_update();
+  millis_t new_millis = millis();
+
+  if (new_millis >= idle_millis + 100) {
+	ms100_idle();
+
+	counter_ms1000++;
+	if (counter_ms1000 >= 10) {
+		ms1000_idle();
+		counter_ms1000 = 0;
+	}
+
+	idle_millis = new_millis;
+  }
+
   get_fsr_value();
 }
 
