@@ -3895,11 +3895,11 @@ inline void gcode_M114() {
   SERIAL_PROTOCOL(current_position[E_AXIS]);
 
   SERIAL_PROTOCOLPGM(MSG_COUNT_X);
-  SERIAL_PROTOCOL(float(st_get_position(X_AXIS))/axis_steps_per_unit[X_AXIS]);
+  SERIAL_PROTOCOL(st_get_position_mm(X_AXIS));
   SERIAL_PROTOCOLPGM(" Y:");
-  SERIAL_PROTOCOL(float(st_get_position(Y_AXIS))/axis_steps_per_unit[Y_AXIS]);
+  SERIAL_PROTOCOL(st_get_position_mm(Y_AXIS));
   SERIAL_PROTOCOLPGM(" Z:");
-  SERIAL_PROTOCOL(float(st_get_position(Z_AXIS))/axis_steps_per_unit[Z_AXIS]);
+  SERIAL_PROTOCOL(st_get_position_mm(Z_AXIS));
 
   SERIAL_EOL;
 
@@ -5297,13 +5297,13 @@ void process_next_command() {
   //  - Bypass N[0-9][0-9]*[ ]*
   //  - Overwrite * with nul to mark the end
   while (*current_command == ' ') ++current_command;
-  if (*current_command == 'N' && current_command[1] >= '0' && current_command[1] <= '9') {
-    current_command += 2; // skip N[0-9]
+  if (*current_command == 'N' && ((current_command[1] >= '0' && current_command[1] <= '9') || current_command[1] == '-')) {
+    current_command += 2; // skip N[-0-9]
     while (*current_command >= '0' && *current_command <= '9') ++current_command; // skip [0-9]*
     while (*current_command == ' ') ++current_command; // skip [ ]*
   }
   char *starpos = strchr(current_command, '*');  // * should always be the last parameter
-  if (starpos) *starpos = '\0';
+  if (starpos) while (*starpos == ' ' || *starpos == '*') *starpos-- = '\0'; // nullify '*' and ' '
 
   // Get the command code, which must be G, M, or T
   char command_code = *current_command;
