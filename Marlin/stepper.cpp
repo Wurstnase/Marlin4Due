@@ -301,8 +301,8 @@ TcChannel *stepperChannel = (STEP_TIMER_COUNTER->TC_CHANNEL + STEP_TIMER_CHANNEL
 FORCE_INLINE
 void HAL_timer_stepper_count(uint32_t count) {
 
-  uint32_t counter_value = stepperChannel->TC_CV + 42;  // we need time for other stuff!
-  //if(count < 105) count = 105;
+  uint32_t counter_value = stepperChannel->TC_CV + 105;  // we need time for other stuff!
+  if(count < 210) count = 210;
   stepperChannel->TC_RC = (counter_value <= count) ? count : counter_value;
 }
 
@@ -347,7 +347,7 @@ HAL_STEP_TIMER_ISR {
 
   //STEP_TIMER_COUNTER->TC_CHANNEL[STEP_TIMER_CHANNEL].TC_SR;
   stepperChannel->TC_SR;
-  //stepperChannel->TC_RC = 1000000;
+  stepperChannel->TC_RC = 1000000;
 
   if (cleaning_buffer_counter)
   {

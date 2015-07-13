@@ -2837,7 +2837,7 @@ inline void gcode_G28() {
         float x_tmp = current_position[X_AXIS] + X_PROBE_OFFSET_FROM_EXTRUDER,
               y_tmp = current_position[Y_AXIS] + Y_PROBE_OFFSET_FROM_EXTRUDER,
               z_tmp = current_position[Z_AXIS],
-              real_z = (float)st_get_position(Z_AXIS) / axis_steps_per_unit[Z_AXIS];  //get the real Z (since the auto bed leveling is already correcting the plane)
+              real_z = st_get_position_mm(Z_AXIS);  //get the real Z (since the auto bed leveling is already correcting the plane)
 
         apply_rotation_xyz(plan_bed_level_matrix, x_tmp, y_tmp, z_tmp); // Apply the correction sending the probe offset
         current_position[Z_AXIS] = z_tmp - real_z - zprobe_zoffset;;                     // The difference is added to current position and sent to planner.
@@ -6359,6 +6359,11 @@ void disable_all_steppers() {
  */
 
 inline
+void ms20_idle() {
+	lcd_update();
+}
+
+inline
 void ms100_idle() {
 	manage_heater();
 	manage_inactivity();
@@ -6366,7 +6371,7 @@ void ms100_idle() {
 
 inline
 void ms1000_idle() {
-	lcd_update();
+
 }
 
 millis_t idle_millis = 0;
@@ -6375,16 +6380,20 @@ uint8_t counter_ms1000 = 0;
 
 void idle() {
   millis_t new_millis = millis();
+  if (new_millis >= idle_millis + 20) {
+	ms20_idle();
 
-  if (new_millis >= idle_millis + 100) {
-	ms100_idle();
+    counter_ms100++;
+	if (counter_ms100 >= 5) {
+	  ms100_idle();
+	  counter_ms100 = 0;
 
-	counter_ms1000++;
-	if (counter_ms1000 >= 10) {
+	  counter_ms1000++;
+	  if (counter_ms1000 >= 10) {
 		ms1000_idle();
 		counter_ms1000 = 0;
+	  }
 	}
-
 	idle_millis = new_millis;
   }
 

@@ -62,7 +62,7 @@
 
 #define BEEPER             41
 
-#define FAN_PIN            -1
+#define FAN_PIN            12
 
 #define PS_ON_PIN          40
 
