@@ -62,7 +62,7 @@
 
 #define BEEPER             41
 
-#define FAN_PIN            12
+#define FAN_PIN            12 //12
 
 #define PS_ON_PIN          40
 
@@ -85,7 +85,7 @@
 
 #define TEMP_BED_PIN       4   // ANALOG NUMBERING
 #define TEMP_0_PIN         0   // ANALOG NUMBERING
-#define TEMP_1_PIN         -1  // 1   // ANALOG NUMBERING
+#define TEMP_1_PIN         1  // 1   // ANALOG NUMBERING
 #define TEMP_2_PIN         -1  // 2   // ANALOG NUMBERING
 #define TEMP_3_PIN         -1  // 3   // ANALOG NUMBERING
 
@@ -109,40 +109,54 @@
 
 	// RADDS LCD panel
 	#ifdef NEWPANEL
-	  #define LCD_PINS_RS 		42
-	  #define LCD_PINS_ENABLE 	43
-	  #define LCD_PINS_D4 		44
-	  #define LCD_PINS_D5 		45
-	  #define LCD_PINS_D6 		46
-	  #define LCD_PINS_D7 		47
 
-	  #ifdef RADDS_DISPLAY
-			#define BEEPER 41
+		#ifdef RADDS_DISPLAY
+			#define LCD_PINS_RS 		42
+	  	  	#define LCD_PINS_ENABLE 	43
+	  	  	#define LCD_PINS_D4 		44
+	  	  	#define LCD_PINS_D5 		45
+	  	  	#define LCD_PINS_D6 		46
+	  	  	#define LCD_PINS_D7 		47
 
-			#define BTN_EN1 50
-			#define BTN_EN2 52
-			#define BTN_ENC 48
+		  	#define BEEPER 41
+
+		  	#define BTN_EN1 50
+		  	#define BTN_EN2 52
+		  	#define BTN_ENC 48
 			
-			#define BTN_BACK 71
+		  	#define BTN_BACK 71
 
-			#undef SDSS
-			#define SDSS  10
-			#define SDCARDDETECT 14
+		  	#undef SDSS
+		 	#define SDSS  10
+          	#define SDCARDDETECT 14
           
-         #elif defined(SSD1306_OLED_I2C_CONTROLLER)
-                        #define BTN_EN1 50
-                        #define BTN_EN2 52
-                        #define BTN_ENC 48
-                        #define BEEPER 41
-                        #define LCD_SDSS 10
-                        #define SDCARDDETECT 14
-                        #define KILL_PIN -1
-      
-           #endif
-       #endif
+		#elif defined(SSD1306_OLED_I2C_CONTROLLER)
+      		#define BTN_EN1 50
+          	#define BTN_EN2 52
+          	#define BTN_ENC 48
+          	#define BEEPER 41
+          	#define LCD_SDSS 10
+          	#define SDCARDDETECT 14
+			#define KILL_PIN -1
+
+		// Sparklabs Full Graphic Display for RADDS
+		#elif defined(SPARK_FULL_GRAPHICS)
+			#define LCD_PINS_D4 29
+			#define LCD_PINS_ENABLE 27
+			#define LCD_PINS_RS 25
+
+			#define BTN_EN1 33
+			#define BTN_EN2 35
+			#define BTN_ENC 37
+
+			#define KILL_PIN -1
+    		#undef BEEPER
+			#define BEEPER -1
+		#endif // SPARK_FULL_GRAPHICS
+
+	#endif
 
 #endif //ULTRA_LCD
-
 
 // SPI for Max6675 Thermocouple
 

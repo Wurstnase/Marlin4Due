@@ -123,6 +123,5 @@ class U8GLIB_ST7920_128X64_RRD : public U8GLIB
     U8GLIB_ST7920_128X64_RRD(uint8_t dummy) : U8GLIB(&u8g_dev_st7920_128x64_rrd_sw_spi) {}
 };
 
-
 #endif //U8GLIB_ST7920
 #endif //ULCDST7920_H

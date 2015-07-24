@@ -5160,7 +5160,49 @@ inline void gcode_M907() {
 #endif // HAS_MICROSTEPS
 
 inline void gcode_M800() {
-	SERIAL_ECHOLN(get_fsr_value());
+	if (code_seen('V'))	SERIAL_ECHOLN(get_fsr_value());
+	if (code_seen('A')) {
+		switch (code_value_short()) {
+		case 0:
+			SERIAL_ECHO(getAdcFreerun(pinToAdcChannel(TEMP_1_PIN), true));
+			break;
+		case 1:
+			SERIAL_ECHO(get_long_sample());
+			break;
+		case 2:
+			SERIAL_ECHO(getAdcFreerun(pinToAdcChannel(TEMP_1_PIN), true));
+			SERIAL_ECHO(" : ");
+			SERIAL_ECHO(get_long_sample());
+		}
+		SERIAL_EOL;
+	}
+
+	if (code_seen('D')) {
+		set_debug(code_value_short());
+	}
+
+	if (code_seen('S')) {
+		float new_threshold = code_value();
+		if (new_threshold >= 0.1) {
+			set_threshold(new_threshold);
+		}
+		SERIAL_ECHOPAIR("threshold: ", get_threshold());
+		SERIAL_EOL;
+	}
+	if (code_seen('T')) {
+		set_z_probe_type(code_value_short());
+	}
+}
+
+inline void gcode_M801() {
+	uint8_t test_axis;
+	if (code_seen('X')) test_axis = X_AXIS;
+	if (code_seen('Y')) test_axis = Y_AXIS;
+	if (code_seen('Z')) test_axis = Z_AXIS;
+
+	SERIAL_ECHO("Axis: "); SERIAL_ECHO(test_axis);
+	SERIAL_ECHO(":"); SERIAL_ECHO(st_get_position(test_axis));
+	SERIAL_EOL;
 }
 
 /**
@@ -5826,6 +5868,9 @@ void process_next_command() {
       case 800:
     	gcode_M800();
     	break;
+      case 801:
+    	gcode_M801();
+    	break;
       case 999: // M999: Restart after being Stopped
         gcode_M999();
         break;
@@ -6360,7 +6405,7 @@ void disable_all_steppers() {
 
 inline
 void ms20_idle() {
-	lcd_update();
+	get_fsr_value();
 }
 
 inline
@@ -6396,8 +6441,7 @@ void idle() {
 	}
 	idle_millis = new_millis;
   }
-
-  get_fsr_value();
+  lcd_update();
 }
 
 /**
