@@ -6,7 +6,7 @@ Some time ago bobc started with this port. After some time sadly he stopped with
 
 Also a big thanks to all Marlin8bit-developers. Keep on working.
 
-A big thanks to Repetier! We've talked a lot in the last weeks.
+A big thanks to Repetier, great guy, great firmware!
 
 *Wurstnase*
 
