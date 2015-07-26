@@ -7,8 +7,9 @@
 //
 #ifdef MB(RAMPS_FD_V1)
   #define INVERTED_HEATER_PINS
+  #define INVERTED_MOSFET_CHANNELS
    //WARNING:If you have a RAMPS_FD_V1 modded for bugfix (same http://forums.reprap.org/read.php?219,424146,507810), you must use RAMPS_FD_V2 configuration 
-  // No EEPROM
+  // No EEPROM - unless you trivially add it . . .
   // Use 4k7 thermistor tables
 #else
   // #define RAMPS_FD_V2
@@ -56,19 +57,20 @@
 
 #define PS_ON_PIN          -1
 
-#define KILL_PIN           -1
+#define KILL_PIN           41 //Dawson
 
 
-#define HEATER_BED_PIN     9    // BED
+#define HEATER_BED_PIN     8    // BED //Dawson - OTW, not on the right power feed!
 
-#define HEATER_0_PIN       8
+#define HEATER_0_PIN       9 //Dawson - OTW, not on the right power feed!
 #define HEATER_1_PIN       -1
-#define HEATER_2_PIN       11
+// #define HEATER_2_PIN       11
+#define HEATER_2_PIN       -1 // Dawson - use this for stepper fan control
 
 #define TEMP_BED_PIN       0   // ANALOG NUMBERING
 
 #define TEMP_0_PIN         1   // ANALOG NUMBERING
-#define TEMP_1_PIN         -1  // 2    // ANALOG NUMBERING
+#define TEMP_1_PIN         2  // 2    // ANALOG NUMBERING
 #define TEMP_2_PIN         -1  // 3     // ANALOG NUMBERING
 
 #define TEMP_3_PIN         -1   // ANALOG NUMBERING
@@ -77,7 +79,7 @@
 
 
   #ifdef NUM_SERVOS
-    #define SERVO0_PIN         11
+    #define SERVO0_PIN         7
 
     #if NUM_SERVOS > 1
       #define SERVO1_PIN         6
