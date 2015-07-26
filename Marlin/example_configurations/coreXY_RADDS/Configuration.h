@@ -687,6 +687,12 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 #endif
 
 // PANELOLU2 LCD with status LEDs, separate encoder and click inputs
+//
+// This uses the LiquidTWI2 library v1.2.3 or later ( https://github.com/lincomatic/LiquidTWI2 )
+// Make sure the LiquidTWI2 directory is placed in the Arduino or Sketchbook libraries subdirectory.
+// (v1.2.3 no longer requires you to define PANELOLU in the LiquidTWI2.h library header file)
+// Note: The PANELOLU2 encoder click input can either be directly connected to a pin
+//       (if BTN_ENC defined to != -1) or read through I2C (when BTN_ENC == -1).
 //#define LCD_I2C_PANELOLU2
 #ifdef LCD_I2C_PANELOLU2
   // This uses the LiquidTWI2 library v1.2.3 or later ( https://github.com/lincomatic/LiquidTWI2 )
