@@ -311,6 +311,9 @@ your extruder heater takes 2 minutes to hit the target on heating.
 // Uncomment this option to enable CoreXY kinematics
 // #define COREXY
 
+// Uncomment this option to enable CoreXZ kinematics
+// #define COREXZ
+
 // Enable this option for Toshiba steppers
 // #define CONFIG_STEPPERS_TOSHIBA
 
