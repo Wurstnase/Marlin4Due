@@ -2,6 +2,7 @@
 #define CONFIGURATION_H
 
 #include "boards.h"
+#include "macros.h"
 
 //===========================================================================
 //============================= Getting Started =============================
@@ -582,7 +583,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 //#define ENCODER_STEPS_PER_MENU_ITEM 5 // Set according to ENCODER_PULSES_PER_STEP or your liking
 //#define ULTIMAKERCONTROLLER //as available from the Ultimaker online store.
 //#define ULTIPANEL  //the UltiPanel as on Thingiverse
-//#define LCD_FEEDBACK_FREQUENCY_HZ 1000	// this is the tone frequency the buzzer plays when on UI feedback. ie Screen Click
+//#define SPEAKER // The sound device is a speaker - not a buzzer. A buzzer resonates with his own frequency.
 //#define LCD_FEEDBACK_FREQUENCY_DURATION_MS 100 // the duration the buzzer plays the UI feedback sound. ie Screen Click
 
 // PanelOne from T3P3 (via RAMPS 1.4 AUX2/AUX3)
@@ -687,6 +688,12 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 #endif
 
 // PANELOLU2 LCD with status LEDs, separate encoder and click inputs
+//
+// This uses the LiquidTWI2 library v1.2.3 or later ( https://github.com/lincomatic/LiquidTWI2 )
+// Make sure the LiquidTWI2 directory is placed in the Arduino or Sketchbook libraries subdirectory.
+// (v1.2.3 no longer requires you to define PANELOLU in the LiquidTWI2.h library header file)
+// Note: The PANELOLU2 encoder click input can either be directly connected to a pin
+//       (if BTN_ENC defined to != -1) or read through I2C (when BTN_ENC == -1).
 //#define LCD_I2C_PANELOLU2
 #ifdef LCD_I2C_PANELOLU2
   // This uses the LiquidTWI2 library v1.2.3 or later ( https://github.com/lincomatic/LiquidTWI2 )

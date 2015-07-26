@@ -2,6 +2,7 @@
 #define CONFIGURATION_H
 
 #include "boards.h"
+#include "macros.h"
 
 //===========================================================================
 //============================= Getting Started =============================
@@ -343,6 +344,9 @@ your extruder heater takes 2 minutes to hit the target on heating.
 // Uncomment this option to enable CoreXY kinematics
 // #define COREXY
 
+// Uncomment this option to enable CoreXZ kinematics
+// #define COREXZ
+
 // Enable this option for Toshiba steppers
 // #define CONFIG_STEPPERS_TOSHIBA
 
@@ -571,7 +575,7 @@ const bool Z_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the logic 
   // If you want to still use the Z min endstop for homing, disable Z_SAFE_HOMING above. Eg; to park the head outside the bed area when homing with G28.
   // WARNING: The Z MIN endstop will need to set properly as it would without a Z PROBE to prevent head crashes and premature stopping during a print.
   // To use a separate Z PROBE endstop, you must have a Z_PROBE_PIN defined in the pins.h file for your control board.
-  // If you are using a servo based Z PROBE, you will need to enable NUM_SERVOS, SERVO_ENDSTOPS and SERVO_ENDSTOPS_ANGLES in the R/C Servo below.
+  // If you are using a servo based Z PROBE, you will need to enable NUM_SERVOS, Z_ENDSTOP_SERVO_NR and SERVO_ENDSTOPS_ANGLES in the R/C Servo below.
   // RAMPS 1.3/1.4 boards may be able to use the 5V, Ground and the D32 pin in the Aux 4 section of the RAMPS board. Use 5V for powered sensors, otherwise connect to ground and D32
   // for normally closed configuration and 5V and D32 for normally open configurations. Normally closed configuration is advised and assumed.
   // The D32 pin in Aux 4 on RAMPS maps to the Arduino D32 pin. Z_PROBE_PIN is setting the pin to use on the Arduino. Since the D32 pin on the RAMPS maps to D32 on Arduino, this works.
@@ -690,6 +694,7 @@ const bool Z_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the logic 
 //#define ENCODER_STEPS_PER_MENU_ITEM 5 // Set according to ENCODER_PULSES_PER_STEP or your liking
 //#define ULTIMAKERCONTROLLER //as available from the Ultimaker online store.
 //#define ULTIPANEL  //the UltiPanel as on Thingiverse
+//#define SPEAKER // The sound device is a speaker - not a buzzer. A buzzer resonates with his own frequency.
 //#define LCD_FEEDBACK_FREQUENCY_DURATION_MS 100 // the duration the buzzer plays the UI feedback sound. ie Screen Click
 //#define LCD_FEEDBACK_FREQUENCY_HZ 1000         // this is the tone frequency the buzzer plays when on UI feedback. ie Screen Click
                                                  // 0 to disable buzzer feedback. Test with M300 S<frequency Hz> P<duration ms>
@@ -750,6 +755,12 @@ const bool Z_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the logic 
 //#define LCD_I2C_SAINSMART_YWROBOT
 
 // PANELOLU2 LCD with status LEDs, separate encoder and click inputs
+//
+// This uses the LiquidTWI2 library v1.2.3 or later ( https://github.com/lincomatic/LiquidTWI2 )
+// Make sure the LiquidTWI2 directory is placed in the Arduino or Sketchbook libraries subdirectory.
+// (v1.2.3 no longer requires you to define PANELOLU in the LiquidTWI2.h library header file)
+// Note: The PANELOLU2 encoder click input can either be directly connected to a pin
+//       (if BTN_ENC defined to != -1) or read through I2C (when BTN_ENC == -1).
 //#define LCD_I2C_PANELOLU2
 
 // Panucatt VIKI LCD with status LEDs, integrated click & L/R/U/P buttons, separate encoder inputs
@@ -818,7 +829,9 @@ const bool Z_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the logic 
 // This allows for servo actuated endstops, primary usage is for the Z Axis to eliminate calibration or bed height changes.
 // Use M851 to set the z-probe vertical offset from the nozzle. Store that setting with M500.
 //
-//#define SERVO_ENDSTOPS {-1, -1, 0} // Servo index for X, Y, Z. Disable with -1
+//#define X_ENDSTOP_SERVO_NR 1
+//#define Y_ENDSTOP_SERVO_NR 2
+//#define Z_ENDSTOP_SERVO_NR 0
 //#define SERVO_ENDSTOP_ANGLES {0,0, 0,0, 70,0} // X,Y,Z Axis Extend and Retract angles
 
 /**********************************************************************\

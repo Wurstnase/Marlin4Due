@@ -199,8 +199,13 @@ static void lcd_implementation_init() {
     digitalWrite(LCD_PIN_BL, HIGH);
   #endif
 
-  u8g.setContrast(lcd_contrast);  
-  // FIXME: remove this workaround
+  #ifdef LCD_PIN_RESET
+    pinMode(LCD_PIN_RESET, OUTPUT);           
+    digitalWrite(LCD_PIN_RESET, HIGH);
+  #endif
+
+  u8g.setContrast(lcd_contrast);	
+	// FIXME: remove this workaround
   // Uncomment this if you have the first generation (V1.10) of STBs board
   // pinMode(17, OUTPUT); // Enable LCD backlight
   // digitalWrite(17, HIGH);
