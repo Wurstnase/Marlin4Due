@@ -6279,7 +6279,6 @@ void plan_arc(
       uint8_t speed = (lastMotor == 0 || ms >= lastMotor + (CONTROLLERFAN_SECS * 1000UL)) ? 255 : (255 - CONTROLLERFAN_SPEED);
   #else
       uint8_t speed = (lastMotor == 0 || ms >= lastMotor + (CONTROLLERFAN_SECS * 1000UL)) ? 0 : CONTROLLERFAN_SPEED;
-      CUMBUCKET ERROR
   #endif
  
       // allows digital or PWM fan output to be used (see M42 handling)
