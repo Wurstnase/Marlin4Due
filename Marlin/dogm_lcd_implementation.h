@@ -115,7 +115,8 @@
 // LCD selection
 #ifdef U8GLIB_ST7920
   //U8GLIB_ST7920_128X64_RRD u8g(0,0,0);
-  U8GLIB_ST7920_128X64_RRD u8g(0);
+  //U8GLIB_ST7920_128X64_RRD u8g(0);
+  U8GLIB_ST7920_128X64_4X u8g(LCD_PINS_D4, LCD_PINS_ENABLE, LCD_PINS_RS);
 #elif defined(U8GLIB_SSD1306)
   U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_DEV_0|U8G_I2C_OPT_NO_ACK|U8G_I2C_OPT_FAST);
 #elif defined(MAKRPANEL)
@@ -234,7 +235,7 @@ static void lcd_implementation_init() {
       u8g.drawBitmapP(offx, offy, START_BMPBYTEWIDTH, START_BMPHEIGHT, start_bmp);
       lcd_setFont(FONT_MENU);
       #ifndef STRING_SPLASH_LINE2
-        u8g.drawStr(txt1X, u8g.getHeight() - DOG_CHAR_HEIGHT, STRING_SPLASH_LINE1);
+        u8g.drawStr(0, u8g.getHeight(), STRING_SPLASH_LINE1);
       #else
         int txt2X = (u8g.getWidth() - (sizeof(STRING_SPLASH_LINE2) - 1)*DOG_CHAR_WIDTH) / 2;
         u8g.drawStr(txt1X, u8g.getHeight() - DOG_CHAR_HEIGHT*3/2, STRING_SPLASH_LINE1);
