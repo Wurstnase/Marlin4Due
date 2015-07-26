@@ -495,7 +495,9 @@
    * Helper Macros for heaters and extruder fan
    */
   
-  #ifdef INVERTED_HEATER_PINS
+  // #ifdef INVERTED_HEATER_PINS 
+  // Dawson - rename to something that is more correctly descriptive . . . More than just heaters on the MOSFETS . . . 
+  #ifdef INVERTED_MOSFET_CHANNELS
     #define WRITE_HEATER(pin,value) WRITE(pin,!value)
   #else
     #define WRITE_HEATER(pin,value) WRITE(pin,value)
@@ -520,7 +522,12 @@
     #define WRITE_HEATER_BED(v) WRITE_HEATER(HEATER_BED_PIN, v)
   #endif
   #if HAS_FAN
-    #define WRITE_FAN(v) WRITE(FAN_PIN, v)
+    //#ifdef INVERTED_HEATER_PINS //Dawson - layer fan control for RAMPS-FDv1
+    #ifdef INVERTED_MOSFET_CHANNELS //Dawson - layer fan control for RAMPS-FDv1
+      #define WRITE_FAN(v) WRITE(FAN_PIN, !v)
+    #else
+      #define WRITE_FAN(v) WRITE(FAN_PIN, v)
+    #endif // INVERTED_HEATER_PINS
   #endif
 
   #define HAS_BUZZER ((defined(BEEPER) && BEEPER >= 0) || defined(LCD_USE_I2C_BUZZER))

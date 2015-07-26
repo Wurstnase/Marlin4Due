@@ -6272,7 +6272,16 @@ void plan_arc(
       ) {
         lastMotor = ms; //... set time to NOW so the fan will turn on
       }
+      
+  // Dawson - try to get the motor/controller card fan control working with RAMPS-FD v1
+  // #ifdef INVERTED_HEATER_PINS
+  #ifdef INVERTED_MOSFET_CHANNELS
+      uint8_t speed = (lastMotor == 0 || ms >= lastMotor + (CONTROLLERFAN_SECS * 1000UL)) ? 255 : (255 - CONTROLLERFAN_SPEED);
+  #else
       uint8_t speed = (lastMotor == 0 || ms >= lastMotor + (CONTROLLERFAN_SECS * 1000UL)) ? 0 : CONTROLLERFAN_SPEED;
+      CUMBUCKET ERROR
+  #endif
+ 
       // allows digital or PWM fan output to be used (see M42 handling)
       digitalWrite(CONTROLLERFAN_PIN, speed);
       analogWrite(CONTROLLERFAN_PIN, speed);
