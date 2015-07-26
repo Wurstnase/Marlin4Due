@@ -74,7 +74,7 @@ Here are some standard links for getting your machine calibrated:
 
 // Optional custom name for your RepStrap or other custom machine
 // Displayed in the LCD "Ready" message
-// #define CUSTOM_MACHINE_NAME "3D Printer"
+#define CUSTOM_MACHINE_NAME "Marlin4Due"
 
 // Define this to set a unique identifier for this printer, (Used by some programs to differentiate between machines)
 // You can use an online service to generate a random UUID. (eg http://www.uuidgenerator.net/version4)
@@ -655,7 +655,11 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 
 // Original RADDS Display from Willy
 // http://max3dshop.org/index.php/default/elektronik/radds-lcd-sd-display-with-reset-and-back-buttom.html
-#define RADDS_DISPLAY
+//#define RADDS_DISPLAY
+
+// sparkLCD - Grafic Display for RADDS Board
+// http://sparklab-shop.de/elektronik/29/sparklcd-grafik-display-fuer-radds-board?c=10
+#define SPARK_FULL_GRAPHICS
 
 // PanelOne from T3P3 (via RAMPS 1.4 AUX2/AUX3)
 // http://reprap.org/wiki/PanelOne

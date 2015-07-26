@@ -669,6 +669,7 @@ void setup() {
   st_init();    // Initialize stepper, this enables interrupts!
   setup_photpin();
   servo_init();
+  init_fsr_values();
 
   #if HAS_CONTROLLERFAN
     SET_OUTPUT(CONTROLLERFAN_PIN); //Set pin used for driver cooling fan
@@ -2475,8 +2476,8 @@ inline void gcode_G28() {
       bool left_out_l = left_probe_bed_position < MIN_PROBE_X,
            left_out = left_out_l || left_probe_bed_position > right_probe_bed_position - MIN_PROBE_EDGE,
            right_out_r = right_probe_bed_position > MAX_PROBE_X,
-           right_out = right_out_r || right_probe_bed_position < left_probe_bed_position + MIN_PROBE_EDGE,
-           front_out_f = front_probe_bed_position < MIN_PROBE_Y,
+           right_out = right_out_r || right_probe_bed_position < left_probe_bed_position + MIN_PROBE_EDGE;
+      bool front_out_f = front_probe_bed_position < MIN_PROBE_Y,
            front_out = front_out_f || front_probe_bed_position > back_probe_bed_position - MIN_PROBE_EDGE,
            back_out_b = back_probe_bed_position > MAX_PROBE_Y,
            back_out = back_out_b || back_probe_bed_position < front_probe_bed_position + MIN_PROBE_EDGE;
@@ -5067,6 +5068,10 @@ inline void gcode_M907() {
 
 #endif // HAS_MICROSTEPS
 
+inline void gcode_M800() {
+	SERIAL_ECHOLN(get_fsr_value());
+}
+
 /**
  * M999: Restart after being stopped
  */
@@ -5727,7 +5732,9 @@ void process_next_command() {
           break;
 
       #endif // HAS_MICROSTEPS
-
+      case 800:
+    	gcode_M800();
+    	break;
       case 999: // M999: Restart after being Stopped
         gcode_M999();
         break;
@@ -6405,6 +6412,7 @@ void idle() {
   manage_heater();
   manage_inactivity();
   lcd_update();
+  get_fsr_value();
 }
 
 /**
