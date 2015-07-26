@@ -306,15 +306,20 @@ HAL_BEEPER_TIMER_ISR {
 
 uint16_t getAdcReading(adc_channel_num_t chan)
 {
-  uint16_t rslt = (uint16_t) adc_get_channel_value(ADC, chan);
-  adc_disable_channel(ADC, chan);
-  return rslt;
+	if ((ADC->ADC_ISR & BIT(chan)) == BIT(chan)) {
+		uint16_t rslt = ADC->ADC_CDR[chan];
+		ADC->ADC_CHDR |= BIT(chan);
+		return rslt;
+	}
+	else {
+		SERIAL_ECHOLN("error getAdcReading");
+		return 0;
+	}
 }
 
 void startAdcConversion(adc_channel_num_t chan)
 {
-  adc_enable_channel(ADC, chan);
-  adc_start(ADC );
+  ADC->ADC_CHER |= BIT(chan);
 }
 
 // Convert an Arduino Due pin number to the corresponding ADC channel number
@@ -325,6 +330,30 @@ adc_channel_num_t pinToAdcChannel(int pin)
     pin += A0;
   }
   return (adc_channel_num_t) (int) g_APinDescription[pin].ulADCChannelNumber;
+}
+
+uint16_t getAdcFreerun(adc_channel_num_t chan, bool wait_for_conversion)
+{
+  if (wait_for_conversion) while (!((ADC->ADC_ISR & BIT(chan)) == BIT(chan)));
+  if ((ADC->ADC_ISR & BIT(chan)) == BIT(chan)) {
+	  uint16_t rslt = ADC->ADC_CDR[chan];
+	  return rslt;
+  }
+  else {
+	  SERIAL_ECHOLN("wait freerun");
+  	  return 0;
+  }
+}
+
+uint16_t getAdcSuperSample(adc_channel_num_t chan) {
+	uint16_t rslt = 0;
+	for (int i = 0; i < 8; i++) rslt += getAdcFreerun(chan, true);
+	return rslt /4 ;
+}
+
+void stopAdcFreerun(adc_channel_num_t chan)
+{
+  ADC->ADC_CHDR |= BIT(chan);
 }
 
 // --------------------------------------------------------------------------
