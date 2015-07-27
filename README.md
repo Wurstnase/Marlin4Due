@@ -50,7 +50,7 @@ This firmware is a mashup between [Sprinter](https://github.com/kliment/Sprinter
 The current Marlin4Due dev team consists of:
 
  - Nico [@wurstnase]
- - 
+ - Tim Dawson [@tadawson]
 
 ## Donation
 
