@@ -59,10 +59,10 @@
   #endif
 
   #ifdef SPARK_FULL_GRAPHICS
-	#define ENCODER_PULSES_PER_STEP 2
+    #define ENCODER_PULSES_PER_STEP 2
     #define ENCODER_STEPS_PER_MENU_ITEM 1
 
-	#define DOGLCD
+    #define DOGLCD
     #define U8GLIB_ST7920
     #define REPRAP_DISCOUNT_SMART_CONTROLLER
   #endif
