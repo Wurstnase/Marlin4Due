@@ -213,6 +213,7 @@
  * ************* SCARA End ***************
  *
  * ************ Custom codes - This can change to suit future G-code regulations
+ * M100 - Watch Free Memory (For Debugging Only)
  * M851 - Set probe's Z offset (mm above extruder -- The value will always be negative)
 
 
@@ -224,6 +225,10 @@
  * T0-T3 - Select a tool by index (usually an extruder) [ F<mm/min> ]
  *
  */
+
+#ifdef M100_FREE_MEMORY_WATCHER
+  void gcode_M100();
+#endif
 
 #ifdef SDSUPPORT
   CardReader card;
@@ -414,6 +419,8 @@ void plan_arc(float target[NUM_AXIS], float *offset, uint8_t clockwise);
 
 bool setTargetedHotend(int code);
 
+void serial_echopair_P(const char *s_P, int v)           { serialprintPGM(s_P); SERIAL_ECHO(v); }
+void serial_echopair_P(const char *s_P, long v)          { serialprintPGM(s_P); SERIAL_ECHO(v); }
 void serial_echopair_P(const char *s_P, float v)         { serialprintPGM(s_P); SERIAL_ECHO(v); }
 void serial_echopair_P(const char *s_P, double v)        { serialprintPGM(s_P); SERIAL_ECHO(v); }
 void serial_echopair_P(const char *s_P, unsigned long v) { serialprintPGM(s_P); SERIAL_ECHO(v); }
@@ -1428,8 +1435,11 @@ static void setup_for_endstop_move() {
 
       // Move up for safety
       feedrate = Z_PROBE_ALLEN_KEY_STOW_1_FEEDRATE;
-      destination[Z_AXIS] = current_position[Z_AXIS] + Z_RAISE_AFTER_PROBING;
-      prepare_move_raw(); // this will also set_current_to_destination
+
+      #if Z_RAISE_AFTER_PROBING > 0
+        destination[Z_AXIS] = current_position[Z_AXIS] + Z_RAISE_AFTER_PROBING;
+        prepare_move_raw(); // this will also set_current_to_destination
+      #endif
 
       // Move to the start position to initiate retraction
       destination[X_AXIS] = Z_PROBE_ALLEN_KEY_STOW_1_X;
@@ -1615,7 +1625,9 @@ static void setup_for_endstop_move() {
 
     float oldXpos = current_position[X_AXIS]; // save x position
     if (dock) {
-      do_blocking_move_to_z(current_position[Z_AXIS] + Z_RAISE_AFTER_PROBING); // raise Z   
+      #if Z_RAISE_AFTER_PROBING > 0
+        do_blocking_move_to_z(current_position[Z_AXIS] + Z_RAISE_AFTER_PROBING); // raise Z
+      #endif
       do_blocking_move_to_x(X_MAX_POS + SLED_DOCKING_OFFSET + offset - 1);  // Dock sled a bit closer to ensure proper capturing
       digitalWrite(SLED_PIN, LOW); // turn off magnet
     } else {
@@ -2771,7 +2783,11 @@ inline void gcode_G28() {
         //      adjust for inaccurate endstops, not for reasonably accurate probes. If it were
         //      added here, it could be seen as a compensating factor for the Z probe.
         //
-        current_position[Z_AXIS] = -zprobe_zoffset + Z_RAISE_AFTER_PROBING + (z_tmp - real_z);
+        current_position[Z_AXIS] = -zprobe_zoffset + (z_tmp - real_z)
+          #if ENABLED(SERVO_ENDSTOPS) || ENABLED(Z_PROBE_ALLEN_KEY) || ENABLED(Z_PROBE_SLED)
+             + Z_RAISE_AFTER_PROBING
+          #endif
+          ;
         // current_position[Z_AXIS] += home_offset[Z_AXIS]; // The probe determines Z=0, not "Z home"
         sync_plan_position();
       }
@@ -5371,6 +5387,12 @@ void process_next_command() {
           gcode_M48();
           break;
       #endif // ENABLE_AUTO_BED_LEVELING && Z_PROBE_REPEATABILITY_TEST
+
+      #ifdef M100_FREE_MEMORY_WATCHER
+        case 100:
+          gcode_M100();
+          break;
+      #endif
 
       case 104: // M104
         gcode_M104();
