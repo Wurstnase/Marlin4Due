@@ -61,7 +61,7 @@ Here are some standard links for getting your machine calibrated:
 
 // This determines the communication speed of the printer
 // :[2400,9600,19200,38400,57600,115200,250000]
-#define BAUDRATE 115200
+#define BAUDRATE 250000
 
 // This enables the serial port associated to the Bluetooth interface
 //#define BTENABLED              // Enable BT interface on AT90USB devices
@@ -659,7 +659,7 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 
 // sparkLCD - Grafic Display for RADDS Board
 // http://sparklab-shop.de/elektronik/29/sparklcd-grafik-display-fuer-radds-board?c=10
-#define SPARK_FULL_GRAPHICS
+// #define SPARK_FULL_GRAPHICS
 
 // PanelOne from T3P3 (via RAMPS 1.4 AUX2/AUX3)
 // http://reprap.org/wiki/PanelOne
