@@ -6255,7 +6255,7 @@ void plan_arc(
     millis_t ms = millis();
     if (ms >= lastMotorCheck + 2500) { // Not a time critical function, so we only check every 2500ms
       lastMotorCheck = ms;
-      if (X_ENABLE_READ == X_ENABLE_ON || Y_ENABLE_READ == Y_ENABLE_ON || Z_ENABLE_READ == Z_ENABLE_ON || soft_pwm_bed > 0
+      if (X_ENABLE_READ == X_ENABLE_ON /*|| Y_ENABLE_READ == Y_ENABLE_ON*/ || Z_ENABLE_READ == Z_ENABLE_ON || soft_pwm_bed > 0
         || E0_ENABLE_READ == E_ENABLE_ON // If any of the drivers are enabled...
         #if EXTRUDERS > 1
           || E1_ENABLE_READ == E_ENABLE_ON
