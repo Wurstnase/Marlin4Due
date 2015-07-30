@@ -514,15 +514,15 @@ bool enqueuecommand(const char *cmd) {
 void setup_killpin() {
   #if HAS_KILL
     SET_INPUT(KILL_PIN);
-    WRITE(KILL_PIN, HIGH);
+    PULLUP(KILL_PIN, HIGH);
   #endif
 }
 
 void setup_filrunoutpin() {
   #if HAS_FILRUNOUT
-    pinMode(FILRUNOUT_PIN, INPUT);
+    SET_INPUT(FILRUNOUT_PIN);
     #ifdef ENDSTOPPULLUP_FIL_RUNOUT
-      WRITE(FILRUNOUT_PIN, HIGH);
+      PULLUP(FILRUNOUT_PIN, HIGH);
     #endif
   #endif
 }
@@ -531,7 +531,7 @@ void setup_filrunoutpin() {
 void setup_homepin(void) {
   #if HAS_HOME
     SET_INPUT(HOME_PIN);
-    WRITE(HOME_PIN, HIGH);
+    PULLUP(HOME_PIN, HIGH);
   #endif
 }
 
