@@ -9,24 +9,48 @@
 //=============================Thermal Settings  ============================
 //===========================================================================
 
-#ifdef BED_LIMIT_SWITCHING
+#if ENABLED(BED_LIMIT_SWITCHING)
   #define BED_HYSTERESIS 2 //only disable heating if T>target+BED_HYSTERESIS and enable heating if T>target-BED_HYSTERESIS
 #endif
 #define BED_CHECK_INTERVAL 5000 //ms between checks in bang-bang control
 
-//// Heating sanity check:
-// This waits for the watch period in milliseconds whenever an M104 or M109 increases the target temperature
-// If the temperature has not increased at the end of that period, the target temperature is set to zero.
-// It can be reset with another M104/M109. This check is also only triggered if the target temperature and the current temperature
-//  differ by at least 2x WATCH_TEMP_INCREASE
-//#define WATCH_TEMP_PERIOD 40000 //40 seconds
-//#define WATCH_TEMP_INCREASE 10  //Heat up at least 10 degree in 20 seconds
+/**
+ * Thermal Protection parameters
+ */
+#if ENABLED(THERMAL_PROTECTION_HOTENDS)
+  #define THERMAL_PROTECTION_PERIOD 40        // Seconds
+  #define THERMAL_PROTECTION_HYSTERESIS 4     // Degrees Celsius
 
-#ifdef PIDTEMP
+  /**
+   * Whenever an M104 or M109 increases the target temperature the firmware will wait for the
+   * WATCH_TEMP_PERIOD to expire, and if the temperature hasn't increased by WATCH_TEMP_INCREASE
+   * degrees, the machine is halted, requiring a hard reset. This test restarts with any M104/M109,
+   * but only if the current temperature is far enough below the target for a reliable test.
+   */
+  #define WATCH_TEMP_PERIOD 16                // Seconds
+  #define WATCH_TEMP_INCREASE 4               // Degrees Celsius
+#endif
+
+#if ENABLED(THERMAL_PROTECTION_BED)
+  #define THERMAL_PROTECTION_BED_PERIOD 20    // Seconds
+  #define THERMAL_PROTECTION_BED_HYSTERESIS 2 // Degrees Celsius
+#endif
+
+/**
+ * Automatic Temperature:
+ * The hotend target temperature is calculated by all the buffered lines of gcode.
+ * The maximum buffered steps/sec of the extruder motor is called "se".
+ * Start autotemp mode with M109 S<mintemp> B<maxtemp> F<factor>
+ * The target temperature is set to mintemp+factor*se[steps/sec] and is limited by
+ * mintemp and maxtemp. Turn this off by excuting M109 without F*
+ * Also, if the temperature is set to a value below mintemp, it will not be changed by autotemp.
+ * On an Ultimaker, some initial testing worked with M109 S215 B260 F1 in the start.gcode
+ */
+#if ENABLED(PIDTEMP)
   // this adds an experimental additional term to the heating power, proportional to the extrusion speed.
   // if Kc is chosen well, the additional required power due to increased melting should be compensated.
   #define PID_ADD_EXTRUSION_RATE
-  #ifdef PID_ADD_EXTRUSION_RATE
+  #if ENABLED(PID_ADD_EXTRUSION_RATE)
     #define  DEFAULT_Kc (1) //heating power=Kc*(e_speed)
   #endif
 #endif
@@ -40,7 +64,7 @@
 // Also, if the temperature is set to a value <mintemp, it is not changed by autotemp.
 // on an Ultimaker, some initial testing worked with M109 S215 B260 F1 in the start.gcode
 #define AUTOTEMP
-#ifdef AUTOTEMP
+#if ENABLED(AUTOTEMP)
   #define AUTOTEMP_OLDWEIGHT 0.98
 #endif
 
@@ -112,7 +136,7 @@
 // On a RAMPS (or other 5 driver) motherboard, using this feature will limit you to using 1 extruder.
 //#define Z_DUAL_STEPPER_DRIVERS
 
-#ifdef Z_DUAL_STEPPER_DRIVERS
+#if ENABLED(Z_DUAL_STEPPER_DRIVERS)
 
   // Z_DUAL_ENDSTOPS is a feature to enable the use of 2 endstops for both Z steppers - Let's call them Z stepper and Z2 stepper.
   // That way the machine is capable to align the bed during home, since both Z steppers are homed. 
@@ -125,10 +149,13 @@
 
   #define Z_DUAL_ENDSTOPS
 
-  #ifdef Z_DUAL_ENDSTOPS
-    #define Z2_STEP_PIN E2_STEP_PIN           // Stepper to be used to Z2 axis.
-    #define Z2_DIR_PIN E2_DIR_PIN
-    #define Z2_ENABLE_PIN E2_ENABLE_PIN
+  #define Z2_STEP_PIN E2_STEP_PIN           // Stepper to be used to Z2 axis.
+  #define Z2_DIR_PIN E2_DIR_PIN
+  #define Z2_ENABLE_PIN E2_ENABLE_PIN
+
+  // #define Z_DUAL_ENDSTOPS
+
+  #if ENABLED(Z_DUAL_ENDSTOPS)
     #define Z2_MAX_PIN 36                     //Endstop used for Z2 axis. In this case I'm using XMAX in a Rumba Board (pin 36)
     const bool Z2_MAX_ENDSTOP_INVERTING = false;
     #define DISABLE_XMAX_ENDSTOP              //Better to disable the XMAX to avoid conflict. Just rename "XMAX_ENDSTOP" by the endstop you are using for Z2 axis.
@@ -147,7 +174,7 @@
 // prevents hot-end ooze contaminating the print. It also reduces the weight of each x-carriage
 // allowing faster printing speeds.
 //#define DUAL_X_CARRIAGE
-#ifdef DUAL_X_CARRIAGE
+#if ENABLED(DUAL_X_CARRIAGE)
   // Configuration for second X-carriage
   // Note: the first x-carriage is defined as the x-carriage which homes to the minimum endstop;
   // the second x-carriage always homes to the maximum endstop.
@@ -218,7 +245,7 @@
 
 // @section lcd
 
-#ifdef ULTIPANEL
+#if ENABLED(ULTIPANEL)
   #define MANUAL_FEEDRATE {50*60, 50*60, 4*60, 60} // Feedrates for manual moves along X, Y, Z, E from panel
   #define ULTIPANEL_FEEDMULTIPLY  // Comment to disable setting feedrate multiplier via encoder
 #endif
@@ -268,7 +295,7 @@
 
 // @section lcd
 
-#ifdef SDSUPPORT
+#if ENABLED(SDSUPPORT)
 
   // If you are using a RAMPS board or cheap E-bay purchased boards that do not detect when an SD card is inserted
   // You can get round this by connecting a push button or single throw switch to the pin defined as SDCARDCARDDETECT
@@ -287,7 +314,7 @@
   // Show a progress bar on HD44780 LCDs for SD printing
   //#define LCD_PROGRESS_BAR
 
-  #ifdef LCD_PROGRESS_BAR
+  #if ENABLED(LCD_PROGRESS_BAR)
     // Amount of time (ms) to show the bar
     #define PROGRESS_BAR_BAR_TIME 2000
     // Amount of time (ms) to show the status message
@@ -300,12 +327,24 @@
 
 #endif // SDSUPPORT
 
+// for dogm lcd displays you can choose some additional fonts:
+#if ENABLED(DOGLCD)
+  // save 3120 bytes of PROGMEM by commenting out #define USE_BIG_EDIT_FONT
+  // we don't have a big font for Cyrillic, Kana
+  //#define USE_BIG_EDIT_FONT
+ 
+  // If you have spare 2300Byte of progmem and want to use a 
+  // smaller font on the Info-screen uncomment the next line.
+  //#define USE_SMALL_INFOFONT
+#endif // DOGLCD
+
+
 // @section more
 
 // The hardware watchdog should reset the microcontroller disabling all outputs, in case the firmware gets stuck and doesn't do temperature regulation.
 //#define USE_WATCHDOG
 
-#ifdef USE_WATCHDOG
+#if ENABLED(USE_WATCHDOG)
 // If you have a watchdog reboot in an ArduinoMega2560 then the device will hang forever, as a watchdog reset will leave the watchdog on.
 // The "WATCHDOG_RESET_MANUAL" goes around this by not using the hardware reset.
 //  However, THIS FEATURE IS UNSAFE!, as it will only work if interrupts are disabled. And the code could hang in an interrupt routine with interrupts disabled.
@@ -321,7 +360,7 @@
 // it can e.g. be used to change z-positions in the print startup phase in real-time
 // does not respect endstops!
 //#define BABYSTEPPING
-#ifdef BABYSTEPPING
+#if ENABLED(BABYSTEPPING)
   #define BABYSTEP_XY  //not only z, but also XY in the menu. more clutter, more functions
   #define BABYSTEP_INVERT_Z false  //true for inverse movements in Z
   #define BABYSTEP_Z_MULTIPLICATOR 2 //faster z movements
@@ -338,7 +377,7 @@
 // so: v ^ 2 is proportional to number of steps we advance the extruder
 //#define ADVANCE
 
-#ifdef ADVANCE
+#if ENABLED(ADVANCE)
   #define EXTRUDER_ADVANCE_K .0
   #define D_FILAMENT 2.85
   #define STEPS_MM_E 836
@@ -368,7 +407,7 @@ const unsigned int dropsegments=5; //everything with less than this number of st
 
 // The number of linear motions that can be in the plan at any give time.
 // THE BLOCK_BUFFER_SIZE NEEDS TO BE A POWER OF 2, i.g. 8,16,32 because shifts and ors are used to do the ring-buffering.
-#ifdef SDSUPPORT
+#if ENABLED(SDSUPPORT)
   #define BLOCK_BUFFER_SIZE 16   // SD,LCD,Buttons take more memory, block buffer needs to be smaller
 #else
   #define BLOCK_BUFFER_SIZE 16 // maximize block buffer
@@ -389,7 +428,7 @@ const unsigned int dropsegments=5; //everything with less than this number of st
 // the moves are than replaced by the firmware controlled ones.
 
 // #define FWRETRACT  //ONLY PARTIALLY TESTED
-#ifdef FWRETRACT
+#if ENABLED(FWRETRACT)
   #define MIN_RETRACT 0.1                //minimum extruded mm to accept a automatic gcode retraction attempt
   #define RETRACT_LENGTH 3               //default retract length (positive mm)
   #define RETRACT_LENGTH_SWAP 13         //default swap retract length (positive mm), for extruder change
@@ -401,9 +440,9 @@ const unsigned int dropsegments=5; //everything with less than this number of st
 #endif
 
 // Add support for experimental filament exchange support M600; requires display
-#ifdef ULTIPANEL
+#if ENABLED(ULTIPANEL)
   //#define FILAMENTCHANGEENABLE
-  #ifdef FILAMENTCHANGEENABLE
+  #if ENABLED(FILAMENTCHANGEENABLE)
     #define FILAMENTCHANGE_XPOS 3
     #define FILAMENTCHANGE_YPOS 3
     #define FILAMENTCHANGE_ZADD 10
@@ -420,7 +459,7 @@ const unsigned int dropsegments=5; //everything with less than this number of st
 // @section tmc
 
 //#define HAVE_TMCDRIVER
-#ifdef HAVE_TMCDRIVER
+#if ENABLED(HAVE_TMCDRIVER)
 
 //  #define X_IS_TMC
   #define X_MAX_CURRENT 1000  //in mA
@@ -482,7 +521,7 @@ const unsigned int dropsegments=5; //everything with less than this number of st
 // @section l6470
 
 //#define HAVE_L6470DRIVER
-#ifdef HAVE_L6470DRIVER
+#if ENABLED(HAVE_L6470DRIVER)
 
 //  #define X_IS_L6470
   #define X_MICROSTEPS 16     //number of microsteps

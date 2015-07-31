@@ -36,6 +36,17 @@ Here are some standard links for getting your machine calibrated:
 // example_configurations/SCARA directory.
 //
 
+<<<<<<< HEAD:Marlin/example_configurations/coreXY_RADDS/Configuration.h
+=======
+// @section info
+
+#if ENABLED(HAS_AUTOMATIC_VERSIONING)
+  #include "_Version.h"
+#else
+  #include "Default_Version.h"
+#endif
+
+>>>>>>> 040b9cd... Merge pull request #2496 from thinkyhead/move_macros:Marlin/example_configurations/WITBOX/Configuration.h
 // User-specified version info of this build to display in [Pronterface, etc] terminal window during
 // startup. Implementation of an idea by Prof Braino to inform user that any changes made to this
 // build by the user have been successfully uploaded into firmware.
@@ -174,8 +185,13 @@ Here are some standard links for getting your machine calibrated:
 // Comment the following line to disable PID and enable bang-bang.
 #define PIDTEMP
 #define BANG_MAX 255 // limits current to nozzle while in bang-bang mode; 255=full current
+<<<<<<< HEAD:Marlin/example_configurations/coreXY_RADDS/Configuration.h
 #define PID_MAX 170 // limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
 #ifdef PIDTEMP
+=======
+#define PID_MAX BANG_MAX // limits current to nozzle while PID is active (see PID_FUNCTIONAL_RANGE below); 255=full current
+#if ENABLED(PIDTEMP)
+>>>>>>> 040b9cd... Merge pull request #2496 from thinkyhead/move_macros:Marlin/example_configurations/WITBOX/Configuration.h
   //#define PID_DEBUG // Sends debug data to the serial port.
   //#define PID_OPENLOOP 1 // Puts PID in open loop. M104/M140 sets the output power from 0 to PID_MAX
   //#define SLOW_PWM_HEATERS // PWM with very low frequency (roughly 0.125Hz=8s) and minimum state time of approximately 1s useful for heaters driven by a relay
@@ -226,6 +242,7 @@ Here are some standard links for getting your machine calibrated:
 // so you shouldn't use it unless you are OK with PWM on your bed.  (see the comment on enabling PIDTEMPBED)
 #define MAX_BED_POWER 255 // limits duty cycle to bed; 255=full current
 
+<<<<<<< HEAD:Marlin/example_configurations/coreXY_RADDS/Configuration.h
 #ifdef PIDTEMPBED
 //120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
 //from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
@@ -240,6 +257,27 @@ Here are some standard links for getting your machine calibrated:
 //    #define  DEFAULT_bedKd 1675.16
 
 // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
+=======
+//#define PID_BED_DEBUG // Sends debug data to the serial port.
+
+#if ENABLED(PIDTEMPBED)
+
+  #define PID_BED_INTEGRAL_DRIVE_MAX MAX_BED_POWER //limit for the integral term
+
+  //120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
+  //from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
+  #define  DEFAULT_bedKp 10.00
+  #define  DEFAULT_bedKi .023
+  #define  DEFAULT_bedKd 305.4
+
+  //120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
+  //from pidautotune
+  //#define  DEFAULT_bedKp 97.1
+  //#define  DEFAULT_bedKi 1.41
+  //#define  DEFAULT_bedKd 1675.16
+
+  // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
+>>>>>>> 040b9cd... Merge pull request #2496 from thinkyhead/move_macros:Marlin/example_configurations/WITBOX/Configuration.h
 #endif // PIDTEMPBED
 
 
@@ -368,11 +406,50 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 #define Y_MIN_POS 0
 #define Z_MAX_POS 215
 #define Z_MIN_POS 0
+<<<<<<< HEAD:Marlin/example_configurations/coreXY_RADDS/Configuration.h
+=======
+#define X_MAX_POS 297
+#define Y_MAX_POS 210
+#define Z_MAX_POS 200
+
+//===========================================================================
+//========================= Filament Runout Sensor ==========================
+//===========================================================================
+//#define FILAMENT_RUNOUT_SENSOR // Uncomment for defining a filament runout sensor such as a mechanical or opto endstop to check the existence of filament
+                                 // In RAMPS uses servo pin 2. Can be changed in pins file. For other boards pin definition should be made.
+                                 // It is assumed that when logic high = filament available
+                                 //                    when logic  low = filament ran out
+#if ENABLED(FILAMENT_RUNOUT_SENSOR)
+  const bool FIL_RUNOUT_INVERTING = true;  // Should be uncommented and true or false should assigned
+  #define ENDSTOPPULLUP_FIL_RUNOUT // Uncomment to use internal pullup for filament runout pins if the sensor is defined.
+  #define FILAMENT_RUNOUT_SCRIPT "M600"
+#endif
+
+//===========================================================================
+//=========================== Manual Bed Leveling ===========================
+//===========================================================================
+>>>>>>> 040b9cd... Merge pull request #2496 from thinkyhead/move_macros:Marlin/example_configurations/WITBOX/Configuration.h
 
 #define X_MAX_LENGTH (X_MAX_POS - X_MIN_POS)
 #define Y_MAX_LENGTH (Y_MAX_POS - Y_MIN_POS)
 #define Z_MAX_LENGTH (Z_MAX_POS - Z_MIN_POS)
 
+<<<<<<< HEAD:Marlin/example_configurations/coreXY_RADDS/Configuration.h
+=======
+#if ENABLED(MANUAL_BED_LEVELING)
+  #define MBL_Z_STEP 0.025  // Step size while manually probing Z axis
+#endif  // MANUAL_BED_LEVELING
+
+#if ENABLED(MESH_BED_LEVELING)
+  #define MESH_MIN_X 10
+  #define MESH_MAX_X (X_MAX_POS - MESH_MIN_X)
+  #define MESH_MIN_Y 10
+  #define MESH_MAX_Y (Y_MAX_POS - MESH_MIN_Y)
+  #define MESH_NUM_X_POINTS 3  // Don't use more than 7 points per axis, implementation limited
+  #define MESH_NUM_Y_POINTS 3
+  #define MESH_HOME_SEARCH_Z 4  // Z after Home, bed somewhere below but above 0.0
+#endif  // MESH_BED_LEVELING
+>>>>>>> 040b9cd... Merge pull request #2496 from thinkyhead/move_macros:Marlin/example_configurations/WITBOX/Configuration.h
 
 //===========================================================================
 //============================= Bed Auto Leveling ===========================
@@ -381,15 +458,19 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 #define ENABLE_AUTO_BED_LEVELING // Delete the comment to enable (remove // at the start of the line)
 #define Z_PROBE_REPEATABILITY_TEST  // If not commented out, Z-Probe Repeatability test will be included if Auto Bed Leveling is Enabled.
 
-#ifdef ENABLE_AUTO_BED_LEVELING
+#if ENABLED(ENABLE_AUTO_BED_LEVELING)
 
 // There are 2 different ways to pick the X and Y locations to probe:
 
+<<<<<<< HEAD:Marlin/example_configurations/coreXY_RADDS/Configuration.h
 //  - "grid" mode
 //    Probe every point in a rectangular grid
 //    You must specify the rectangle, and the density of sample points
 //    This mode is preferred because there are more measurements.
 //    It used to be called ACCURATE_BED_LEVELING but "grid" is more descriptive
+=======
+  #if ENABLED(AUTO_BED_LEVELING_GRID)
+>>>>>>> 040b9cd... Merge pull request #2496 from thinkyhead/move_macros:Marlin/example_configurations/WITBOX/Configuration.h
 
 //  - "3-point" mode
 //    Probe 3 arbitrary points on the bed (that aren't colinear)
@@ -461,7 +542,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
                           // - Position the probe in a defined XY point before Z Homing when homing all axis (G28)
                           // - Block Z homing only when the probe is outside bed area.
 
-  #ifdef Z_SAFE_HOMING
+  #if ENABLED(Z_SAFE_HOMING)
 
     #define Z_SAFE_HOMING_X_POINT (X_MAX_LENGTH/2)    // X point for Z homing when homing all axis (G28)
     #define Z_SAFE_HOMING_Y_POINT (Y_MAX_LENGTH/2)    // Y point for Z homing when homing all axis (G28)
@@ -500,10 +581,25 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 
 //Manual homing switch locations:
 // For deltabots this means top and center of the Cartesian print volume.
+<<<<<<< HEAD:Marlin/example_configurations/coreXY_RADDS/Configuration.h
 #define MANUAL_X_HOME_POS 0
 #define MANUAL_Y_HOME_POS 0
 #define MANUAL_Z_HOME_POS 0
 //#define MANUAL_Z_HOME_POS 402 // For delta: Distance between nozzle and print surface after homing.
+=======
+#if ENABLED(MANUAL_HOME_POSITIONS)
+  #define MANUAL_X_HOME_POS 0
+  #define MANUAL_Y_HOME_POS 0
+  #define MANUAL_Z_HOME_POS 0
+  //#define MANUAL_Z_HOME_POS 402 // For delta: Distance between nozzle and print surface after homing.
+#endif
+
+// @section movement
+
+/**
+ * MOVEMENT SETTINGS
+ */
+>>>>>>> 040b9cd... Merge pull request #2496 from thinkyhead/move_macros:Marlin/example_configurations/WITBOX/Configuration.h
 
 //// MOVEMENT SETTINGS
 #define NUM_AXIS 4 // The axis order in all axis related arrays is X, Y, Z, E
@@ -536,10 +632,19 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 
 // Custom M code points
 #define CUSTOM_M_CODES
+<<<<<<< HEAD:Marlin/example_configurations/coreXY_RADDS/Configuration.h
 #ifdef CUSTOM_M_CODES
   #define CUSTOM_M_CODE_SET_Z_PROBE_OFFSET 851
   #define Z_PROBE_OFFSET_RANGE_MIN -15
   #define Z_PROBE_OFFSET_RANGE_MAX 0
+=======
+#if ENABLED(CUSTOM_M_CODES)
+  #if ENABLED(ENABLE_AUTO_BED_LEVELING)
+    #define CUSTOM_M_CODE_SET_Z_PROBE_OFFSET 851
+    #define Z_PROBE_OFFSET_RANGE_MIN -20
+    #define Z_PROBE_OFFSET_RANGE_MAX 20
+  #endif
+>>>>>>> 040b9cd... Merge pull request #2496 from thinkyhead/move_macros:Marlin/example_configurations/WITBOX/Configuration.h
 #endif
 
 
@@ -550,9 +655,19 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 // M502 - reverts to the default "factory settings".  You still need to store them in EEPROM afterwards if you want to.
 //define this to enable EEPROM support
 //#define EEPROM_SETTINGS
+<<<<<<< HEAD:Marlin/example_configurations/coreXY_RADDS/Configuration.h
 //to disable EEPROM Serial responses and decrease program space by ~1700 byte: comment this out:
 // please keep turned on if you can.
 //#define EEPROM_CHITCHAT
+=======
+
+#if ENABLED(EEPROM_SETTINGS)
+  // To disable EEPROM Serial responses and decrease program space by ~1700 byte: comment this out:
+  #define EEPROM_CHITCHAT // Please keep turned on if you can.
+#endif
+
+// @section temperature
+>>>>>>> 040b9cd... Merge pull request #2496 from thinkyhead/move_macros:Marlin/example_configurations/WITBOX/Configuration.h
 
 // Preheat Constants
 #define PLA_PREHEAT_HOTEND_TEMP 180
@@ -831,8 +946,20 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 // This allows for servo actuated endstops, primary usage is for the Z Axis to eliminate calibration or bed height changes.
 // Use M206 command to correct for switch height offset to actual nozzle height. Store that setting with M500.
 //
+<<<<<<< HEAD:Marlin/example_configurations/coreXY_RADDS/Configuration.h
 //#define SERVO_ENDSTOPS {-1, -1, 0} // Servo index for X, Y, Z. Disable with -1
 //#define SERVO_ENDSTOP_ANGLES {0,0, 0,0, 70,0} // X,Y,Z Axis Extend and Retract angles
+=======
+// With this option servos are powered only during movement, then turned off to prevent jitter.
+//#define DEACTIVATE_SERVOS_AFTER_MOVE
+
+#if ENABLED(DEACTIVATE_SERVOS_AFTER_MOVE)
+  // Delay (in microseconds) before turning the servo off. This depends on the servo speed.
+  // 300ms is a good value but you can try less delay.
+  // If the servo can't reach the requested position, increase it.
+  #define SERVO_DEACTIVATION_DELAY 300
+#endif
+>>>>>>> 040b9cd... Merge pull request #2496 from thinkyhead/move_macros:Marlin/example_configurations/WITBOX/Configuration.h
 
 /**********************************************************************\
  * Support for a filament diameter sensor
