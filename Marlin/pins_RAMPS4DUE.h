@@ -145,7 +145,7 @@
     #endif
 
     #if ENABLED(REPRAP_DISCOUNT_SMART_CONTROLLER)
-      #define BEEPER 37
+      #define BEEPER_PIN 37
 
       #define BTN_EN1 31
       #define BTN_EN2 33
@@ -166,8 +166,8 @@
       #define LCD_SDSS 53
       #define SDCARDDETECT 49
     #else
-      // arduino pin which triggers an piezzo beeper
-      #define BEEPER 33  // Beeper on AUX-4
+
+      #define BEEPER_PIN 33  // Beeper on AUX-4
 
       // buttons are directly attached using AUX-2
       #if ENABLED(REPRAPWORLD_KEYPAD)
@@ -195,7 +195,7 @@
 
     #endif
   #else // !NEWPANEL (Old-style panel with shift register)
-    // Arduino pin to trigger a piezzo beeper
+
     #define BEEPER 33   // No Beeper added
 
     // Buttons are attached to a shift register

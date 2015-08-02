@@ -533,7 +533,7 @@
     #endif // INVERTED_HEATER_PINS
   #endif
 
-  #define HAS_BUZZER ((defined(BEEPER) && BEEPER >= 0) || defined(LCD_USE_I2C_BUZZER))
+  #define HAS_BUZZER (PIN_EXISTS(BEEPER) || defined(LCD_USE_I2C_BUZZER))
 
   #if defined(NUM_SERVOS) && NUM_SERVOS > 0
     #ifndef X_ENDSTOP_SERVO_NR
