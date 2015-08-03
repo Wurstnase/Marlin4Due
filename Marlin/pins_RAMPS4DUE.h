@@ -151,20 +151,20 @@
       #define BTN_EN2 33
       #define BTN_ENC 35
 
-      #define SDCARDDETECT 49
+      #define SD_DETECT_PIN 49
     #elif ENABLED(LCD_I2C_PANELOLU2)
       #define BTN_EN1 47  // reverse if the encoder turns the wrong way.
       #define BTN_EN2 43
       #define BTN_ENC 32
       #define LCD_SDSS 53
-      #define SDCARDDETECT -1
+      #define SD_DETECT_PIN -1
       #define KILL_PIN 41
     #elif ENABLED(LCD_I2C_VIKI)
       #define BTN_EN1 22  // reverse if the encoder turns the wrong way.
       #define BTN_EN2 7
       #define BTN_ENC -1
       #define LCD_SDSS 53
-      #define SDCARDDETECT 49
+      #define SD_DETECT_PIN 49
     #else
 
       #define BEEPER_PIN 33  // Beeper on AUX-4
@@ -188,15 +188,15 @@
       #endif
 
       #if ENABLED(G3D_PANEL)
-        #define SDCARDDETECT 49
+        #define SD_DETECT_PIN 49
       #else
-        #define SDCARDDETECT -1  // Ramps does not use this port
+        #define SD_DETECT_PIN -1  // Ramps doesn't use this
       #endif
 
     #endif
   #else // !NEWPANEL (Old-style panel with shift register)
 
-    #define BEEPER 33   // No Beeper added
+    #define BEEPER_PIN 33   // No Beeper added
 
     // Buttons are attached to a shift register
     // Not wired yet

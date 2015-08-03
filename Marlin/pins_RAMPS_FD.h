@@ -51,7 +51,7 @@
 #define SDSS               4
 #define LED_PIN            13
 
-#define BEEPER             -1
+#define BEEPER_PIN             -1
 
 #define FAN_PIN            10 //fet3
 
@@ -106,21 +106,21 @@
       #define LCD_PINS_D7 29
 
       #ifdef REPRAP_DISCOUNT_SMART_CONTROLLER
-        #define BEEPER 37
+        #define BEEPER_PIN 37
 
         #define BTN_EN1 33
         #define BTN_EN2 31
         #define BTN_ENC 35
 
-        #define SDCARDDETECT 49
+        #define SD_DETECT_PIN 49
      
       #elif defined(SSD1306_OLED_I2C_CONTROLLER)
         #define BTN_EN1 31
         #define BTN_EN2 33
         #define BTN_ENC 35
-        #define BEEPER -1
+        #define BEEPER_PIN -1
         #define LCD_SDSS 49
-        #define SDCARDDETECT 37
+        #define SD_DETECT_PIN 37
         #define KILL_PIN 39
       #endif
 

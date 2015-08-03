@@ -60,7 +60,7 @@
 #define SDSS               4 //10 Display
 #define LED_PIN            -1
 
-#define BEEPER             41
+#define BEEPER_PIN             41
 
 #define FAN_PIN            -1
 
@@ -118,7 +118,7 @@
 	  	  	#define LCD_PINS_D6 		46
 	  	  	#define LCD_PINS_D7 		47
 
-		  	#define BEEPER 41
+		  	#define BEEPER_PIN 41
 
 		  	#define BTN_EN1 50
 		  	#define BTN_EN2 52
@@ -128,15 +128,15 @@
 
 		  	#undef SDSS
 		 	#define SDSS  10
-          	#define SDCARDDETECT 14
+          	#define SD_DETECT_PIN 14
           
 		#elif defined(SSD1306_OLED_I2C_CONTROLLER)
       		#define BTN_EN1 50
           	#define BTN_EN2 52
           	#define BTN_ENC 48
-          	#define BEEPER 41
+          	#define BEEPER_PIN 41
           	#define LCD_SDSS 10
-          	#define SDCARDDETECT 14
+          	#define SD_DETECT_PIN 14
 			#define KILL_PIN -1
 
 		// Sparklabs Full Graphic Display for RADDS
@@ -150,8 +150,8 @@
 			#define BTN_ENC 37
 
 			#define KILL_PIN -1
-    		#undef BEEPER
-			#define BEEPER -1
+    		#undef BEEPER_PIN
+			#define BEEPER_PIN -1
 		#endif // SPARK_FULL_GRAPHICS
 
 	#endif
