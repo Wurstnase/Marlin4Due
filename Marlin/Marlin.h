@@ -45,12 +45,12 @@ typedef unsigned long millis_t;
 
 #include "WString.h"
 
-#ifdef AT90USB
-  #ifdef BTENABLED
+#ifdef USBCON
+  #if ENABLED(BLUETOOTH)
     #define MYSERIAL bt
   #else
     #define MYSERIAL Serial
-  #endif // BTENABLED
+  #endif // BLUETOOTH
 #else
   #ifndef MYSERIAL
   #define MYSERIAL Serial
