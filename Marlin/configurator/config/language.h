@@ -13,31 +13,41 @@
 //   ==> ALSO TRY ALL AVAILABLE LANGUAGE OPTIONS
 
 // Languages
-// en    English
-// pl    Polish
-// fr    French
-// de    German
-// es    Spanish
-// ru    Russian
-// it    Italian
-// pt    Portuguese
-// pt-br Portuguese (Brazil)
-// fi    Finnish
-// an    Aragonese
-// nl    Dutch
-// ca    Catalan
-// eu    Basque-Euskera
+// en       English
+// pl       Polish
+// fr       French
+// de       German
+// es       Spanish
+// ru       Russian
+// bg       Bulgarian
+// it       Italian
+// pt       Portuguese
+// pt-br    Portuguese (Brazil)
+// fi       Finnish
+// an       Aragonese
+// nl       Dutch
+// ca       Catalan
+// eu       Basque-Euskera
+// kana     Japanese
+// kana_utf Japanese
+// cn       Chinese
 
+// fallback if no language is set, don't change
 #ifndef LANGUAGE_INCLUDE
-  // pick your language from the list above
   #define LANGUAGE_INCLUDE GENERATE_LANGUAGE_INCLUDE(en)
+#endif
+
+#if ENABLED(USE_AUTOMATIC_VERSIONING)
+  #include "_Version.h"
+#else
+  #include "Default_Version.h"
 #endif
 
 #define PROTOCOL_VERSION "1.0"
 
 #if MB(ULTIMAKER)|| MB(ULTIMAKER_OLD)|| MB(ULTIMAIN_2)
   #define MACHINE_NAME "Ultimaker"
-  #define FIRMWARE_URL "http://firmware.ultimaker.com"
+  #define SOURCE_CODE_URL "https://github.com/Ultimaker/Marlin"
 #elif MB(RUMBA)
   #define MACHINE_NAME "Rumba"
 #elif MB(3DRAG)
@@ -61,9 +71,17 @@
   #define FIRMWARE_URL "https://github.com/MarlinFirmware/Marlin"
 #endif
 
-#ifdef CUSTOM_MENDEL_NAME
+#ifdef CUSTOM_MACHINE_NAME
   #undef MACHINE_NAME
-  #define MACHINE_NAME CUSTOM_MENDEL_NAME
+  #define MACHINE_NAME CUSTOM_MACHINE_NAME
+#endif
+
+#ifndef SOURCE_CODE_URL
+  #define SOURCE_CODE_URL "https://github.com/MarlinFirmware/Marlin"
+#endif
+
+#ifndef DETAILED_BUILD_VERSION
+  #error BUILD_VERSION Information must be specified
 #endif
 
 #ifndef MACHINE_UUID
@@ -109,12 +127,7 @@
 #define MSG_M218_INVALID_EXTRUDER           "M218 Invalid extruder "
 #define MSG_M221_INVALID_EXTRUDER           "M221 Invalid extruder "
 #define MSG_ERR_NO_THERMISTORS              "No thermistors - no temperature"
-#define MSG_M109_INVALID_EXTRUDER           "M109 Invalid extruder "
-#define MSG_HEATING                         "Heating..."
-#define MSG_HEATING_COMPLETE                "Heating done."
-#define MSG_BED_HEATING                     "Bed Heating."
-#define MSG_BED_DONE                        "Bed done."
-#define MSG_M115_REPORT                     "FIRMWARE_NAME:Marlin V1; Sprinter/grbl mashup for gen6 FIRMWARE_URL:" FIRMWARE_URL " PROTOCOL_VERSION:" PROTOCOL_VERSION " MACHINE_TYPE:" MACHINE_NAME " EXTRUDER_COUNT:" STRINGIFY(EXTRUDERS) " UUID:" MACHINE_UUID "\n"
+#define MSG_M115_REPORT                     "FIRMWARE_NAME:Marlin " DETAILED_BUILD_VERSION " SOURCE_CODE_URL:" SOURCE_CODE_URL " PROTOCOL_VERSION:" PROTOCOL_VERSION " MACHINE_TYPE:" MACHINE_NAME " EXTRUDER_COUNT:" STRINGIFY(EXTRUDERS) " UUID:" MACHINE_UUID "\n"
 #define MSG_COUNT_X                         " Count X: "
 #define MSG_ERR_KILLED                      "Printer halted. kill() called!"
 #define MSG_ERR_STOPPED                     "Printer stopped due to errors. Fix the error and use M999 to restart. (Temperature is reset. Set it after restarting)"
@@ -159,6 +172,49 @@
 #define MSG_SERIAL_ERROR_MENU_STRUCTURE     "Error in menu structure"
 
 #define MSG_ERR_EEPROM_WRITE                "Error writing to EEPROM!"
+
+// temperature.cpp strings
+#define MSG_PID_AUTOTUNE                    "PID Autotune"
+#define MSG_PID_AUTOTUNE_START              MSG_PID_AUTOTUNE " start"
+#define MSG_PID_AUTOTUNE_FAILED             MSG_PID_AUTOTUNE " failed!"
+#define MSG_PID_BAD_EXTRUDER_NUM            MSG_PID_AUTOTUNE_FAILED " Bad extruder number"
+#define MSG_PID_TEMP_TOO_HIGH               MSG_PID_AUTOTUNE_FAILED " Temperature too high"
+#define MSG_PID_TIMEOUT                     MSG_PID_AUTOTUNE_FAILED " timeout"
+#define MSG_BIAS                            " bias: "
+#define MSG_D                               " d: "
+#define MSG_T_MIN                           " min: "
+#define MSG_T_MAX                           " max: "
+#define MSG_KU                              " Ku: "
+#define MSG_TU                              " Tu: "
+#define MSG_CLASSIC_PID                     " Classic PID "
+#define MSG_KP                              " Kp: "
+#define MSG_KI                              " Ki: "
+#define MSG_KD                              " Kd: "
+#define MSG_B                               "B:"
+#define MSG_T                               "T:"
+#define MSG_AT                              " @:"
+#define MSG_PID_AUTOTUNE_FINISHED           MSG_PID_AUTOTUNE " finished! Put the last Kp, Ki and Kd constants from below into Configuration.h"
+#define MSG_PID_DEBUG                       " PID_DEBUG "
+#define MSG_PID_DEBUG_INPUT                 ": Input "
+#define MSG_PID_DEBUG_OUTPUT                " Output "
+#define MSG_PID_DEBUG_PTERM                 " pTerm "
+#define MSG_PID_DEBUG_ITERM                 " iTerm "
+#define MSG_PID_DEBUG_DTERM                 " dTerm "
+#define MSG_INVALID_EXTRUDER_NUM            " - Invalid extruder number !"
+
+#define MSG_HEATER_BED                      "bed"
+#define MSG_STOPPED_HEATER                  ", system stopped! Heater_ID: "
+#define MSG_REDUNDANCY                      "Heater switched off. Temperature difference between temp sensors is too high !"
+#define MSG_T_HEATING_FAILED                "Heating failed"
+#define MSG_T_THERMAL_RUNAWAY               "Thermal Runaway"
+#define MSG_T_MAXTEMP                       "MAXTEMP triggered"
+#define MSG_T_MINTEMP                       "MINTEMP triggered"
+
+// Debug
+#define MSG_DEBUG_ECHO                      "DEBUG ECHO ENABLED"
+#define MSG_DEBUG_INFO                      "DEBUG INFO ENABLED"
+#define MSG_DEBUG_ERRORS                    "DEBUG ERRORS ENABLED"
+#define MSG_DEBUG_DRYRUN                    "DEBUG DRYRUN ENABLED"
 
 // LCD Menu Messages
 
