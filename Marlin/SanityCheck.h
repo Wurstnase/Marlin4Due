@@ -32,13 +32,10 @@
    * Babystepping
    */
   #if ENABLED(BABYSTEPPING)
-    #if ENABLED(COREXY)
-      #error BABYSTEPPING not implemented for COREXY yet.
-    #endif
     #if ENABLED(SCARA)
       #error BABYSTEPPING is not implemented for SCARA yet.
     #endif
-    #if ENABLED(DELTA) && ENABLED(BABYSTEP_XY)
+    #if (ENABLED(DELTA) || ENABLED(COREXY)) && ENABLED(BABYSTEP_XY)
       #error BABYSTEPPING only implemented for Z axis on deltabots.
     #endif
   #endif
