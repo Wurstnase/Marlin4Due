@@ -67,7 +67,7 @@
     #define REPRAP_DISCOUNT_SMART_CONTROLLER
   #endif
 
-  #if ENABLED(ULTIMAKERCONTROLLER) || ENABLED(REPRAP_DISCOUNT_SMART_CONTROLLER) || ENABLED(G3D_PANEL)
+  #if ENABLED(ULTIMAKERCONTROLLER) || ENABLED(REPRAP_DISCOUNT_SMART_CONTROLLER) || ENABLED(G3D_PANEL) || ENABLED(RIGIDBOT_PANEL)
     #define ULTIPANEL
     #define NEWPANEL
   #endif
@@ -90,6 +90,14 @@
     #define LCD_I2C_ADDRESS 0x27   // I2C Address of the port expander
     #define ULTIPANEL
     #define NEWPANEL
+  #endif
+
+  #if ENABLED(MINIPANEL)
+   #define DOGLCD
+   #define SDSUPPORT
+   #define ULTIPANEL
+   #define NEWPANEL
+   #define DEFAULT_LCD_CONTRAST 17
   #endif
 
   /**
