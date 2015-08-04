@@ -103,7 +103,6 @@ void _EEPROM_writeData(int &pos, uint8_t* value, uint8_t size) {
   uint8_t c;
   while(size--) {
     eeprom_write_byte((unsigned char*)pos, *value);
-    _delay_ms(2);
     c = eeprom_read_byte((unsigned char*)pos);
     if (c != *value) {
       SERIAL_ECHO_START;

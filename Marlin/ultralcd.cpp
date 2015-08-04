@@ -289,7 +289,7 @@ static void lcd_goto_menu(menuFunc_t menu, const bool feedback=false, const uint
  */
 
 static void lcd_status_screen() {
-	encoderRateMultiplierEnabled = false;
+  encoderRateMultiplierEnabled = false;
 
   #if ENABLED(LCD_PROGRESS_BAR)
     millis_t ms = millis();
@@ -1193,7 +1193,7 @@ static void lcd_sd_updir() {
  *
  */
 void lcd_sdcard_menu() {
-  if (lcdDrawUpdate == 0 && LCD_CLICKED == 0) return;	// nothing to do (so don't thrash the SD card)
+  if (lcdDrawUpdate == 0 && LCD_CLICKED == 0) return; // nothing to do (so don't thrash the SD card)
   uint16_t fileCnt = card.getnrfilenames();
   START_MENU(lcd_main_menu);
   MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
@@ -1226,7 +1226,6 @@ void lcd_sdcard_menu() {
   }
   END_MENU();
 }
-#endif
 
 /**
  *
@@ -1847,18 +1846,18 @@ char *ftostr32(const float &x) {
 
 // Convert float to string with 1.234 format
 char *ftostr43(const float &x) {
-	long xx = x * 1000;
+  long xx = x * 1000;
     if (xx >= 0)
-		conv[0] = (xx / 1000) % 10 + '0';
-	else
-		conv[0] = '-';
-	xx = abs(xx);
-	conv[1] = '.';
-	conv[2] = (xx / 100) % 10 + '0';
-	conv[3] = (xx / 10) % 10 + '0';
-	conv[4] = (xx) % 10 + '0';
-	conv[5] = 0;
-	return conv;
+    conv[0] = (xx / 1000) % 10 + '0';
+  else
+    conv[0] = '-';
+  xx = abs(xx);
+  conv[1] = '.';
+  conv[2] = (xx / 100) % 10 + '0';
+  conv[3] = (xx / 10) % 10 + '0';
+  conv[4] = (xx) % 10 + '0';
+  conv[5] = 0;
+  return conv;
 }
 
 // Convert float to string with 1.23 format

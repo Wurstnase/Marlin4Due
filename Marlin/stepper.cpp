@@ -370,7 +370,7 @@ inline void update_endstops() {
         
         #if ENABLED(Z_PROBE_ENDSTOP)
           UPDATE_ENDSTOP(Z, PROBE);
-
+          
           if (TEST_ENDSTOP(Z_PROBE))
           {
             endstops_trigsteps[Z_AXIS] = count_position[Z_AXIS];
@@ -380,7 +380,7 @@ inline void update_endstops() {
       }
   #if ENABLED(COREXZ)
     }
-  #endif
+  #endif  
   old_endstop_bits = current_endstop_bits;
 }
 
@@ -574,21 +574,21 @@ HAL_STEP_TIMER_ISR {
 
   if (current_block != NULL) {
 
-	// Update endstops state, if enabled
-	  if (check_endstops) update_endstops();
+  // Update endstops state, if enabled
+    if (check_endstops) update_endstops();
 
-	#define _COUNTER(axis) counter_## axis
-	#define _APPLY_STEP(AXIS) AXIS ##_APPLY_STEP
-	#define _INVERT_STEP_PIN(AXIS) INVERT_## AXIS ##_STEP_PIN
+  #define _COUNTER(axis) counter_## axis
+  #define _APPLY_STEP(AXIS) AXIS ##_APPLY_STEP
+  #define _INVERT_STEP_PIN(AXIS) INVERT_## AXIS ##_STEP_PIN
 
-	#define STEP_START(axis, AXIS) \
-	  _COUNTER(axis) += current_block->steps[_AXIS(AXIS)]; \
-	  if (_COUNTER(axis) > 0) { \
-		_APPLY_STEP(AXIS)(!_INVERT_STEP_PIN(AXIS),0); \
-		_COUNTER(axis) -= current_block->step_event_count; \
-		count_position[_AXIS(AXIS)] += count_direction[_AXIS(AXIS)]; }
+  #define STEP_START(axis, AXIS) \
+    _COUNTER(axis) += current_block->steps[_AXIS(AXIS)]; \
+    if (_COUNTER(axis) > 0) { \
+    _APPLY_STEP(AXIS)(!_INVERT_STEP_PIN(AXIS),0); \
+    _COUNTER(axis) -= current_block->step_event_count; \
+    count_position[_AXIS(AXIS)] += count_direction[_AXIS(AXIS)]; }
 
-	#define STEP_END(axis, AXIS) _APPLY_STEP(AXIS)(_INVERT_STEP_PIN(AXIS),0)
+  #define STEP_END(axis, AXIS) _APPLY_STEP(AXIS)(_INVERT_STEP_PIN(AXIS),0)
 
     #if defined(ENABLE_HIGH_SPEED_STEPPING)
       // Take multiple steps per interrupt (For high speed moves)
@@ -1091,7 +1091,7 @@ void quickStop() {
           X_STEP_WRITE(!INVERT_X_STEP_PIN);
           Y_STEP_WRITE(!INVERT_Y_STEP_PIN);
           Z_STEP_WRITE(!INVERT_Z_STEP_PIN);
-          _delay_us(1U);
+          delayMicroseconds(2);
           X_STEP_WRITE(INVERT_X_STEP_PIN); 
           Y_STEP_WRITE(INVERT_Y_STEP_PIN); 
           Z_STEP_WRITE(INVERT_Z_STEP_PIN);

@@ -3,7 +3,7 @@
 
 #include "Marlin.h"
 
-#ifdef U8GLIB_ST7920
+#if ENABLED(U8GLIB_ST7920)
 
 //set optimization so ARDUINO optimizes this file
 #pragma GCC optimize (3)
@@ -30,8 +30,8 @@ static void ST7920_SWSPI_SND_8BIT(uint8_t val)
     delayMicroseconds(2);
     WRITE(ST7920_DAT_PIN,val&0x80); 
     val<<=1;
-    delayMicroseconds(2);
     WRITE(ST7920_CLK_PIN,1);
+    delayMicroseconds(2);
   }
 }
 
