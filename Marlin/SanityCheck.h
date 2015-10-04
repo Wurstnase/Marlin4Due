@@ -32,14 +32,11 @@
    * Babystepping
    */
   #ifdef BABYSTEPPING
-    #ifdef COREXY
-      #error BABYSTEPPING not implemented for COREXY yet.
-    #endif
     #ifdef SCARA
       #error BABYSTEPPING is not implemented for SCARA yet.
     #endif
-    #if defined(DELTA) && defined(BABYSTEP_XY)
-      #error BABYSTEPPING only implemented for Z axis on deltabots.
+    #if (defined(DELTA) || defined(COREXY)) && defined(BABYSTEP_XY)
+      #error BABYSTEPPING only implemented for Z axis.
     #endif
   #endif
 
