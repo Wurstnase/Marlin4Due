@@ -1408,6 +1408,10 @@ void lcd_init() {
     SET_INPUT(BTN_ENC);
     PULLUP(BTN_ENC,HIGH);
   #endif
+  #if BTN_BACK > 0
+    SET_INPUT(BTN_BACK);
+    PULLUP(BTN_BACK,HIGH);
+  #endif
   #ifdef REPRAPWORLD_KEYPAD
     pinMode(SHIFT_CLK,OUTPUT);
     pinMode(SHIFT_LD,OUTPUT);
