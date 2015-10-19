@@ -25,7 +25,7 @@
 #define Sd2PinMap_h
 
 //Note: use hardware SPI only, soft SPI not supported
-uint8_t const SS_PIN = SS;
+uint8_t const SS_PIN = SDSS;
 uint8_t const MOSI_PIN = MOSI;
 uint8_t const MISO_PIN = MISO;
 uint8_t const SCK_PIN = SCK;
