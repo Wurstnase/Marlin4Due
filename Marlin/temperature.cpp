@@ -835,57 +835,105 @@ void tp_init() {
   for (int e = 0; e < EXTRUDERS; e++) {
     // populate with the first value 
     maxttemp[e] = maxttemp[0];
-    #ifdef PIDTEMP
+    #if ENABLED(PIDTEMP)
       temp_iState_min[e] = 0.0;
       temp_iState_max[e] = PID_INTEGRAL_DRIVE_MAX / PID_PARAM(Ki,e);
     #endif //PIDTEMP
-    #ifdef PIDTEMPBED
+    #if ENABLED(PIDTEMPBED)
       temp_iState_min_bed = 0.0;
       temp_iState_max_bed = PID_BED_INTEGRAL_DRIVE_MAX / bedKi;
     #endif //PIDTEMPBED
   }
 
   #if HAS_HEATER_0
-    //SET_OUTPUT(HEATER_0_PIN);
-    pinMode(HEATER_0_PIN, OUTPUT);    
-    digitalWrite(HEATER_0_PIN, LOW);    
+  //======================================================================
+    #ifdef INVERTED_MOSFET_CHANNELS
+      SET_OUTPUT(HEATER_0_PIN); 
+    #else
+    PIO_Configure(
+                  g_APinDescription[HEATER_0_PIN].pPort,
+                  PIO_OUTPUT_0,
+                  g_APinDescription[HEATER_0_PIN].ulPin,
+                  g_APinDescription[HEATER_0_PIN].ulPinConfiguration ) ;   
+    #endif
+  //======================================================================    
   #endif
   #if HAS_HEATER_1
-    //SET_OUTPUT(HEATER_1_PIN);
-    pinMode(HEATER_1_PIN, OUTPUT);        
-    digitalWrite(HEATER_1_PIN, LOW);   
-       
+  //======================================================================
+    #ifdef INVERTED_MOSFET_CHANNELS
+      SET_OUTPUT(HEATER_1_PIN); 
+    #else
+    PIO_Configure(
+                  g_APinDescription[HEATER_1_PIN].pPort,
+                  PIO_OUTPUT_0,
+                  g_APinDescription[HEATER_1_PIN].ulPin,
+                  g_APinDescription[HEATER_1_PIN].ulPinConfiguration ) ;   
+    #endif
+  //======================================================================  
   #endif
   #if HAS_HEATER_2
-    //SET_OUTPUT(HEATER_2_PIN);
-    pinMode(HEATER_2_PIN, OUTPUT);        
-    digitalWrite(HEATER_2_PIN, LOW);      
+  //======================================================================
+    #ifdef INVERTED_MOSFET_CHANNELS
+      SET_OUTPUT(HEATER_2_PIN); 
+    #else
+    PIO_Configure(
+                  g_APinDescription[HEATER_2_PIN].pPort,
+                  PIO_OUTPUT_0,
+                  g_APinDescription[HEATER_2_PIN].ulPin,
+                  g_APinDescription[HEATER_2_PIN].ulPinConfiguration ) ;   
+    #endif
+  //======================================================================  
   #endif
   #if HAS_HEATER_3
-    //SET_OUTPUT(HEATER_3_PIN);
-    pinMode(HEATER_3_PIN, OUTPUT);        
-    digitalWrite(HEATER_3_PIN, LOW);      
+  //======================================================================
+    #ifdef INVERTED_MOSFET_CHANNELS
+      SET_OUTPUT(HEATER_3_PIN); 
+    #else
+    PIO_Configure(
+                  g_APinDescription[HEATER_3_PIN].pPort,
+                  PIO_OUTPUT_0,
+                  g_APinDescription[HEATER_3_PIN].ulPin,
+                  g_APinDescription[HEATER_3_PIN].ulPinConfiguration ) ;   
+    #endif
+  //======================================================================     
   #endif
   #if HAS_HEATER_BED
-    //SET_OUTPUT(HEATER_BED_PIN);
-    pinMode(HEATER_BED_PIN, OUTPUT);        
-    digitalWrite(HEATER_BED_PIN, LOW);      
+  //======================================================================
+    #ifdef INVERTED_MOSFET_CHANNELS
+      SET_OUTPUT(HEATER_BED_PIN); 
+    #else
+    PIO_Configure(
+                  g_APinDescription[HEATER_BED_PIN].pPort,
+                  PIO_OUTPUT_0,
+                  g_APinDescription[HEATER_BED_PIN].ulPin,
+                  g_APinDescription[HEATER_BED_PIN].ulPinConfiguration ) ;   
+    #endif
+  //======================================================================  
   #endif  
   #if HAS_FAN
-//    SET_OUTPUT(FAN_PIN);
-    pinMode(FAN_PIN, OUTPUT);        
-    digitalWrite(FAN_PIN, LOW);  
-    #ifdef FAST_PWM_FAN
-      setPwmFrequency(FAN_PIN, 1); // No prescaling. Pwm frequency = F_CPU/256/8
+  //======================================================================
+    #ifdef INVERTED_MOSFET_CHANNELS
+      SET_OUTPUT(FAN_PIN); 
+    #else
+    PIO_Configure(
+                  g_APinDescription[FAN_PIN].pPort,
+                  PIO_OUTPUT_0,
+                  g_APinDescription[FAN_PIN].ulPin,
+                  g_APinDescription[FAN_PIN].ulPinConfiguration ) ;   
     #endif
-    #ifdef FAN_SOFT_PWM
-      soft_pwm_fan = 0;//fanSpeedSoftPwm / 2;
+  //======================================================================   
+    #if ENABLED(FAST_PWM_FAN)
+     //analogWrite(FAN_PIN,CALC_FAN_SPEED);
+      //setPwmFrequency(FAN_PIN, 1); // No prescaling. Pwm frequency = F_CPU/256/8
+    #endif
+    #if ENABLED(FAN_SOFT_PWM)
+      soft_pwm_fan = fanSpeedSoftPwm / 2;
     #endif
   #endif
 
-  #ifdef HEATER_0_USES_MAX6675
+  #if ENABLED(HEATER_0_USES_MAX6675)
 
-    #ifndef SDSUPPORT
+    #if DISABLED(SDSUPPORT)
       OUT_WRITE(SCK_PIN, LOW);
       OUT_WRITE(MOSI_PIN, HIGH);
       OUT_WRITE(MISO_PIN, HIGH);
