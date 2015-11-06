@@ -846,27 +846,40 @@ void tp_init() {
   }
 
   #if HAS_HEATER_0
-    SET_OUTPUT(HEATER_0_PIN);
+    //SET_OUTPUT(HEATER_0_PIN);
+    pinMode(HEATER_0_PIN, OUTPUT);    
+    digitalWrite(HEATER_0_PIN, LOW);    
   #endif
   #if HAS_HEATER_1
-    SET_OUTPUT(HEATER_1_PIN);
+    //SET_OUTPUT(HEATER_1_PIN);
+    pinMode(HEATER_1_PIN, OUTPUT);        
+    digitalWrite(HEATER_1_PIN, LOW);   
+       
   #endif
   #if HAS_HEATER_2
-    SET_OUTPUT(HEATER_2_PIN);
+    //SET_OUTPUT(HEATER_2_PIN);
+    pinMode(HEATER_2_PIN, OUTPUT);        
+    digitalWrite(HEATER_2_PIN, LOW);      
   #endif
   #if HAS_HEATER_3
-    SET_OUTPUT(HEATER_3_PIN);
+    //SET_OUTPUT(HEATER_3_PIN);
+    pinMode(HEATER_3_PIN, OUTPUT);        
+    digitalWrite(HEATER_3_PIN, LOW);      
   #endif
   #if HAS_HEATER_BED
-    SET_OUTPUT(HEATER_BED_PIN);
+    //SET_OUTPUT(HEATER_BED_PIN);
+    pinMode(HEATER_BED_PIN, OUTPUT);        
+    digitalWrite(HEATER_BED_PIN, LOW);      
   #endif  
   #if HAS_FAN
-    SET_OUTPUT(FAN_PIN);
+//    SET_OUTPUT(FAN_PIN);
+    pinMode(FAN_PIN, OUTPUT);        
+    digitalWrite(FAN_PIN, LOW);  
     #ifdef FAST_PWM_FAN
       setPwmFrequency(FAN_PIN, 1); // No prescaling. Pwm frequency = F_CPU/256/8
     #endif
     #ifdef FAN_SOFT_PWM
-      soft_pwm_fan = fanSpeedSoftPwm / 2;
+      soft_pwm_fan = 0;//fanSpeedSoftPwm / 2;
     #endif
   #endif
 
@@ -902,13 +915,13 @@ void tp_init() {
       START_BED_TEMP();
     #endif
     #if HAS_TEMP_1
-      START_TEMP(1)
+      START_TEMP(1);
     #endif
     #if HAS_TEMP_2
-      START_TEMP(2)
+      START_TEMP(2);
     #endif
     #if HAS_TEMP_3
-      START_TEMP(3)
+      START_TEMP(3);
     #endif
 
   // Use timer0 for temperature measurement
@@ -1439,7 +1452,7 @@ HAL_TEMP_TIMER_ISR {
 
     case PrepareTemp_1:
       #if HAS_TEMP_1
-        START_TEMP(1)
+        START_TEMP(1);
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_1;
@@ -1453,7 +1466,7 @@ HAL_TEMP_TIMER_ISR {
 
     case PrepareTemp_2:
       #if HAS_TEMP_2
-        START_TEMP(2)
+        START_TEMP(2);
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_2;
@@ -1467,14 +1480,14 @@ HAL_TEMP_TIMER_ISR {
 
     case PrepareTemp_3:
       #if HAS_TEMP_3
-        START_TEMP(3)
+        START_TEMP(3);
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_3;
       break;
     case MeasureTemp_3:
       #if HAS_TEMP_3
-        READ_TEMP(3)
+        READ_TEMP(3);
       #endif
       temp_state = Prepare_FILWIDTH;
       break;
