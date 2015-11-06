@@ -839,33 +839,94 @@ void tp_init() {
       temp_iState_min[e] = 0.0;
       temp_iState_max[e] = PID_INTEGRAL_DRIVE_MAX / PID_PARAM(Ki,e);
     #endif //PIDTEMP
-    #ifdef PIDTEMPBED
+    #ifdef PIDTEMPBED)
       temp_iState_min_bed = 0.0;
       temp_iState_max_bed = PID_BED_INTEGRAL_DRIVE_MAX / bedKi;
     #endif //PIDTEMPBED
   }
 
   #if HAS_HEATER_0
-    SET_OUTPUT(HEATER_0_PIN);
+  //======================================================================
+    #ifdef INVERTED_MOSFET_CHANNELS
+      SET_OUTPUT(HEATER_0_PIN); 
+    #else
+    PIO_Configure(
+                  g_APinDescription[HEATER_0_PIN].pPort,
+                  PIO_OUTPUT_0,
+                  g_APinDescription[HEATER_0_PIN].ulPin,
+                  g_APinDescription[HEATER_0_PIN].ulPinConfiguration ) ;   
+    #endif
+  //======================================================================    
   #endif
   #if HAS_HEATER_1
-    SET_OUTPUT(HEATER_1_PIN);
+  //======================================================================
+    #ifdef INVERTED_MOSFET_CHANNELS
+      SET_OUTPUT(HEATER_1_PIN); 
+    #else
+    PIO_Configure(
+                  g_APinDescription[HEATER_1_PIN].pPort,
+                  PIO_OUTPUT_0,
+                  g_APinDescription[HEATER_1_PIN].ulPin,
+                  g_APinDescription[HEATER_1_PIN].ulPinConfiguration ) ;   
+    #endif
+  //======================================================================  
   #endif
   #if HAS_HEATER_2
-    SET_OUTPUT(HEATER_2_PIN);
+  //======================================================================
+    #ifdef INVERTED_MOSFET_CHANNELS
+      SET_OUTPUT(HEATER_2_PIN); 
+    #else
+    PIO_Configure(
+                  g_APinDescription[HEATER_2_PIN].pPort,
+                  PIO_OUTPUT_0,
+                  g_APinDescription[HEATER_2_PIN].ulPin,
+                  g_APinDescription[HEATER_2_PIN].ulPinConfiguration ) ;   
+    #endif
+  //======================================================================  
   #endif
   #if HAS_HEATER_3
-    SET_OUTPUT(HEATER_3_PIN);
+  //======================================================================
+    #ifdef INVERTED_MOSFET_CHANNELS
+      SET_OUTPUT(HEATER_3_PIN); 
+    #else
+    PIO_Configure(
+                  g_APinDescription[HEATER_3_PIN].pPort,
+                  PIO_OUTPUT_0,
+                  g_APinDescription[HEATER_3_PIN].ulPin,
+                  g_APinDescription[HEATER_3_PIN].ulPinConfiguration ) ;   
+    #endif
+  //======================================================================     
   #endif
   #if HAS_HEATER_BED
-    SET_OUTPUT(HEATER_BED_PIN);
+  //======================================================================
+    #ifdef INVERTED_MOSFET_CHANNELS
+      SET_OUTPUT(HEATER_BED_PIN); 
+    #else
+    PIO_Configure(
+                  g_APinDescription[HEATER_BED_PIN].pPort,
+                  PIO_OUTPUT_0,
+                  g_APinDescription[HEATER_BED_PIN].ulPin,
+                  g_APinDescription[HEATER_BED_PIN].ulPinConfiguration ) ;   
+    #endif
+  //======================================================================  
   #endif  
   #if HAS_FAN
-    SET_OUTPUT(FAN_PIN);
-    #ifdef FAST_PWM_FAN
-      setPwmFrequency(FAN_PIN, 1); // No prescaling. Pwm frequency = F_CPU/256/8
+  //======================================================================
+    #ifdef INVERTED_MOSFET_CHANNELS
+      SET_OUTPUT(FAN_PIN); 
+    #else
+    PIO_Configure(
+                  g_APinDescription[FAN_PIN].pPort,
+                  PIO_OUTPUT_0,
+                  g_APinDescription[FAN_PIN].ulPin,
+                  g_APinDescription[FAN_PIN].ulPinConfiguration ) ;   
     #endif
-    #ifdef FAN_SOFT_PWM
+  //======================================================================   
+    #if ENABLED(FAST_PWM_FAN)
+     //analogWrite(FAN_PIN,CALC_FAN_SPEED);
+      //setPwmFrequency(FAN_PIN, 1); // No prescaling. Pwm frequency = F_CPU/256/8
+    #endif
+    #if ENABLED(FAN_SOFT_PWM)
       soft_pwm_fan = fanSpeedSoftPwm / 2;
     #endif
   #endif
@@ -902,13 +963,13 @@ void tp_init() {
       START_BED_TEMP();
     #endif
     #if HAS_TEMP_1
-      START_TEMP(1)
+      START_TEMP(1);
     #endif
     #if HAS_TEMP_2
-      START_TEMP(2)
+      START_TEMP(2);
     #endif
     #if HAS_TEMP_3
-      START_TEMP(3)
+      START_TEMP(3);
     #endif
 
   // Use timer0 for temperature measurement
@@ -1439,7 +1500,7 @@ HAL_TEMP_TIMER_ISR {
 
     case PrepareTemp_1:
       #if HAS_TEMP_1
-        START_TEMP(1)
+        START_TEMP(1);
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_1;
@@ -1453,7 +1514,7 @@ HAL_TEMP_TIMER_ISR {
 
     case PrepareTemp_2:
       #if HAS_TEMP_2
-        START_TEMP(2)
+        START_TEMP(2);
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_2;
@@ -1467,14 +1528,14 @@ HAL_TEMP_TIMER_ISR {
 
     case PrepareTemp_3:
       #if HAS_TEMP_3
-        START_TEMP(3)
+        START_TEMP(3);
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_3;
       break;
     case MeasureTemp_3:
       #if HAS_TEMP_3
-        READ_TEMP(3)
+        READ_TEMP(3);
       #endif
       temp_state = Prepare_FILWIDTH;
       break;
