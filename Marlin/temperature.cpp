@@ -931,9 +931,9 @@ void tp_init() {
     #endif
   #endif
 
-  #if ENABLED(HEATER_0_USES_MAX6675)
+  #ifdef HEATER_0_USES_MAX6675
 
-    #if DISABLED(SDSUPPORT)
+    #ifndef SDSUPPORT
       OUT_WRITE(SCK_PIN, LOW);
       OUT_WRITE(MOSI_PIN, HIGH);
       OUT_WRITE(MISO_PIN, HIGH);
