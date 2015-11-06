@@ -835,11 +835,11 @@ void tp_init() {
   for (int e = 0; e < EXTRUDERS; e++) {
     // populate with the first value 
     maxttemp[e] = maxttemp[0];
-    #if ENABLED(PIDTEMP)
+    #ifdef PIDTEMP
       temp_iState_min[e] = 0.0;
       temp_iState_max[e] = PID_INTEGRAL_DRIVE_MAX / PID_PARAM(Ki,e);
     #endif //PIDTEMP
-    #if ENABLED(PIDTEMPBED)
+    #ifdef PIDTEMPBED)
       temp_iState_min_bed = 0.0;
       temp_iState_max_bed = PID_BED_INTEGRAL_DRIVE_MAX / bedKi;
     #endif //PIDTEMPBED
