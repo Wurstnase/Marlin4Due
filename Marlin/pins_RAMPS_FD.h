@@ -5,7 +5,7 @@
 ****************************************************************************************/
 
 //
-#ifdef MB(RAMPS_FD_V1)
+#if MB(RAMPS_FD_V1)
   #define INVERTED_HEATER_PINS
   #define INVERTED_MOSFET_CHANNELS
    //WARNING:If you have a RAMPS_FD_V1 modded for bugfix (same http://forums.reprap.org/read.php?219,424146,507810), you must use RAMPS_FD_V2 configuration 
