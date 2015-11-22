@@ -56,7 +56,7 @@ static inline void digitalFastWrite(int pin, bool v) {
 
 #define _FASTREAD(IO) ((bool)(DIO ## IO ## _WPORT -> PIO_PDSR & (MASK(DIO ## IO ## _PIN))))
 
-#define _FASTWRITE(IO, v) do {  if (v) {DIO ## IO ## _WPORT -> PIO_SODR |= MASK(DIO ## IO ##_PIN); } \
+#define _FASTWRITE(IO, v) do {  if (v) {DIO ## IO ## _WPORT -> PIO_SODR = MASK(DIO ## IO ##_PIN); } \
                                 else {DIO ##  IO ## _WPORT -> PIO_CODR = MASK(DIO ## IO ## _PIN); }; \
                           } while (0)
 

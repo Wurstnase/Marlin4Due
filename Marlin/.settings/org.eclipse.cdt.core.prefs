@@ -16,7 +16,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.CORE.PATH/value=${A.RUNTIME.PLATFORM.PATH}/cores/${A.BUILD.CORE}
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.CORE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.CORE/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.CORE/value=arduino
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.CORE/value=${JANTJE.BUILD_CORE}
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.EXTRA_FLAGS/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.EXTRA_FLAGS/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.EXTRA_FLAGS/value=-D__SAM3X8E__ -mthumb ${A.BUILD.USB_FLAGS}
@@ -61,7 +61,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.VARIANT.PATH/value=${A.RUNTIME.PLATFORM.PATH}/variants/${A.BUILD.VARIANT}
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.VARIANT/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.VARIANT/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.VARIANT/value=arduino_due_x
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.VARIANT/value=${JANTJE.BUILD_VARIANT}
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.VARIANT_SYSTEM_LIB/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.VARIANT_SYSTEM_LIB/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.BUILD.VARIANT_SYSTEM_LIB/value=libsam_sam3x8e_gcc_rel.a
@@ -148,13 +148,13 @@ environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.CONFIG
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.CONFIG.PATH/value=${A.TOOLS.BOSSAC.CONFIG.PATH}
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.DTS/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.DTS/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.DTS/value=3600
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.DTS/value=0
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.LOCAL/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.LOCAL/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.LOCAL/value=1438111095
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.LOCAL/value=1448179432
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.UTC/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.UTC/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.UTC/value=1438103895
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.UTC/value=1448175832
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.ZONE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.ZONE/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.EXTRA.TIME.ZONE/value=3600
@@ -265,7 +265,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.TOOLS.
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.TOOLS.BOSSAC.UPLOAD.PARAMS.VERBOSE/value=-i -d
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.TOOLS.BOSSAC.UPLOAD.PATTERN/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.TOOLS.BOSSAC.UPLOAD.PATTERN/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.TOOLS.BOSSAC.UPLOAD.PATTERN/value="${A.PATH}/${A.CMD}" ${A.UPLOAD.VERBOSE} --port\=${A.SERIAL.PORT.FILE} -U ${A.UPLOAD.NATIVE_USB} -e -w -v -b "${A.BUILD.PATH}/${A.BUILD.PROJECT_NAME}.bin" -R
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.TOOLS.BOSSAC.UPLOAD.PATTERN/value="${A.PATH}/${A.CMD}" ${A.UPLOAD.VERBOSE} --port\=${A.SERIAL.PORT.FILE} -U ${A.UPLOAD.NATIVE_USB} -e -w -b "${A.BUILD.PATH}/${A.BUILD.PROJECT_NAME}.bin" -R
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.UPLOAD.MAXIMUM_SIZE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.UPLOAD.MAXIMUM_SIZE/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/A.UPLOAD.MAXIMUM_SIZE/value=524288
@@ -302,6 +302,12 @@ environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.B
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.BOARD_NAME/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.BOARD_NAME/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.BOARD_NAME/value=Arduino Due (Programming Port)
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.BUILD_CORE/delimiter=\:
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.BUILD_CORE/operation=replace
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.BUILD_CORE/value=arduino
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.BUILD_VARIANT/delimiter=\:
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.BUILD_VARIANT/operation=replace
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.BUILD_VARIANT/value=arduino_due_x
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.COM_PORT/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.COM_PORT/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.COM_PORT/value=/dev/ttyACM0
@@ -326,6 +332,9 @@ environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.P
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.Processor/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.Processor/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.Processor/value=
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.REFERENCED_PLATFORM_FILE/delimiter=\:
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.REFERENCED_PLATFORM_FILE/operation=replace
+environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.REFERENCED_PLATFORM_FILE/value=
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.SIZE.SWITCH/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.SIZE.SWITCH/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.826016723/JANTJE.SIZE.SWITCH/value=${A.RECIPE.SIZE.PATTERN}
