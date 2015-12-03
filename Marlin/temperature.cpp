@@ -902,13 +902,13 @@ void tp_init() {
       START_BED_TEMP();
     #endif
     #if HAS_TEMP_1
-      START_TEMP(1)
+      START_TEMP(1);
     #endif
     #if HAS_TEMP_2
-      START_TEMP(2)
+      START_TEMP(2);
     #endif
     #if HAS_TEMP_3
-      START_TEMP(3)
+      START_TEMP(3);
     #endif
 
   // Use timer0 for temperature measurement
@@ -1439,7 +1439,7 @@ HAL_TEMP_TIMER_ISR {
 
     case PrepareTemp_1:
       #if HAS_TEMP_1
-        START_TEMP(1)
+        //START_TEMP(1)
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_1;
@@ -1453,7 +1453,7 @@ HAL_TEMP_TIMER_ISR {
 
     case PrepareTemp_2:
       #if HAS_TEMP_2
-        START_TEMP(2)
+        //START_TEMP(2)
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_2;
@@ -1467,14 +1467,14 @@ HAL_TEMP_TIMER_ISR {
 
     case PrepareTemp_3:
       #if HAS_TEMP_3
-        START_TEMP(3)
+        //START_TEMP(3)
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_3;
       break;
     case MeasureTemp_3:
       #if HAS_TEMP_3
-        READ_TEMP(3)
+        READ_TEMP(3);
       #endif
       temp_state = Prepare_FILWIDTH;
       break;
