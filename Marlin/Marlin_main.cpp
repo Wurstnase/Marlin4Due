@@ -676,7 +676,7 @@ void setup() {
   st_init();    // Initialize stepper, this enables interrupts!
   setup_photpin();
   servo_init();
-  init_fsr_values();
+  //init_fsr_values();
 
   #if HAS_CONTROLLERFAN
     SET_OUTPUT(CONTROLLERFAN_PIN); //Set pin used for driver cooling fan
@@ -5085,7 +5085,7 @@ inline void gcode_M907() {
 #endif // HAS_MICROSTEPS
 
 inline void gcode_M800() {
-	SERIAL_ECHOLN(get_fsr_value());
+	//SERIAL_ECHOLN(get_fsr_value());
 }
 
 /**
@@ -6442,7 +6442,7 @@ void idle() {
   manage_heater();
   manage_inactivity();
   lcd_update();
-  get_fsr_value();
+  //get_fsr_value();
 }
 
 /**
