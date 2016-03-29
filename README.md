@@ -2,11 +2,9 @@
 <img align="right" src="Documentation/Logo/Marlin%20Logo%20GitHub.png" />
 
 ### Story about Marlin 32bit
-Some time ago bobc started with this port. After some time sadly he stopped with the development. So I started to take his work and try to make some small modifications. After a couple of weeks I found the most importent things which speed up my new fork. Thanks to bobc for this great work! I'm not a professional programmer and without bobc I couldn't do that.
+Story is currently over. I will not make any new updates. Maybe you could try other forks or take this work and make your own update. There were a lot of guys how take this and make their own version. 
 
-Also a big thanks to all Marlin8bit-developers. Keep on working.
-
-A big thanks to Repetier, great guy, great firmware!
+Thanks again to bobc even if he was unlucky when I've started with this.
 
 *Wurstnase*
 
@@ -50,7 +48,6 @@ This firmware is a mashup between [Sprinter](https://github.com/kliment/Sprinter
 The current Marlin4Due dev team consists of:
 
  - Nico [@wurstnase]
- - Tim Dawson [@tadawson]
 
 ## Donation
 
@@ -65,5 +62,3 @@ More features have been added by:
 
 Marlin is published under the [GPL license](/Documentation/COPYING.md) because We believe in open development.
 Do not use this code in products (3D printers, CNC etc) that are closed source or are crippled by a patent.
-
-Marlin4Due [![Flattr Marlin4Due](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=Wurstnase&url=https%3A%2F%2Fgithub.com%2FWurstnase%2FMarlin4Due) MarlinFirmware [![Flattr MarlinFirmware](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=ErikZalm&url=https://github.com/MarlinFirmware/Marlin&title=Marlin&language=&tags=github&category=software)
