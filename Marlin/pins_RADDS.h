@@ -160,12 +160,13 @@
 
 // SPI for Max6675 Thermocouple
 
-//works with radds??? #ifndef SDSUPPORT
-//// these pins are defined in the SD library if building with SD support
-//  #define MAX_SCK_PIN          52
-//  #define MAX_MISO_PIN         50
-//  #define MAX_MOSI_PIN         51
-//  #define MAX6675_SS       53
-//#else
-//  #define MAX6675_SS       49
-//#endif
+//Extruder 1
+  #define MAX_SCLK_PIN 27
+  #define MAX_CS_PIN   29
+  #define MAX_MISO_PIN 31
+  
+//Extruder 2
+  #define MAX_SCLK1_PIN 33
+  #define MAX_CS1_PIN   35
+  #define MAX_MISO1_PIN 37
+

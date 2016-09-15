@@ -360,7 +360,9 @@
     #define HEATER_0_USES_THERMISTOR
   #endif
 
-  #if TEMP_SENSOR_1 == -1
+  #if TEMP_SENSOR_1 == -2
+    #define HEATER_1_USES_MAX6675
+  #elif TEMP_SENSOR_1 == -1
     #define HEATER_1_USES_AD595
   #elif TEMP_SENSOR_1 == 0
     #undef HEATER_1_MINTEMP

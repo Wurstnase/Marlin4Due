@@ -109,7 +109,7 @@ Here are some standard links for getting your machine calibrated:
 //--NORMAL IS 4.7kohm PULLUP!-- 1kohm pullup can be used on hotend sensor, using correct resistor and table
 //
 //// Temperature sensor settings:
-// -2 is thermocouple with MAX6675 (only for sensor 0)
+// -2 is thermocouple with MAX6675 (only for sensor 0 or sensor 1)
 // -1 is thermocouple with AD595
 // 0 is not used
 // 1 is 100k thermistor - best choice for EPCOS 100k (4.7k pullup)
